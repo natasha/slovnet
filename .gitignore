@@ -1,0 +1,11 @@
+.DS_Store
+.cache/
+.coverage
+*.egg-info/
+*.pyc
+__pycache__
+.ipynb_checkpoints
+.pytest_cache/
+build/
+dist/
+notes
