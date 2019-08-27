@@ -8,6 +8,7 @@ from .bio import (
 
 
 UNK = '<unk>'
+PAD = '<pad>'
 
 
 class Vocab(Record):
@@ -21,6 +22,7 @@ class Vocab(Record):
             for id, item in enumerate(self.items)
         }
         self.unk_id = self.item_ids.get(UNK)
+        self.pad_id = self.item_ids.get(PAD)
 
     def encode(self, item):
         return self.item_ids.get(item, self.unk_id)
