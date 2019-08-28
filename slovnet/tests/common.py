@@ -9,4 +9,5 @@ def relative_path(*parts):
     return join_path(dirname(__file__), *parts)
 
 
+NAVEC = relative_path('data', 'navec.tar')
 NERUS = relative_path('data', 'nerus.tar.gz')

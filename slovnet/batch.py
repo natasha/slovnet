@@ -37,7 +37,7 @@ class Batch(Record):
 
     @classmethod
     def from_token_encoder(cls, ids):
-        # ids  [feats1, feats2]
+        # ids  [feats1, feats2, ...]
         input = [torch.LongTensor([_]) for _ in ids]
         return cls(input, target=None)
 

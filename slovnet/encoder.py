@@ -130,7 +130,7 @@ class BatchEncoder(Encoder):
 
     def tokenize(self, markups):
         for markup in markups:
-            markup = markup.tag(self.tokenizer)
+            markup = markup.to_tag(self.tokenizer)
             for pair in markup.pairs:
                 yield pair
 

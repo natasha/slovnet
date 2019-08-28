@@ -90,11 +90,11 @@ class MarkupScore(Record):
 
 
 class BatchScore(MarkupScore):
-    __attributes__ = ['loss', 'tags']
+    __attributes__ = ['loss', 'types']
 
-    def __init__(self, loss, tags=None):
+    def __init__(self, loss, types=None):
         self.loss = loss
-        super(BatchScore, self).__init__(tags)
+        super(BatchScore, self).__init__(types)
 
 
 def eval_tags_type(preds, targets, type):
