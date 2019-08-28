@@ -1,2 +1,2 @@
-numpy
-navec
+numpy>=1.16.0
+navec>=0.6.0
