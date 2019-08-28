@@ -1,7 +1,7 @@
 
 from itertools import islice
 
-from nerus import load_norm
+from nerus.load import load_norm
 
 from .record import Record
 from .markup import SpanMarkup
