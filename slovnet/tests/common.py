@@ -10,4 +10,4 @@ def relative_path(*parts):
 
 
 NAVEC = relative_path('data', 'navec.tar')
-NERUS = relative_path('data', 'nerus.tar.gz')
+NERUS = relative_path('data', 'nerus.jsonl.gz')
