@@ -39,11 +39,11 @@ from slovnet.eval import (
     eval_batches,
     avg_batch_scores
 )
-from slovnet.tagger import Tagger
+from slovnet.tagger import NERTagger
 
 from slovnet.infer.impl import NavecEmbedding as InferNavecEmbedding
 from slovnet.infer.pack import Pack
-from slovnet.infer.tagger import Tagger as InferTagger
+from slovnet.infer.tagger import NERTagger as InferNERTagger
 
 from .common import (
     NERUS,
@@ -142,7 +142,7 @@ def test_integration(tmpdir):
     test_board.add_batch_score(score)
 
     ner_model.eval()
-    tagger = Tagger(
+    tagger = NERTagger(
         tokenizer,
         token_encoder,
         tags_vocab,
@@ -159,7 +159,7 @@ def test_integration(tmpdir):
     pack.context.navec = InferNavecEmbedding.from_navec(navec)
     ner_model = pack.scheme.to_impl(pack.context)
 
-    tagger = InferTagger(
+    tagger = InferNERTagger(
         tokenizer,
         token_encoder,
         tags_vocab,

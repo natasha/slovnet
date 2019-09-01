@@ -7,7 +7,7 @@ from .markup import SpanMarkup
 from .batch import Batch
 
 
-class Tagger(Record):
+class NERTagger(Record):
     __attributes__ = ['tokenizer', 'token_encoder', 'tags_vocab', 'model', 'device']
 
     def __init__(self, tokenizer, token_encoder, tags_vocab, model, device):
