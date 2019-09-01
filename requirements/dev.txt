@@ -1,6 +1,6 @@
-torch>=1.2.0
-matplotlib
-tqdm
+torch>=1.1.0
+matplotlib>=3.0.2
+tqdm>=4.19.7
 
 navec>=0.6.0
 nerus>=1.4.0
