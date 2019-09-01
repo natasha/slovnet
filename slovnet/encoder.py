@@ -10,7 +10,6 @@ from .chop import (
     chop,
     chop_equal
 )
-from .batch import Batch
 from .markup import TagMarkup
 
 
@@ -149,6 +148,9 @@ class BatchEncoder(Encoder):
             yield item
 
     def encode(self, groups):
+        # uses torch, not needed in infer
+        from .batch import Batch
+
         for group in groups:
             ids = self.markup_encoder.map(group)
             yield Batch.from_markup_encoder(ids)
