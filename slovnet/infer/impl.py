@@ -97,12 +97,13 @@ class Conv1d(Module):
             [(0, 0), (0, 0), (self.padding, self.padding)],
             mode='constant', constant_values=0
         )
+        input = np.ascontiguousarray(input)
 
-        batch_size, in_dim, seq_size = input.shape
+        batch_size, in_dim, seq_len = input.shape
         batch_stride, in_stride, seq_stride = input.strides
         unit_stride = input.data.itemsize
         filters_count, in_dim, kernel_size = self.weight.shape
-        windows_count = seq_size - kernel_size + 1
+        windows_count = seq_len - kernel_size + 1
 
         # populate conv windows
         windows = np.ndarray(
