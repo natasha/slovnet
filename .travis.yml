@@ -1,0 +1,11 @@
+language: python
+python:
+  # - "2.7"  # drop support for now
+  - "3.5"
+  - "3.6"
+  # - "pypy"  # problems with installing numpy
+  # - "pypy3"
+install:
+  pip install -r requirements/main.txt -r requirements/test.txt
+script:
+  - make ci
