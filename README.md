@@ -17,7 +17,7 @@ $ pip install slovnet
 
 ## Usage
 
-Download <a href="https://github.com/natasha/navec#downloads">news Navec embeddings</a> and <a href="#downloads">SlovNet NER model</a>:
+Download <a href="https://github.com/natasha/navec#downloads">news Navec embeddings</a> and <a href="#downloads">SlovNet news NER model</a>:
 
 ```python
 >>> from navec import Navec
@@ -88,9 +88,22 @@ LOC                                LOC---
 
 ## Downloads
 
-<a href="">slovnet_ner_v1.tar</a> 1.5 MB
+<a href="https://github.com/natasha/slovnet/releases/download/v0.0.0/slovnet_ner_v1.tar">slovnet_ner_v1.tar</a> 1.5 MB
 
 ## Evaluation
+
+4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus">Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>.
+
+`slovnet` is compared to:
+
+* `deeppavlov` — biLSTM + CRF by DeepPavlov, see <a href="https://arxiv.org/pdf/1709.09686.pdf">their 2017 paper</a> for more.
+* `deeppavlov_bert` — BERT based NER, current SOTA for Russian language, see <a href="https://www.youtube.com/watch?v=eKTA8i8s-zs">video presentation</a> describing the approach.
+* <a href="http://pullenti.ru/">`pullenti`</a> — first place on factRuEval-2016, super sophisticated ruled based system.
+* <a href="https://texterra.ispras.ru">`texterra`</a> — multifunctional NLP solution by <a href="https://www.ispras.ru/">ISP RAS</a>, NER is one of the features.
+* <a href="https://github.com/yandex/tomita-parser/">`tomita`</a> — GLR-parser by Yandex, only grammars for `PER` are publicly available.
+* <a href="https://github.com/mit-nlp/MITIE">`mitie`</a> — engine developed at MIT + <a href="http://lang.org.ua/en/models/">third party model for Russian language</a>.
+
+For every column top 3 results are highlighted. In each case `slovnet` and `deeppavlov_bert` are 5-10% better then other systems:
 
 <table border="0" class="dataframe">
   <thead>
@@ -218,6 +231,11 @@ LOC                                LOC---
   </tbody>
 </table>
 
+* `init` — time between system launch and first response. It is convenient for testing and devops to have model that starts quickly. `deeppavlov_bert` and `texterra` take >30 sec to start, `slovnet` takes just ~1 sec.
+* `disk` — file size of artefacts one needs to download before using the system: model weights, embeddings, binaries, vocabs. It is inconvenient to deploy large models in production. `deeppavlov` models require >1 GB download, `slovnet` is just 30 MB including embeddings.
+* `ram` — average memory consumption. `deeppavlov` systems and `texterra` are memory heavy, `slovnet` consumes ~200 MB of RAM.
+* `speed` — number of news articles processed per second, one article is ~1 KB of text. `deeppavlov` systems process texts in batches on GPU, but they are still slover than `tomita`, `mitie` and `slovnet` that run on single CPU.
+
 <table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -283,9 +301,9 @@ LOC                                LOC---
 
 ## License
 
-Source code of `navec` is distributed under MIT license (allows modification and commercial usage)
+Source code of `slovnet` is distributed under MIT license (allows modification and commercial usage)
 
 ## Support
 
 - Chat — https://telegram.me/natural_language_processing
-- Issues — https://github.com/natasha/navec/issues
+- Issues — https://github.com/natasha/slovnet/issues
