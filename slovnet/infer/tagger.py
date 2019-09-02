@@ -40,7 +40,7 @@ class NERTagger(Record):
         input = [np.array([_]) for _ in ids]
 
         pred = self.model(input)
-        pred = pred.squeeze()
+        pred = pred.squeeze(0)
         pred = pred.tolist()
 
         tags = [self.tags_vocab.decode(_) for _ in pred]
