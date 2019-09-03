@@ -1,5 +1,5 @@
 
-<img src="i/logo.svg" height="75">
+<img src="https://github.com/natasha/natasha-logos/blob/master/slovnet.svg">
 
 [![Build Status](https://travis-ci.org/natasha/slovnet.svg?branch=master)](https://travis-ci.org/natasha/slovnet)
 
