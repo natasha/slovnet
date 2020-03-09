@@ -1,7 +1,7 @@
 
 from slovnet.chop import (
     chop,
-    chop_equal
+    chop_fill
 )
 
 
@@ -11,11 +11,11 @@ def test_chop():
     assert etalon == list(guess)
 
 
-def test_chop_equal():
-    guess = chop_equal(range(10), 3)
+def test_chop_fill():
+    guess = chop_fill(range(10), 3)
     etalon = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [7, 8, 9]]
     assert etalon == list(guess)
 
-    guess = chop_equal(range(3), 5)
+    guess = chop_fill(range(3), 5)
     etalon = [[0, 1, 2, 0, 1]]
     assert etalon == list(guess)

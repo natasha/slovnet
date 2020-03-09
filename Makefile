@@ -15,5 +15,11 @@ upload:
 	twine upload dist/*
 
 clean:
-	find . -name '*.pyc' -not -path '*/__pycache__/*' -o -name .DS_Store | xargs rm
-	rm -rf dist build *.egg-info coverage.xml
+	find . \
+		-name '*.pyc' \
+		-o -name __pycache__ \
+		-o -name .DS_Store \
+		| xargs rm -rf
+
+	rm -rf dist/ build/ .pytest_cache/ .cache/ .ipynb_checkpoints/ \
+		*.egg-info coverage.xml .coverage

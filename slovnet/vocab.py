@@ -9,11 +9,13 @@ from .bio import (
 
 UNK = '<unk>'
 PAD = '<pad>'
+CLS = '<cls>'
+SEP = '<sep>'
+MASK = '<mask>'
 
 
 class Vocab(Record):
     __attributes__ = ['items']
-    __hide_repr__ = True
 
     def __init__(self, items):
         self.items = items
@@ -34,16 +36,18 @@ class Vocab(Record):
         return len(self.items)
 
     def __repr__(self):
-        if self.__hide_repr__:
-            name = self.__class__.__name__
-            return '%s(items=[...])' % name
-        return super(Vocab, self).__repr__()
+        return '%s(items=[...])' % self.__class__.__name__
 
     def _repr_pretty_(self, printer, cycle):
-        if self.__hide_repr__:
-            printer.text(repr(self))
-        else:
-            super(Vocab, self)._repr_pretty_(printer, cycle)
+        printer.text(repr(self))
+
+
+class BERTVocab(Vocab):
+    def __init__(self, items):
+        super(BERTVocab, self).__init__(items)
+        self.sep_id = self.item_ids[SEP]
+        self.cls_id = self.item_ids[CLS]
+        self.mask_id = self.item_ids[MASK]
 
 
 class WordsVocab(Vocab):

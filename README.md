@@ -5,8 +5,6 @@
 
 SlovNet is a Python library for deep-learning based NLP modeling for Russian language. Library is integrated with other <a href="https://github.com/natasha/">Natasha</a> projects: <a href="https://github.com/natasha/nerus">large NER corpus</a> and <a href="https://github.com/natasha/navec">compact Russian embeddings</a>. SlovNet provides high quality practical model for Russian NER, it is 1-2% worse than current BERT SOTA by DeepPavlov but 60 times smaller in size (~30 MB) and works fast on CPU (~30 news articles/sec), see <a href="#evaluation">evaluation section</a> for more.
 
-</table>
-
 ## Install
 
 During inference `slovnet` depends only on `numpy`. Library supports Python 2.7+, 3.4+ и PyPy 3. PyPy 2 is excluded since it is hard to install `numpy` for PyPy 2.
@@ -307,3 +305,22 @@ Source code of `slovnet` is distributed under MIT license (allows modification a
 
 - Chat — https://telegram.me/natural_language_processing
 - Issues — https://github.com/natasha/slovnet/issues
+
+## Development
+
+Rent GPU:
+
+```bash
+vast search offers | grep '1 x  RTX 2080 Ti'
+vast create instance 474463 --image alexkuk/my-vast --disk 20
+vast destroy instance 482511
+watch vast show instances
+
+ssh -Nf vast -L 8888:localhost:8888 -L 6006:localhost:6006
+http://localhost:8888/
+http://localhost:6006
+
+rsync --exclude data --exclude notes -rv . vast:~/slovnet
+rsync -u --exclude data --exclude runs -rv 'vast:~/slovnet/*' .
+
+```

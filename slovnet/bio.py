@@ -5,8 +5,6 @@ from .span import Span
 B = 'B'
 I = 'I'
 O = 'O'
-E = 'E'
-S = 'S'
 
 PER = 'PER'
 LOC = 'LOC'

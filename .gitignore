@@ -3,10 +3,10 @@
 .coverage
 *.egg-info/
 *.pyc
-__pycache__
-.ipynb_checkpoints
+__pycache__/
+.ipynb_checkpoints/
 .pytest_cache/
 build/
 dist/
-notes
-data
+notes/
+data/

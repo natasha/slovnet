@@ -11,7 +11,15 @@ def chop(items, size):
         yield buffer
 
 
-def chop_equal(items, size):
+def chop_drop(items, size):
+    chunks = chop(items, size)
+    for chunk in chunks:
+        if len(chunk) < size:
+            continue
+        yield chunk
+
+
+def chop_fill(items, size):
     previous = None
     chunks = chop(items, size)
     for chunk in chunks:

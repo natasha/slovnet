@@ -1,3 +1,0 @@
--r requirements/main.txt
--r requirements/dev.txt
--r requirements/test.txt

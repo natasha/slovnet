@@ -44,11 +44,7 @@ class TagMarkup(Markup):
     def pairs(self):
         return zip(self.tokens, self.tags)
 
-    @classmethod
-    def from_pairs(cls, pairs):
-        tokens = []
-        tags = []
-        for token, tag in pairs:
-            tokens.append(token)
-            tags.append(tag)
-        return cls(tokens, tags)
+    def to_span(self):
+        text = join_tokens(self.tokens)
+        spans = list(bio_spans(self.tokens, self.tags))
+        return SpanMarkup(text, spans)
