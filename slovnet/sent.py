@@ -1,6 +1,8 @@
 
 import re
 
+from razdel import sentenize as sentenize_
+
 from .record import Record
 from .span import (
     envelop_spans,
@@ -26,8 +28,6 @@ def split_lines(text):
 
 
 def sentenize(text):
-    from razdel import sentenize as sentenize_
-
     for line in split_lines(text):
         for sent in sentenize_(line.text):
             if not sent.text:  # '\n\t\n' for example

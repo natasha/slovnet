@@ -7,4 +7,4 @@ def load_model(model, path):
 
 
 def dump_model(model, path):
-    torch.save(model.cpu().state_dict(), path)
+    torch.save(model.state_dict(), path)

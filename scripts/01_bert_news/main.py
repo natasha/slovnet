@@ -1,7 +1,7 @@
 
 import re
 from os import listdir, makedirs
-from os.path import exists, dirname, join
+from os.path import exists, join, expanduser
 from random import seed, shuffle
 
 from tqdm.notebook import tqdm as log_progress
@@ -23,11 +23,10 @@ from slovnet.io import (
     load_lines,
     dump_lines
 )
-from slovnet.env import Env
-from slovnet.s3 import s3_client
-from slovnet.device import get_device
+from slovnet.s3 import S3
 from slovnet.board import Board
 from slovnet.loop import every
+from slovnet.const import CUDA0
 
 from slovnet.model.state import (
     load_model as load_submodel,
@@ -46,10 +45,41 @@ from slovnet.score import (
     MLMScoreMeter,
     score_mlm_batch as score_batch
 )
-from slovnet.loss import flatten_cross_entropy
+from slovnet.loss import flatten_cross_entropy as criterion
 
 
-env = Env.from_file()
+#######
+#
+#  PARTS
+#
+#####
+
+
+PARTS = ['emb', 'encoder', 'mlm']
+
+
+def load_model(model, parts=PARTS):
+    for part in parts:
+        load_submodel(
+            getattr(model, part),
+            'model/%s.pt' % part
+        )
+
+
+def dump_model(model, parts=PARTS):
+    for part in parts:
+        dump_submodel(
+            getattr(model, part),
+            'model/%s.pt' % part
+        )
+
+
+def upload_model(s3, parts=PARTS):
+    for part in parts:
+        s3.upload(
+            'model/%s.pt' % part,
+            '01_bert_news/model/%s.pt' % part
+        )
 
 
 ########
@@ -77,42 +107,3 @@ def infer_batches(model, criterion, batches):
         for batch in batches:
             yield process_batch(model, criterion, batch)
     model.train(training)
-
-
-########
-#
-#   S3
-#
-######
-
-
-s3 = s3_client(env.s3_key_id, env.s3_key)
-
-
-def upload(path):
-    s3.upload_file(path, env.s3_bucket, join('01_bert_news', path))
-
-
-def download(path):
-    makedirs(dirname(path), exist_ok=True)
-    s3.download_file(env.s3_bucket, join('01_bert_news', path), path)
-
-
-########
-#
-#  STATE
-#
-#######
-
-
-def load_model(model, dir='model'):
-    load_submodel(model.emb, join(dir, 'emb.pt'))
-    load_submodel(model.encoder, join(dir, 'encoder.pt'))
-    load_submodel(model.mlm, join(dir, 'mlm.pt'))
-
-
-def dump_model(model, dir='model'):
-    makedirs(dir, exist_ok=True)
-    dump_submodel(model.emb, join(dir, 'emb.pt'))
-    dump_submodel(model.encoder, join(dir, 'encoder.pt'))
-    dump_submodel(model.mlm, join(dir, 'mlm.pt'))

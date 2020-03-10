@@ -1,9 +1,8 @@
 
 from .record import Record
-from .bio import spans_bio
-from .sent import (
-    sentenize,
-    sent_spans
+from .bio import (
+    spans_bio,
+    bio_spans
 )
 
 
@@ -18,19 +17,10 @@ class SpanMarkup(Markup):
         self.text = text
         self.spans = spans
 
-    @property
-    def sents(self):
-        for sent in sentenize(self.text):
-            spans = sent_spans(sent, self.spans)
-            yield SpanMarkup(
-                sent.text,
-                list(spans)
-            )
-
-    def to_tag(self, tokenizer):
+    def to_bio(self, tokenizer):
         tokens = list(tokenizer(self.text))
         tags = list(spans_bio(tokens, self.spans))
-        return TagMarkup(tokens, tags)
+        return BIOMarkup(tokens, tags)
 
 
 class TagMarkup(Markup):
@@ -44,7 +34,28 @@ class TagMarkup(Markup):
     def pairs(self):
         return zip(self.tokens, self.tags)
 
+    @classmethod
+    def from_pairs(cls, pairs):
+        tokens, tags = [], []
+        for token, tag in pairs:
+            tokens.append(token)
+            tags.append(tag)
+        return cls(tokens, tags)
+
+
+def tokens_text(tokens, fill=' '):
+    previous = None
+    parts = []
+    for token in tokens:
+        if previous:
+            parts.append(fill * (token.start - previous.stop))
+        parts.append(token.text)
+        previous = token
+    return ''.join(parts)
+
+
+class BIOMarkup(TagMarkup):
     def to_span(self):
-        text = join_tokens(self.tokens)
+        text = tokens_text(self.tokens)
         spans = list(bio_spans(self.tokens, self.tags))
         return SpanMarkup(text, spans)

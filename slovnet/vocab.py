@@ -60,17 +60,13 @@ class ShapesVocab(Vocab):
     pass
 
 
-def type_tags(types):
-    yield O
-    for type in types:
-        for part in [B, I]:
-            yield format_bio(part, type)
-
-
-class TagsVocab(Vocab):
-    __hide_repr__ = False
-
+class NERTagsVocab(Vocab):
     def __init__(self, types):
         self.types = types
-        items = list(type_tags(types))
-        super(TagsVocab, self).__init__(items)
+
+        items = [PAD, O]
+        for type in types:
+            for part in [B, I]:
+                items.append(format_bio(part, type))
+
+        super(NERTagsVocab, self).__init__(items)
