@@ -297,10 +297,6 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
   </tbody>
 </table>
 
-## License
-
-Source code of `slovnet` is distributed under MIT license (allows modification and commercial usage)
-
 ## Support
 
 - Chat — https://telegram.me/natural_language_processing
@@ -312,15 +308,24 @@ Rent GPU:
 
 ```bash
 vast search offers | grep '1 x  RTX 2080 Ti'
-vast create instance 474463 --image alexkuk/my-vast --disk 20
-vast destroy instance 482511
+vast create instance 420232 --image alexkuk/my-vast --disk 20
+vast destroy instance 488468
 watch vast show instances
 
 ssh -Nf vast -L 8888:localhost:8888 -L 6006:localhost:6006
-http://localhost:8888/
-http://localhost:6006
+http://localhost:8888/notebooks/
+http://localhost:6006/
 
+scp ~/.slovnet.json vast:~
 rsync --exclude data --exclude notes -rv . vast:~/slovnet
 rsync -u --exclude data --exclude runs -rv 'vast:~/slovnet/*' .
+
+```
+
+Intall dev:
+
+```bash
+pip3 install -e slovnet
+pip3 install -r slovnet/requirements/dev.txt
 
 ```

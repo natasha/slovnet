@@ -2,7 +2,7 @@
 from random import shuffle
 
 
-class ShuffleBuffer(Buffer):
+class ShuffleBuffer:
     def __init__(self, cap):
         self.cap = cap
         self.reset()
@@ -22,3 +22,12 @@ class ShuffleBuffer(Buffer):
         for item in self.buffer:
             yield item
         self.reset()
+
+    def map(self, items):
+        for item in items:
+            self.append(item)
+            if self.is_full:
+                for item in self.flush():
+                    yield item
+        for item in self.flush():
+            yield item

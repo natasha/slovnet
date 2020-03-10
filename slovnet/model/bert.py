@@ -1,5 +1,7 @@
 
+import torch
 from torch import nn
+from torch.nn import functional as F
 
 from slovnet.record import Record
 
@@ -33,7 +35,7 @@ class BERTEmbedding(nn.Module):
         self.drop = nn.Dropout(dropout)
 
     def __call__(self, word_id, position_id):
-        emb =  self.word(word_id) + self.position(position_id)
+        emb = self.word(word_id) + self.position(position_id)
         emb = self.norm(emb)
         return self.drop(emb)
 
@@ -62,7 +64,7 @@ class BERTEncoder(nn.Module):
             )
             for _ in range(layers_num)
         ])
-        
+
     def forward(self, input):
         input = input.transpose(0, 1)  # torch expects seq x batch x emb
         for layer in self.layers:
@@ -72,11 +74,11 @@ class BERTEncoder(nn.Module):
 
 class BERTMLMHead(nn.Module):
     def __init__(self, emb_dim, vocab_size, norm_eps=1e-12):
-        super(BERTMLM, self).__init__()
+        super(BERTMLMHead, self).__init__()
         self.linear1 = nn.Linear(emb_dim, emb_dim)
         self.norm = nn.LayerNorm(emb_dim, eps=norm_eps)
         self.linear2 = nn.Linear(emb_dim, vocab_size)
-        
+
     def forward(self, input):
         x = self.linear1(input)
         x = F.gelu(x)

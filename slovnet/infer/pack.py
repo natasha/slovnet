@@ -24,7 +24,7 @@ def weight_path(id):
 
 
 def parse_weight_path(path):
-    match = re.match('^weights/(\d+).bin$', path)
+    match = re.match(r'^weights/(\d+).bin$', path)
     return int(match.group(1))
 
 

@@ -1,4 +1,6 @@
 
+import re
+
 import torch
 
 from slovnet.chop import chop_drop
@@ -24,6 +26,13 @@ def wordpiece(token, vocab, prefix='##'):
             if stop < start:
                 return
     return parts
+
+
+def re_tokenize(text):
+    # diff with bert tokenizer 28 / 10000 ~0.3%
+    # школа №3 -> школа, №3
+    # @diet_prada -> @, diet, _, prada
+    return re.findall(r'\w+|[^\w\s]', text)
 
 
 def texts_ids(texts, vocab):
@@ -54,27 +63,27 @@ def mlm_mask(input, vocab, prob=0.15):
 
 class BERTMLMEncoder:
     def __init__(self, vocab,
-                 seq_size=512, batch_size=8, shuffle_size=1,
+                 seq_len=512, batch_size=8, shuffle_size=1,
                  mask_prob=0.15, ignore_id=-100):
         self.vocab = vocab
-        self.seq_size = seq_size
+        self.seq_len = seq_len
         self.batch_size = batch_size
-        
+
         self.shuffle = ShuffleBuffer(shuffle_size)
 
         self.mask_prob = mask_prob
         self.ignore_id = ignore_id
 
-    def map(self, texts):
-        vocab, seq_size, batch_size = self.vocab, self.seq_size, self.batch_size
+    def __call__(self, texts):
+        vocab, seq_len, batch_size = self.vocab, self.seq_len, self.batch_size
 
         ids = texts_ids(texts, vocab)
-        seqs = ids_seqs(ids, vocab, seq_size)
+        seqs = ids_seqs(ids, vocab, seq_len)
         seqs = self.shuffle.map(seqs)
         inputs = chop_drop(seqs, batch_size)
 
         for input in inputs:
-            input = torch.LongTensor(input)
+            input = torch.tensor(input).long()
             target = input.clone()
 
             mask = mlm_mask(input, vocab, self.mask_prob)

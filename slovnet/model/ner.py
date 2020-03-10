@@ -1,4 +1,7 @@
 
+from collections import OrderedDict
+
+import torch
 from torch import nn
 
 from .infer import InferMixin
@@ -22,7 +25,6 @@ class WordModel(nn.Module):
         word_emb = self.word_emb(word_id)
         shape_emb = self.shape_emb(shape_id)
         return torch.cat([word_emb, shape_emb], dim=-1)
-
 
 
 class ContextModel(nn.Module):

@@ -19,6 +19,10 @@ class Share(Record):
             return 0
         return self.correct / self.total
 
+    def reset(self):
+        self.correct = 0
+        self.total = 0
+
 
 class Mean(Record):
     __attributes__ = ['accum', 'count']
@@ -36,6 +40,10 @@ class Mean(Record):
         if not self.count:
             return 0
         return self.accum / self.count
+
+    def reset(self):
+        self.accum = 0
+        self.count = 0
 
 
 def topk_acc(pred, target, ks=(1, 2, 4, 8), ignore_id=-100):
@@ -122,3 +130,13 @@ class MLMScoreMeter(ScoreMeter):
             score = self.ks.get(k)
             if score:
                 board.add_scalar(key, score.value)
+
+
+def score_mlm_batch(batch, ks=(1, 2, 4, 8)):
+    scores = ()
+    if ks:
+        scores = topk_acc(batch.pred, batch.target, ks)
+    return MLMBatchScore(
+        batch.loss.item(),
+        ks=dict(zip(ks, scores))
+    )

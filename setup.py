@@ -7,7 +7,7 @@ with open('README.md') as file:
 
 
 with open('requirements/main.txt') as file:
-    requirements = [_.stript() for _ in file]
+    requirements = [_.strip() for _ in file]
 
 
 setup(

@@ -1,6 +1,9 @@
 
 test:
-	pytest -vv --pep8 --flakes --cov slovnet --cov-report term-missing
+	pytest -vv \
+		--pep8 --flakes \
+		--cov slovnet --cov-report term-missing \
+		slovnet
 
 ci:
 	pytest -vv slovnet/tests/test_api.py
