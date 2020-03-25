@@ -1,7 +1,7 @@
 
 import pytest
 
-from slovnet.tokenizer import Tokenizer
+from slovnet.token import tokenize
 from slovnet.bio import (
     B, I, O,
     PER, LOC,
@@ -18,8 +18,7 @@ from slovnet.bio import (
 )
 
 
-tokenizer = Tokenizer()
-T1, T2, T3, T4, T5 = tokenizer('1 2 3 4 5')
+T1, T2, T3, T4, T5 = tokenize('1 2 3 4 5')
 
 B_PER = format_bio(B, PER)
 I_PER = format_bio(I, PER)
