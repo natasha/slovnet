@@ -1,4 +1,11 @@
 
+import torch
+
+from .mask import (
+    Masked,
+    pad_masked
+)
+
 
 def every(step, period):
     return step > 0 and step % period == 0
@@ -24,3 +31,23 @@ def infer_bert_mlm_batches(model, criterion, batches):
         for batch in batches:
             yield process_bert_mlm_batch(model, criterion, batch)
     model.train(training)
+
+
+########
+#
+#   BERT NER
+#
+########
+
+
+def process_bert_ner_batch(model, criterion, batch):
+    input, target = batch
+
+    pred = model(input.value)
+    pred = pad_masked(pred, input.mask)
+    mask = pad_masked(input.mask, input.mask)
+
+    loss = criterion(pred, target.value, target.mask)
+
+    pred = Masked(pred, mask)
+    return batch.processed(loss, pred)
