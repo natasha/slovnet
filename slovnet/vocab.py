@@ -60,7 +60,7 @@ class ShapesVocab(Vocab):
     pass
 
 
-class NERTagsVocab(Vocab):
+class BIOTagsVocab(Vocab):
     def __init__(self, types):
         self.types = types
 
@@ -69,4 +69,4 @@ class NERTagsVocab(Vocab):
             for part in [B, I]:
                 items.append(format_bio(part, type))
 
-        super(NERTagsVocab, self).__init__(items)
+        super(BIOTagsVocab, self).__init__(items)
