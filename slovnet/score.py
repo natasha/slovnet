@@ -320,12 +320,12 @@ def score_morph_batch(batch):
 
 ########
 #
-#   DEP
+#   SYNTAX
 #
 #######
 
 
-class DepBatchScore(Record):
+class SyntaxBatchScore(Record):
     __attributes__ = ['loss', 'uas', 'las']
 
     def __init__(self, loss, uas=None, las=None):
@@ -334,7 +334,7 @@ class DepBatchScore(Record):
         self.las = las
 
 
-class DepScoreMeter(Record):
+class SyntaxScoreMeter(Record):
     __attributes__ = ['loss', 'uas', 'las']
 
     def __init__(self, loss=None, uas=None, las=None):
@@ -385,9 +385,9 @@ def las(head_pred, head_target, rel_pred, rel_target):
     return Share(correct, total)
 
 
-def score_dep_batch(batch):
+def score_syntax_batch(batch):
     input, target, loss, pred = batch
-    return DepBatchScore(
+    return SyntaxBatchScore(
         loss.item(),
         uas(pred.head, target.head_id),
         las(
