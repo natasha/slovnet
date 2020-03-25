@@ -10,6 +10,7 @@ import torch
 from torch import optim
 
 from apex import amp
+O2 = 'O2'
 
 from corus import (
     load_buriy_news,
@@ -25,12 +26,11 @@ from slovnet.io import (
 )
 from slovnet.s3 import S3
 from slovnet.board import Board
-from slovnet.loop import every
 from slovnet.const import CUDA0
 
 from slovnet.model.state import (
-    load_model as load_submodel,
-    dump_model as dump_submodel
+    load_model,
+    dump_model
 )
 from slovnet.model.bert import (
     BERTConfig,
@@ -43,55 +43,52 @@ from slovnet.vocab import BERTVocab
 from slovnet.encoders.bert import BERTMLMEncoder
 from slovnet.score import (
     MLMScoreMeter,
-    score_mlm_batch as score_batch
+    score_mlm_batches as score_batches
 )
 from slovnet.loss import flatten_cross_entropy as criterion
+from slovnet.loop import every
 
 
-#######
-#
-#  PARTS
-#
-#####
+DATA_DIR = 'data'
+MODEL_DIR = 'model'
+RUBERT_DIR = 'rubert'
+RAW_DIR = join(DATA_DIR, 'raw')
 
+TRAIN = join(DATA_DIR, 'train.txt')
+TEST = join(DATA_DIR, 'test.txt')
 
-PARTS = ['emb', 'encoder', 'mlm']
+S3_DIR = '01_bert_news'
+S3_TRAIN = join(S3_DIR, TRAIN)
+S3_TEST = join(S3_DIR, TEST)
 
+VOCAB = 'vocab.txt'
+EMB = 'emb.pt'
+ENCODER = 'encoder.pt'
+MLM = 'mlm.pt'
 
-def load_model(model, parts=PARTS):
-    for part in parts:
-        load_submodel(
-            getattr(model, part),
-            'model/%s.pt' % part
-        )
+RUBERT_VOCAB = join(RUBERT_DIR, VOCAB)
+RUBERT_EMB = join(RUBERT_DIR, EMB)
+RUBERT_ENCODER = join(RUBERT_DIR, ENCODER)
+RUBERT_MLM = join(RUBERT_DIR, MLM)
 
+S3_RUBERT_VOCAB = join(S3_DIR, RUBERT_VOCAB)
+S3_RUBERT_EMB = join(S3_DIR, RUBERT_EMB)
+S3_RUBERT_ENCODER = join(S3_DIR, RUBERT_ENCODER)
+S3_RUBERT_MLM = join(S3_DIR, RUBERT_MLM)
 
-def dump_model(model, parts=PARTS):
-    for part in parts:
-        dump_submodel(
-            getattr(model, part),
-            'model/%s.pt' % part
-        )
+MODEL_EMB = join(MODEL_DIR, EMB)
+MODEL_ENCODER = join(MODEL_DIR, ENCODER)
+MODEL_MLM = join(MODEL_DIR, MLM)
 
+S3_MODEL_EMB = join(S3_DIR, MODEL_EMB)
+S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
+S3_MODEL_MLM = join(S3_DIR, MODEL_MLM)
 
-def upload_model(s3, parts=PARTS):
-    for part in parts:
-        s3.upload(
-            'model/%s.pt' % part,
-            '01_bert_news/model/%s.pt' % part
-        )
+BOARD_NAME = '01_bert_news'
+RUNS_DIR = 'runs'
 
-
-########
-#
-#   LOOP
-#
-######
-
-
-def score_batches(batches):
-    for batch in batches:
-        yield score_batch(batch)
+TRAIN_BOARD = '01_train'
+TEST_BOARD = '02_test'
 
 
 def process_batch(model, criterion, batch):
