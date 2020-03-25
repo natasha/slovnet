@@ -1,12 +1,6 @@
 
 test:
-	pytest -vv \
-		--pep8 --flakes \
-		--cov slovnet --cov-report term-missing \
-		slovnet
-
-ci:
-	pytest -vv slovnet/tests/test_api.py
+	pytest -vv --pep8 --flakes slovnet
 
 wheel:
 	python setup.py bdist_wheel
