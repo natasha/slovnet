@@ -1,10 +1,27 @@
 
-from .tokenizer import (
-    RU, LATIN,
-    INT, OTHER,
-    PUNCT, PUNCTS
-)
+import re
 
+RU = 'RU'
+EN = 'EN'
+NUM = 'NUM'
+PUNCT = 'PUNCT'
+OTHER = 'OTHER'
+
+PUNCTS = (
+    '!#$%&()[]\\/*+,.:;<=>?@^_{|}~'  # string.punctuation
+    '-‐−‒⁃–—―'  # https://habr.com/ru/post/20588/
+    '`"\'«»„“ʼʻ”'
+    '№…'
+)
+TYPE = re.compile(
+    r'''
+    (?P<RU>[а-яё]+)
+    |(?P<EN>[a-z]+)
+    |(?P<NUM>[+-]?\d+)
+    |(?P<PUNCT>[%s]+)
+    ''' % re.escape(PUNCTS),
+    re.X | re.IGNORECASE
+)
 
 X = 'X'
 x = 'x'
@@ -12,7 +29,6 @@ XX = 'XX'
 xx = 'xx'
 Xx = 'Xx'
 Xx_Xx = 'Xx-Xx'
-UNK = '<unk>'
 
 
 def is_title(word):
@@ -25,7 +41,7 @@ def is_dash_title(word):
         return is_title(left) and is_title(right)
 
 
-def get_word_shape(word):
+def word_outline(word):
     if len(word) == 1:
         if word.isupper():
             return X
@@ -41,28 +57,39 @@ def get_word_shape(word):
         elif is_dash_title(word):
             return Xx_Xx
         else:
-            return UNK
+            return OTHER
+
+
+def word_type(word):
+    # СИЗО-6 -> RU
+    # 2011-2020 -> NUM
+    match = TYPE.match(word)
+    if match:
+        return match.lastgroup
+    return OTHER
 
 
 def format_shape(type, value):
     return '%s_%s' % (type, value)
 
 
-def get_shape(token):
-    text = token.text
-    type = token.type
-    if type in (RU, LATIN):
-        return format_shape(type, get_word_shape(text))
+def word_shape(word):
+    type = word_type(word)
+    if type in (RU, EN):
+        return format_shape(type, word_outline(word))
     elif type == PUNCT:
-        return format_shape(PUNCT, text)
-    elif type in (INT, OTHER):
+        if word not in PUNCTS:
+            # ..., ?!, ****
+            word = OTHER
+        return format_shape(PUNCT, word)
+    elif type in (NUM, OTHER):
         return type
 
 
-WORD_SHAPES = [X, x, XX, xx, Xx, Xx_Xx, UNK]
+OUTLINES = [X, x, XX, xx, Xx, Xx_Xx, OTHER]
 SHAPES = (
-    [format_shape(RU, _) for _ in WORD_SHAPES]
-    + [format_shape(LATIN, _) for _ in WORD_SHAPES]
+    [format_shape(RU, _) for _ in OUTLINES]
+    + [format_shape(EN, _) for _ in OUTLINES]
     + [format_shape(PUNCT, _) for _ in PUNCTS]
-    + [INT, OTHER]
+    + [format_shape(PUNCT, OTHER), NUM, OTHER]
 )

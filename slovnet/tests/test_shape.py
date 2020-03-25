@@ -2,18 +2,13 @@
 import pytest
 
 from slovnet.shape import (
-    X, x, xx, XX, Xx, Xx_Xx, UNK,
-    RU, LATIN, INT, PUNCT,
+    X, x, xx, XX, Xx, Xx_Xx, OTHER,
+    RU, EN, NUM, PUNCT,
 
-    get_shape,
+    word_shape,
     format_shape as s
 )
-from slovnet.tokenizer import Tokenizer
-
-
-@pytest.fixture(scope='module')
-def tokenizer():
-    return Tokenizer()
+from slovnet.token import tokenize
 
 
 TESTS = [
@@ -23,30 +18,30 @@ TESTS = [
     ],
     [
         'ИЛ-2',
-        [s(RU, XX), s(PUNCT, '-'), INT],
+        [s(RU, XX)],
     ],
     [
         '105г.',
-        [INT, s(RU, x), s(PUNCT, '.')]
+        [NUM, s(RU, x), s(PUNCT, '.')]
     ],
     [
         'Pal-Yz',
-        [s(LATIN, Xx_Xx)]
+        [s(EN, Xx_Xx)]
     ],
     [
         'и Я-ДаА',
-        [s(RU, x), s(RU, UNK)]
+        [s(RU, x), s(RU, OTHER)]
     ],
     [
         'Прибыл на I@',
-        [s(RU, Xx), s(RU, xx), s(LATIN, X), s(PUNCT, '@')]
+        [s(RU, Xx), s(RU, xx), s(EN, X), s(PUNCT, '@')]
     ],
 ]
 
 
 @pytest.mark.parametrize('test', TESTS)
-def test_shape(tokenizer, test):
+def test_shape(test):
     text, etalon = test
-    tokens = tokenizer(text)
-    guess = [get_shape(_) for _ in tokens]
+    tokens = tokenize(text)
+    guess = [word_shape(_.text) for _ in tokens]
     assert guess == etalon
