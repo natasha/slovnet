@@ -175,7 +175,7 @@ class BERTMorph(nn.Module):
 
 #######
 #
-#   DEP
+#   SYNTAX
 #
 #######
 
@@ -204,9 +204,9 @@ def strip_root(input):
     return input.contiguous()
 
 
-class BERTDepHead(nn.Module):
+class BERTSyntaxHead(nn.Module):
     def __init__(self, input_dim, hidden_dim, dropout=0.1):
-        super(BERTDepHead, self).__init__()
+        super(BERTSyntaxHead, self).__init__()
         self.head = FF(input_dim, hidden_dim, dropout)
         self.tail = FF(input_dim, hidden_dim, dropout)
 
@@ -245,9 +245,9 @@ def select_head(input, root, index):
     return strip_root(input)  # batch x seq x emb
 
 
-class BERTDepRel(nn.Module):
+class BERTSyntaxRel(nn.Module):
     def __init__(self, input_dim, hidden_dim, rel_dim, dropout=0.1):
-        super(BERTDepRel, self).__init__()
+        super(BERTSyntaxRel, self).__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
         self.rel_dim = rel_dim
@@ -282,7 +282,7 @@ def select_words(input, mask):
     return input[mask].view(batch_size, select_size, emb_dim)
 
 
-class DepPred(Record):
+class SyntaxPred(Record):
     __attributes__ = ['head', 'rel']
 
     def __init__(self, head, rel):
@@ -290,9 +290,9 @@ class DepPred(Record):
         self.rel = rel
 
 
-class BERTDep(nn.Module):
+class BERTSyntax(nn.Module):
     def __init__(self, emb, encoder, head, rel):
-        super(BERTDep, self).__init__()
+        super(BERTSyntax, self).__init__()
         self.emb = emb
         self.encoder = encoder
         self.head = head
@@ -302,7 +302,7 @@ class BERTDep(nn.Module):
         x = self.emb(input)
         x = self.encoder(x, pad_mask)
         x = select_words(x, word_mask)
-        return DepPred(
+        return SyntaxPred(
             head=self.head(x),
             rel=self.rel(x, head_id)
         )
