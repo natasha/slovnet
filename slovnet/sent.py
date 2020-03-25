@@ -4,10 +4,6 @@ import re
 from razdel import sentenize as sentenize_
 
 from .record import Record
-from .span import (
-    envelop_spans,
-    offset_spans
-)
 
 
 class Sent(Record):
@@ -37,8 +33,3 @@ def sentenize(text):
                 sent.stop + line.start,
                 sent.text
             )
-
-
-def sent_spans(sent, spans):
-    spans = envelop_spans(sent, spans)
-    return offset_spans(spans, -sent.start)

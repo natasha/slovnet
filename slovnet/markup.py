@@ -5,6 +5,11 @@ from .bio import (
     bio_spans
 )
 from .token import find_tokens
+from .sent import sentenize
+from .span import (
+    envelop_spans,
+    offset_spans
+)
 
 
 ########
@@ -14,12 +19,25 @@ from .token import find_tokens
 #######
 
 
+def sent_spans(sent, spans):
+    spans = envelop_spans(sent, spans)
+    return offset_spans(spans, -sent.start)
+
+
 class SpanMarkup(Record):
     __attributes__ = ['text', 'spans']
 
     def __init__(self, text, spans):
         self.text = text
         self.spans = spans
+
+    @property
+    def sents(self):
+        for sent in sentenize(self.text):
+            yield SpanMarkup(
+                sent.text,
+                list(sent_spans(sent, self.spans))
+            )
 
     def to_bio(self, tokens):
         tags = spans_bio(tokens, self.spans)
