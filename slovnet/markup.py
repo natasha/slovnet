@@ -4,58 +4,91 @@ from .bio import (
     spans_bio,
     bio_spans
 )
+from .token import find_tokens
 
 
-class Markup(Record):
-    pass
+########
+#
+#   SPAN
+#
+#######
 
 
-class SpanMarkup(Markup):
+class SpanMarkup(Record):
     __attributes__ = ['text', 'spans']
 
     def __init__(self, text, spans):
         self.text = text
         self.spans = spans
 
-    def to_bio(self, tokenizer):
-        tokens = list(tokenizer(self.text))
-        tags = list(spans_bio(tokens, self.spans))
-        return BIOMarkup(tokens, tags)
+    def to_bio(self, tokens):
+        tags = spans_bio(tokens, self.spans)
+        words = [_.text for _ in tokens]
+        return BIOMarkup.from_pairs(zip(words, tags))
 
 
-class TagMarkup(Markup):
-    __attributes__ = ['tokens', 'tags']
+########
+#
+#   TAG
+#
+######
 
-    def __init__(self, tokens, tags):
+
+class TagToken(Record):
+    __attributes__ = ['text', 'tag']
+
+    def __init__(self, text, tag):
+        self.text = text
+        self.tag = tag
+
+
+class TagMarkup(Record):
+    __attributes__ = ['tokens']
+
+    def __init__(self, tokens):
         self.tokens = tokens
-        self.tags = tags
 
     @property
-    def pairs(self):
-        return zip(self.tokens, self.tags)
+    def words(self):
+        return [_.text for _ in self.tokens]
+
+    @property
+    def tags(self):
+        return [_.tag for _ in self.tokens]
 
     @classmethod
     def from_pairs(cls, pairs):
-        tokens, tags = [], []
-        for token, tag in pairs:
-            tokens.append(token)
-            tags.append(tag)
-        return cls(tokens, tags)
-
-
-def tokens_text(tokens, fill=' '):
-    previous = None
-    parts = []
-    for token in tokens:
-        if previous:
-            parts.append(fill * (token.start - previous.stop))
-        parts.append(token.text)
-        previous = token
-    return ''.join(parts)
+        return cls([
+            TagToken(word, tag)
+            for word, tag in pairs
+        ])
 
 
 class BIOMarkup(TagMarkup):
-    def to_span(self):
-        text = tokens_text(self.tokens)
-        spans = list(bio_spans(self.tokens, self.tags))
+    def to_span(self, text):
+        tokens = find_tokens(text, self.words)
+        spans = list(bio_spans(tokens, self.tags))
         return SpanMarkup(text, spans)
+
+
+#######
+#
+#   SYNTAX
+#
+#######
+
+
+class SyntaxToken(Record):
+    __attributes__ = ['word', 'head_id', 'rel']
+
+    def __init__(self, word, head_id, rel):
+        self.word = word
+        self.head_id = head_id
+        self.rel = rel
+
+
+class SyntaxMarkup(Record):
+    __attributes__ = ['tokens']
+
+    def __init__(self, tokens):
+        self.tokens = tokens
