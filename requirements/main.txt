@@ -1,2 +1,2 @@
-numpy>=1.16.0
+numpy
 navec>=0.6.0
