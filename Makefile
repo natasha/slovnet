@@ -25,4 +25,4 @@ clean:
 		| xargs rm -rf
 
 	rm -rf dist/ build/ .pytest_cache/ .cache/ .ipynb_checkpoints/ \
-		*.egg-info coverage.xml .coverage
+		*.egg-info/ coverage.xml .coverage
