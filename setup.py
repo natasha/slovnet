@@ -31,10 +31,5 @@ setup(
     keywords='nlp, deeplearning, russian',
 
     packages=find_packages(),
-    entry_points={
-        'console_scripts': [
-            'slov-ctl=slovnet.ctl:main'
-        ],
-    },
     install_requires=requirements
 )
