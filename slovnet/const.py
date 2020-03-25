@@ -4,12 +4,6 @@ from os.path import exists, expanduser
 from .io import load_json
 
 
-TRAIN = 'train'
-TEST = 'test'
-
-TXT = '.txt'
-PT = '.pt'
-
 CUDA0 = 'cuda:0'
 CUDA1 = 'cuda:1'
 CUDA2 = 'cuda:2'
