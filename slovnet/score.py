@@ -182,6 +182,11 @@ def score_mlm_batch(batch, ks=(1, 2, 4, 8)):
     )
 
 
+def score_mlm_batches(batches):
+    for batch in batches:
+        yield score_mlm_batch(batch)
+
+
 #######
 #
 #   NER
