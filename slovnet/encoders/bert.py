@@ -134,18 +134,18 @@ def ner_seqs(items, words_vocab, tags_vocab, size):
 
 class BERTNEREncoder:
     def __init__(self, words_vocab, tags_vocab,
-                 seq_size=512, batch_size=8, shuffle_size=1):
+                 seq_len=512, batch_size=8, shuffle_size=1):
         self.words_vocab = words_vocab
         self.tags_vocab = tags_vocab
 
-        self.seq_size = seq_size
+        self.seq_len = seq_len
         self.batch_size = batch_size
 
         self.shuffle = ShuffleBuffer(shuffle_size)
 
     def __call__(self, markups):
         items = ner_items(markups, self.words_vocab, self.tags_vocab)
-        seqs = ner_seqs(items, self.words_vocab, self.tags_vocab, self.seq_size)
+        seqs = ner_seqs(items, self.words_vocab, self.tags_vocab, self.seq_len)
         seqs = self.shuffle(seqs)
         chunks = chop_drop(seqs, self.batch_size)
 
@@ -196,18 +196,18 @@ def morph_seqs(items, words_vocab, tags_vocab, size):
 
 class BERTMorphEncoder:
     def __init__(self, words_vocab, tags_vocab,
-                 seq_size=512, batch_size=8, shuffle_size=1):
+                 seq_len=512, batch_size=8, shuffle_size=1):
         self.words_vocab = words_vocab
         self.tags_vocab = tags_vocab
 
-        self.seq_size = seq_size
+        self.seq_len = seq_len
         self.batch_size = batch_size
 
         self.shuffle = ShuffleBuffer(shuffle_size)
 
     def __call__(self, markups):
         items = morph_items(markups, self.words_vocab, self.tags_vocab)
-        seqs = morph_seqs(items, self.words_vocab, self.tags_vocab, self.seq_size)
+        seqs = morph_seqs(items, self.words_vocab, self.tags_vocab, self.seq_len)
         seqs = self.shuffle(seqs)
         chunks = chop_drop(seqs, self.batch_size)
 
@@ -272,13 +272,13 @@ def syntax_items(markups, words_vocab, rels_vocab):
         yield syntax_item(markup, words_vocab, rels_vocab)
 
 
-def syntax_chop(items, max_seq_size, max_items):
+def syntax_chop(items, max_seq_len, max_items):
     buffer = []
     accum = 0
     for item in items:
         size = len(item.word_ids)
 
-        if size > max_seq_size:  # 0.02% sents longer then 128
+        if size > max_seq_len:  # 0.02% sents longer then 128
             continue
 
         buffer.append(item)
@@ -348,12 +348,12 @@ def syntax_batch(items, words_vocab, rels_vocab):
 
 class BERTSyntaxEncoder:
     def __init__(self, words_vocab, rels_vocab,
-                 seq_size=512, batch_size=8,
+                 seq_len=512, batch_size=8,
                  shuffle_size=1, size_size=1):
         self.words_vocab = words_vocab
         self.rels_vocab = rels_vocab
 
-        self.seq_size = seq_size
+        self.seq_len = seq_len
         self.batch_size = batch_size
 
         self.shuffle = ShuffleBuffer(shuffle_size)
@@ -364,7 +364,7 @@ class BERTSyntaxEncoder:
         items = self.shuffle(items)
         chunks = self.size(items)
 
-        max_items = self.seq_size * self.batch_size
+        max_items = self.seq_len * self.batch_size
         for chunk in chunks:
-            for chunk in syntax_chop(chunk, self.seq_size, max_items):
+            for chunk in syntax_chop(chunk, self.seq_len, max_items):
                 yield syntax_batch(chunk, self.words_vocab, self.rels_vocab)
