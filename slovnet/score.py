@@ -270,11 +270,6 @@ def score_ner_batch(batch, tags_vocab):
     return score
 
 
-def score_ner_batches(batches):
-    for batch in batches:
-        yield score_ner_batch(batch)
-
-
 ###########
 #
 #   MORPH
