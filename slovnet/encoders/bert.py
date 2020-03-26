@@ -10,7 +10,7 @@ from slovnet.batch import Batch
 from slovnet.mask import Masked, pad_masked
 from slovnet.conllu import conllu_tag
 
-from .shuffle import ShuffleBuffer, SizeBuffer
+from .buffer import ShuffleBuffer, SizeBuffer
 
 
 def wordpiece(text, vocab, prefix='##'):
