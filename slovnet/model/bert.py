@@ -34,8 +34,11 @@ class BERTEmbedding(nn.Module):
         self.norm = nn.LayerNorm(emb_dim, eps=norm_eps)
         self.drop = nn.Dropout(dropout)
 
-    def __call__(self, word_id, position_id):
-        emb = self.word(word_id) + self.position(position_id)
+    def __call__(self, input):
+        batch_size, seq_len = input.shape
+        position = torch.arange(seq_len).expand_as(input).to(input.device)
+
+        emb = self.word(input) + self.position(position)
         emb = self.norm(emb)
         return self.drop(emb)
 
@@ -101,10 +104,7 @@ class BERTMLM(nn.Module):
         self.mlm = mlm
 
     def forward(self, input):
-        batch_size, seq_len = input.shape
-        position = torch.arange(seq_len).expand_as(input).to(input.device)
-
-        x = self.emb(input, position)
+        x = self.emb(input)
         x = self.encoder(x)
         return self.mlm(x)
 
