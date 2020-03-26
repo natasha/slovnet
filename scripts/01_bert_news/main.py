@@ -46,7 +46,11 @@ from slovnet.score import (
     score_mlm_batches as score_batches
 )
 from slovnet.loss import flatten_cross_entropy as criterion
-from slovnet.loop import every
+from slovnet.loop import (
+    every
+    process_bert_mlm_batch as process_batch,
+    infer_bert_mlm_batches as infer_batches
+)
 
 
 DATA_DIR = 'data'
@@ -89,18 +93,3 @@ RUNS_DIR = 'runs'
 
 TRAIN_BOARD = '01_train'
 TEST_BOARD = '02_test'
-
-
-def process_batch(model, criterion, batch):
-    pred = model(batch.input)
-    loss = criterion(pred, batch.target)
-    return batch.processed(loss, pred)
-
-
-def infer_batches(model, criterion, batches):
-    training = model.training
-    model.eval()
-    with torch.no_grad():
-        for batch in batches:
-            yield process_batch(model, criterion, batch)
-    model.train(training)
