@@ -9,6 +9,7 @@ from .bio import (
 from .token import find_tokens
 from .sent import sentenize
 from .span import (
+    Span,
     envelop_spans,
     offset_spans
 )
@@ -28,6 +29,9 @@ def sent_spans(sent, spans):
 
 class SpanMarkup(Record):
     __attributes__ = ['text', 'spans']
+    __annotations__ = {
+        'spans': [Span]
+    }
 
     def __init__(self, text, spans):
         self.text = text
@@ -64,6 +68,9 @@ class TagToken(Record):
 
 class TagMarkup(Record):
     __attributes__ = ['tokens']
+    __annotations__ = {
+        'tokens': [TagToken]
+    }
 
     def __init__(self, tokens):
         self.tokens = tokens
@@ -109,6 +116,9 @@ class SyntaxToken(Record):
 
 class SyntaxMarkup(Record):
     __attributes__ = ['tokens']
+    __annotations__ = {
+        'tokens': [SyntaxToken]
+    }
 
     def __init__(self, tokens):
         self.tokens = tokens
