@@ -1,4 +1,6 @@
 
+from ipymarkup import show_span_box_markup as show_span_markup  # noqa
+
 from .record import Record
 from .bio import (
     spans_bio,
