@@ -5,6 +5,8 @@ from torch.nn import functional as F
 
 from slovnet.record import Record
 
+from .crf import CRF
+
 
 class BERTConfig(Record):
     __attributes__ = [
@@ -123,6 +125,7 @@ class BERTNERHead(nn.Module):
         self.tags_num = tags_num
 
         self.proj = nn.Linear(emb_dim, tags_num)
+        self.crf = CRF(tags_num)
 
     def forward(self, input):
         return self.proj(input)
