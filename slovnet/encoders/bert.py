@@ -8,7 +8,6 @@ from slovnet.pad import pad_sequence
 from slovnet.chop import chop_drop
 from slovnet.batch import Batch
 from slovnet.mask import Masked, pad_masked
-from slovnet.conllu import conllu_tag
 
 from .buffer import ShuffleBuffer, SizeBuffer
 
@@ -48,9 +47,9 @@ def mlm_split(text):
 
 def mlm_ids(texts, vocab):
     for text in texts:
-        words = mlm_split(text)
-        for word in words:
-            parts = wordpiece(word, vocab)
+        chunks = mlm_split(text)
+        for chunk in chunks:
+            parts = wordpiece(chunk, vocab)
             if not parts:
                 yield vocab.unk_id
             else:
@@ -111,9 +110,9 @@ class BERTMLMEncoder:
 
 def ner_items(markups, words_vocab, tags_vocab):
     for markup in markups:
-        for word, tag in markup.tokens:
-            parts = wordpiece(word, words_vocab)
-            tag_id = tags_vocab.encode(tag)
+        for token in markup.tokens:
+            parts = wordpiece(token.text, words_vocab)
+            tag_id = tags_vocab.encode(token.tag)
             if not parts:
                 yield (words_vocab.unk_id, tag_id, True)
             else:
@@ -172,10 +171,9 @@ class BERTNEREncoder:
 
 def morph_items(markups, words_vocab, tags_vocab):
     for markup in markups:
-        for word, feats in markup.tokens:
-            parts = wordpiece(word, words_vocab)
-            tag = conllu_tag(feats)
-            tag_id = tags_vocab.encode(tag)
+        for token in markup.tokens:
+            parts = wordpiece(token.text, words_vocab)
+            tag_id = tags_vocab.encode(token.tag)
             if not parts:
                 yield (words_vocab.unk_id, tag_id, True)
             else:
