@@ -51,3 +51,24 @@ def process_bert_ner_batch(model, criterion, batch):
 
     pred = Masked(pred, mask)
     return batch.processed(loss, pred)
+
+
+########
+#
+#   BERT MORPH
+#
+########
+
+
+def process_bert_morph_batch(model, criterion, batch):
+    input, target = batch
+
+    pred = model(input.value)
+    pred = pad_masked(pred, input.mask)
+    mask = pad_masked(input.mask, input.mask)
+
+    loss = criterion(pred, target.value, target.mask)
+
+    pred = pred.argmax(-1)
+    pred = Masked(pred, mask)
+    return batch.processed(loss, pred)

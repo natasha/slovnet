@@ -21,6 +21,18 @@ CUDA3 = 'cuda:3'
 CPU = 'cpu'
 
 
+######
+#   VOCAB
+########
+
+
+UNK = '<unk>'
+PAD = '<pad>'
+CLS = '<cls>'
+SEP = '<sep>'
+MASK = '<mask>'
+
+
 #####
 #  BIO
 #######

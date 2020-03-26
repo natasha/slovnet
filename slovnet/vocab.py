@@ -1,17 +1,14 @@
 # coding: utf8
 
 from .record import Record
-from .bio import (
+from .const import (
     B, I, O,
-    format_bio
+
+    UNK, PAD,
+    CLS, SEP,
+    MASK,
 )
-
-
-UNK = '<unk>'
-PAD = '<pad>'
-CLS = '<cls>'
-SEP = '<sep>'
-MASK = '<mask>'
+from .bio import format_bio
 
 
 class Vocab(Record):
@@ -57,6 +54,10 @@ class WordsVocab(Vocab):
 
 
 class ShapesVocab(Vocab):
+    pass
+
+
+class TagsVocab(Vocab):
     pass
 
 

@@ -6,3 +6,10 @@ def flatten_cross_entropy(pred, target):
     target = target.flatten()
     pred = pred.view(len(target), -1)
     return F.cross_entropy(pred, target)
+
+
+def masked_flatten_cross_entropy(pred, target, mask, ignore_id=-100):
+    target[~mask] = ignore_id
+    target = target.flatten()
+    pred = pred.view(len(target), -1)
+    return F.cross_entropy(pred, target, ignore_index=ignore_id)

@@ -13,6 +13,7 @@ from .span import (
     envelop_spans,
     offset_spans
 )
+from .conllu import format_conllu_tag
 
 
 ########
@@ -98,6 +99,36 @@ class BIOMarkup(TagMarkup):
         return SpanMarkup(text, spans)
 
 
+########
+#
+#   MORPH
+#
+########
+
+
+class MorphToken(Record):
+    __attributes__ = ['text', 'pos', 'feats']
+
+    def __init__(self, text, pos, feats):
+        self.text = text
+        self.pos = pos
+        self.feats = feats
+
+    @property
+    def tag(self):
+        return format_conllu_tag(self.pos, self.feats)
+
+
+class MorphMarkup(Record):
+    __attributes__ = ['tokens']
+    __annotations__ = {
+        'tokens': [MorphToken]
+    }
+
+    def __init__(self, tokens):
+        self.tokens = tokens
+
+
 #######
 #
 #   SYNTAX
@@ -106,10 +137,10 @@ class BIOMarkup(TagMarkup):
 
 
 class SyntaxToken(Record):
-    __attributes__ = ['word', 'head_id', 'rel']
+    __attributes__ = ['text', 'head_id', 'rel']
 
-    def __init__(self, word, head_id, rel):
-        self.word = word
+    def __init__(self, text, head_id, rel):
+        self.text = text
         self.head_id = head_id
         self.rel = rel
 

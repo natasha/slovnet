@@ -1,14 +1,23 @@
 
 
-def conllu_tag(feats):
-    return '|'.join(
+def format_conllu_tag(pos, feats):
+    if not feats:
+        return pos
+
+    feats = '|'.join(
         '%s=%s' % (_, feats[_])
         for _ in sorted(feats)
     )
+    return '%s|%s' % (pos, feats)
 
 
 def parse_conllu_tag(tag):
-    return dict(
+    if '|' not in tag:
+        return tag
+
+    pos, feats = tag.split('|', 1)
+    feats = dict(
         _.split('=', 1)
-        for _ in tag.split('|')
+        for _ in feats.split('|')
     )
+    return pos, feats
