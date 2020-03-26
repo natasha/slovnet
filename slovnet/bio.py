@@ -1,14 +1,6 @@
 
 from .span import Span
-
-
-B = 'B'
-I = 'I'
-O = 'O'
-
-PER = 'PER'
-LOC = 'LOC'
-ORG = 'ORG'
+from .const import B, I, O
 
 
 def parse_bio(tag):

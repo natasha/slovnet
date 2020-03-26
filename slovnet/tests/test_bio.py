@@ -2,9 +2,11 @@
 import pytest
 
 from slovnet.token import tokenize
-from slovnet.bio import (
+from slovnet.const import (
     B, I, O,
-    PER, LOC,
+    PER, LOC
+)
+from slovnet.bio import (
     format_bio,
 
     io_spans,

@@ -4,11 +4,35 @@ from os.path import exists, expanduser
 from .io import load_json
 
 
+TRAIN = 'train'
+DEV = 'dev'
+TEST = 'test'
+
+
+######
+#  DEVICE
+######
+
+
 CUDA0 = 'cuda:0'
 CUDA1 = 'cuda:1'
 CUDA2 = 'cuda:2'
 CUDA3 = 'cuda:3'
 CPU = 'cpu'
+
+
+#####
+#  BIO
+#######
+
+
+B = 'B'
+I = 'I'
+O = 'O'
+
+PER = 'PER'
+LOC = 'LOC'
+ORG = 'ORG'
 
 
 ######
@@ -23,7 +47,7 @@ if exists(path):
 
 
 ########
-#   S3
+#  S3
 ######
 
 
