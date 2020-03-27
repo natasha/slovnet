@@ -33,7 +33,7 @@ from slovnet.model.state import (
     dump_model
 )
 from slovnet.model.bert import (
-    BERTConfig,
+    RuBERTConfig,
     BERTEmbedding,
     BERTEncoder,
     BERTMLMHead,

@@ -28,6 +28,23 @@ class BERTConfig(Record):
         self.norm_eps = norm_eps
 
 
+class RuBERTConfig(BERTConfig):
+    def __init__(self,
+                 vocab_size=50106,
+                 seq_len=512,
+                 emb_dim=768,
+                 layers_num=12,
+                 heads_num=12,
+                 hidden_dim=3072,
+                 dropout=0.1,
+                 norm_eps=1e-12):
+        super(RuBERTConfig, self).__init__(
+            vocab_size, seq_len, emb_dim,
+            layers_num, heads_num, hidden_dim,
+            dropout, norm_eps
+        )
+
+
 class BERTEmbedding(nn.Module):
     def __init__(self, vocab_size, seq_len, emb_dim, dropout=0.1, norm_eps=1e-12):
         super(BERTEmbedding, self).__init__()
