@@ -43,7 +43,7 @@ from slovnet.model.bert import (
     BERTMorph
 )
 from slovnet.markup import MorphMarkup
-from slovnet.vocab import BERTVocab, TagsVocab
+from slovnet.vocab import BERTVocab, Vocab
 from slovnet.encoders.bert import BERTMorphEncoder
 from slovnet.loss import masked_flatten_cross_entropy
 from slovnet.score import (

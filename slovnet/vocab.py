@@ -47,20 +47,6 @@ class BERTVocab(Vocab):
         self.mask_id = self.item_ids[MASK]
 
 
-class WordsVocab(Vocab):
-    def encode(self, word):
-        word = word.lower()
-        return self.item_ids.get(word, self.unk_id)
-
-
-class ShapesVocab(Vocab):
-    pass
-
-
-class TagsVocab(Vocab):
-    pass
-
-
 class BIOTagsVocab(Vocab):
     def __init__(self, types):
         self.types = types
