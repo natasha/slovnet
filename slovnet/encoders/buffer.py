@@ -15,8 +15,8 @@ class Buffer(object):
 
 
 class ShuffleBuffer(Buffer):
-    def __init__(self, cap):
-        self.cap = cap
+    def __init__(self, size):
+        self.size = size
         self.reset()
 
     def append(self, item):
@@ -27,7 +27,7 @@ class ShuffleBuffer(Buffer):
 
     @property
     def is_full(self):
-        return len(self.buffer) >= self.cap
+        return len(self.buffer) >= self.size
 
     def flush(self):
         shuffle(self.buffer)
@@ -36,14 +36,14 @@ class ShuffleBuffer(Buffer):
         self.reset()
 
 
-class SizeBuffer(Buffer):
-    def __init__(self, cap):
-        self.cap = cap
+class LenBuffer(Buffer):
+    def __init__(self, size):
+        self.size = size
         self.reset()
 
     def append(self, item):
         self.count += 1
-        self.buffer[item.size].append(item)
+        self.buffer[len(item)].append(item)
 
     def reset(self):
         self.count = 0
@@ -51,9 +51,9 @@ class SizeBuffer(Buffer):
 
     @property
     def is_full(self):
-        return self.count >= self.cap
+        return self.count >= self.size
 
     def flush(self):
-        for size in sorted(self.buffer):
-            yield self.buffer[size]
+        for len in sorted(self.buffer):
+            yield self.buffer[len]
         self.reset()

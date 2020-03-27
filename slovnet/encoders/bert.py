@@ -9,7 +9,7 @@ from slovnet.chop import chop_drop
 from slovnet.batch import Batch
 from slovnet.mask import Masked, pad_masked
 
-from .buffer import ShuffleBuffer, SizeBuffer
+from .buffer import ShuffleBuffer, LenBuffer
 
 
 def wordpiece(text, vocab, prefix='##'):
@@ -240,6 +240,9 @@ class SyntaxItem(Record):
         self.head_ids = head_ids
         self.rel_ids = rel_ids
 
+    def __len__(self):
+        return len(self.head_ids)
+
 
 def syntax_item(markup, words_vocab, rels_vocab):
     word_ids, mask, head_ids, rel_ids = [], [], [], []
@@ -259,10 +262,9 @@ def syntax_item(markup, words_vocab, rels_vocab):
         id = rels_vocab.encode(token.rel)
         rel_ids.append(id)
 
-    size = len(markup.tokens)
     word_ids = [words_vocab.cls_id] + word_ids + [words_vocab.sep_id]
     mask = [False] + mask + [False]
-    return SyntaxItem(size, word_ids, mask, head_ids, rel_ids)
+    return SyntaxItem(word_ids, mask, head_ids, rel_ids)
 
 
 def syntax_items(markups, words_vocab, rels_vocab):
@@ -347,7 +349,7 @@ def syntax_batch(items, words_vocab, rels_vocab):
 class BERTSyntaxEncoder:
     def __init__(self, words_vocab, rels_vocab,
                  seq_len=512, batch_size=8,
-                 shuffle_size=1, size_size=1):
+                 shuffle_size=1, len_size=1):
         self.words_vocab = words_vocab
         self.rels_vocab = rels_vocab
 
@@ -355,12 +357,12 @@ class BERTSyntaxEncoder:
         self.batch_size = batch_size
 
         self.shuffle = ShuffleBuffer(shuffle_size)
-        self.size = SizeBuffer(size_size)
+        self.len = LenBuffer(len_size)
 
     def __call__(self, markups):
         items = syntax_items(markups, self.words_vocab, self.rels_vocab)
         items = self.shuffle(items)
-        chunks = self.size(items)
+        chunks = self.len(items)
 
         max_items = self.seq_len * self.batch_size
         for chunk in chunks:
