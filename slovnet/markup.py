@@ -137,9 +137,10 @@ class MorphMarkup(Record):
 
 
 class SyntaxToken(Record):
-    __attributes__ = ['text', 'head_id', 'rel']
+    __attributes__ = ['id', 'text', 'head_id', 'rel']
 
-    def __init__(self, text, head_id, rel):
+    def __init__(self, id, text, head_id, rel):
+        self.id = id
         self.text = text
         self.head_id = head_id
         self.rel = rel
