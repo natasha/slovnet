@@ -100,8 +100,7 @@ BOARD_NAME = getenv('board_name', '02_bert_ner')
 RUNS_DIR = 'runs'
 
 TRAIN_BOARD = '01_train'
-DEV_BOARD = '02_dev'
-TEST_BOARD = '03_test'
+TEST_BOARD = '02_test'
 
 SEED = int(getenv('seed', 72))
 DEVICE = getenv('device', CUDA0)

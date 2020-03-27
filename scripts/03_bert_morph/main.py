@@ -49,8 +49,11 @@ from slovnet.score import (
     MorphScoreMeter,
     score_morph_batch
 )
-from slovnet.mask import split_masked
-from slovnet.loop import every
+from slovnet.mask import (
+    Masked,
+    split_masked,
+    pad_masked
+)
 
 
 DATA_DIR = 'data'
