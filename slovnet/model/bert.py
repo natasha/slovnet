@@ -87,10 +87,10 @@ class BERTEncoder(nn.Module):
             for _ in range(layers_num)
         ])
 
-    def forward(self, input):
+    def forward(self, input, mask=None):
         input = input.transpose(0, 1)  # torch expects seq x batch x emb
         for layer in self.layers:
-            input = layer(input)
+            input = layer(input, src_key_padding_mask=mask)
         return input.transpose(0, 1)  # restore
 
 
@@ -303,11 +303,11 @@ def select_words(input, mask):
 
 
 class SyntaxPred(Record):
-    __attributes__ = ['head', 'rel']
+    __attributes__ = ['head_id', 'rel_id']
 
-    def __init__(self, head, rel):
-        self.head = head
-        self.rel = rel
+    def __init__(self, head_id, rel_id):
+        self.head_id = head_id
+        self.rel_id = rel_id
 
 
 class BERTSyntax(nn.Module):
@@ -323,6 +323,6 @@ class BERTSyntax(nn.Module):
         x = self.encoder(x, pad_mask)
         x = select_words(x, word_mask)
         return SyntaxPred(
-            head=self.head(x),
-            rel=self.rel(x, head_id)
+            head_id=self.head(x),
+            rel_id=self.rel(x, head_id)
         )

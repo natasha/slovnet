@@ -231,10 +231,9 @@ class BERTMorphEncoder:
 
 
 class SyntaxItem(Record):
-    __attributes__ = ['size', 'word_ids', 'mask', 'head_ids', 'rel_ids']
+    __attributes__ = ['word_ids', 'mask', 'head_ids', 'rel_ids']
 
-    def __init__(self, size, word_ids, mask, head_ids, rel_ids):
-        self.size = size
+    def __init__(self, word_ids, mask, head_ids, rel_ids):
         self.word_ids = word_ids
         self.mask = mask
         self.head_ids = head_ids
@@ -244,9 +243,19 @@ class SyntaxItem(Record):
         return len(self.head_ids)
 
 
+ROOT_ID = '0'
+
+
 def syntax_item(markup, words_vocab, rels_vocab):
     word_ids, mask, head_ids, rel_ids = [], [], [], []
-    for token in markup.tokens:
+    ids = {ROOT_ID: 0}
+    for index, token in enumerate(markup.tokens, 1):
+        ids[token.id] = index
+        head_ids.append(token.head_id)
+
+        id = rels_vocab.encode(token.rel)
+        rel_ids.append(id)
+
         parts = wordpiece(token.text, words_vocab)
         if not parts:
             word_ids.append(words_vocab.unk_id)
@@ -257,13 +266,9 @@ def syntax_item(markup, words_vocab, rels_vocab):
                 word_ids.append(id)
                 mask.append(index == 0)
 
-        head_ids.append(token.head_id)
-
-        id = rels_vocab.encode(token.rel)
-        rel_ids.append(id)
-
     word_ids = [words_vocab.cls_id] + word_ids + [words_vocab.sep_id]
     mask = [False] + mask + [False]
+    head_ids = [ids[_] for _ in head_ids]
     return SyntaxItem(word_ids, mask, head_ids, rel_ids)
 
 

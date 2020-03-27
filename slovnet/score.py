@@ -394,9 +394,9 @@ def score_syntax_batch(batch):
     input, target, loss, pred = batch
     return SyntaxBatchScore(
         loss.item(),
-        uas(pred.head, target.head_id),
+        uas(pred.head_id, target.head_id),
         las(
-            pred.head, target.head_id,
-            pred.rel, target.rel_id
+            pred.head_id, target.head_id,
+            pred.rel_id, target.rel_id
         )
     )

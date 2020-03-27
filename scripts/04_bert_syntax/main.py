@@ -1,6 +1,7 @@
 
 from os import getenv, environ
 from os.path import exists, join
+from itertools import chain, islice as head
 from random import seed, sample, randint, uniform
 from subprocess import run
 
@@ -106,18 +107,18 @@ S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
 S3_MODEL_HEAD = join(S3_DIR, MODEL_HEAD)
 S3_MODEL_REL = join(S3_DIR, MODEL_REL)
 
-BOARD_NAME = getenv('board_name', '04_bert_syntax')
+BOARD_NAME = getenv('board_name', '04_bert_syntax_01')
 RUNS_DIR = 'runs'
 
 TRAIN_BOARD = '01_train'
 TEST_BOARD = '02_test'
 
-SEED = int(getenv('seed', 1))
+SEED = int(getenv('seed', 50))
 DEVICE = getenv('device', CUDA0)
-BERT_LR = float(getenv('bert_lr', 0.0002))
-LR = float(getenv('lr', 0.001))
-LR_GAMMA = float(getenv('lr_gamma', 0.8))
-EPOCHS = int(getenv('epochs', 5))
+BERT_LR = float(getenv('bert_lr', 0.000058))
+LR = float(getenv('lr', 0.00012))
+LR_GAMMA = float(getenv('lr_gamma', 0.29))
+EPOCHS = int(getenv('epochs', 2))
 
 
 def process_batch(model, criterion, batch):
@@ -127,11 +128,13 @@ def process_batch(model, criterion, batch):
         input.word_id, input.word_mask, input.pad_mask,
         target.head_id
     )
-    loss = Loss(
-        head=criterion(pred.head, target.head_id),
-        rel=criterion(pred.rel, target.rel_id)
+
+    loss = (
+        criterion(pred.head_id, target.head_id)
+        + criterion(pred.rel_id, target.rel_id)
     )
-    pred.head = pred.head.argmax(-1)
-    pred.rel = pred.rel.argmax(-1)
+
+    pred.head_id = pred.head_id.argmax(-1)
+    pred.rel_id = pred.rel_id.argmax(-1)
 
     return batch.processed(loss, pred)
