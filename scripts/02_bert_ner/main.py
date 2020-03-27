@@ -25,7 +25,7 @@ from slovnet.io import (
 )
 from slovnet.board import Board
 from slovnet.const import (
-    TRAIN, DEV, TEST,
+    TRAIN, TEST,
     PER, LOC, ORG,
     CUDA0,
 )
@@ -58,7 +58,6 @@ from slovnet.mask import (
     split_masked,
     pad_masked
 )
-from slovnet.loop import every
 
 
 DATA_DIR = 'data'

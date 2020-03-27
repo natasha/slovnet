@@ -26,7 +26,6 @@ from slovnet.io import (
 from slovnet.board import Board
 from slovnet.const import (
     TRAIN, TEST,
-    PER, LOC, ORG,
     PAD, CUDA0,
 )
 from slovnet.token import tokenize
@@ -105,7 +104,7 @@ BOARD_NAME = getenv('board_name', '03_bert_morph_02')
 RUNS_DIR = 'runs'
 
 TRAIN_BOARD = '01_train'
-TEST_BOARD = '03_test'
+TEST_BOARD = '02_test'
 
 SEED = int(getenv('seed', 1))
 DEVICE = getenv('device', CUDA0)
