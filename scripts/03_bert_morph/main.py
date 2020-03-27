@@ -1,6 +1,6 @@
 
 from os import getenv, environ
-from os.path import exists, join, expanduser
+from os.path import exists, join
 from random import seed, sample, randint, uniform
 from itertools import islice as head
 from subprocess import run
@@ -45,45 +45,37 @@ from slovnet.model.bert import (
 from slovnet.markup import MorphMarkup
 from slovnet.vocab import BERTVocab, TagsVocab
 from slovnet.encoders.bert import BERTMorphEncoder
-from slovnet.loss import masked_flatten_cross_entropy as criterion
+from slovnet.loss import masked_flatten_cross_entropy
 from slovnet.score import (
     MorphScoreMeter,
-    score_morph_batch as score_batch
+    score_morph_batch
 )
 from slovnet.mask import split_masked
-from slovnet.loop import (
-    every,
-    process_bert_morph_batch as process_batch
-)
+from slovnet.loop import every
 
 
 DATA_DIR = 'data'
 MODEL_DIR = 'model'
 BERT_DIR = 'bert'
-CORUS_DIR = expanduser('~/proj/corus-data/gramru')
+RAW_DIR = join(DATA_DIR, 'raw')
 
 NEWS = join(DATA_DIR, 'news.jl.gz')
-WIKI = join(DATA_DIR, 'wiki.jl.gz')
 FICTION = join(DATA_DIR, 'fiction.jl.gz')
-CORUS_FILES = {
+GRAMRU_DIR = join(RAW_DIR, 'GramEval2020-master')
+GRAMRU_FILES = {
     NEWS: [
-        'dev/GramEval2020-RuEval2017-Lenta-news-dev.conllu',
-        'train/MorphoRuEval2017-Lenta-train.conllu',
-    ],
-    WIKI: [
-        'dev/GramEval2020-GSD-wiki-dev.conllu',
-        'train/GramEval2020-GSD-train.conllu'
+        'dataOpenTest/GramEval2020-RuEval2017-Lenta-news-dev.conllu',
+        'dataTrain/MorphoRuEval2017-Lenta-train.conllu',
     ],
     FICTION: [
-        'dev/GramEval2020-SynTagRus-dev.conllu',
-        'train/GramEval2020-SynTagRus-train-v2.conllu',
-        'train/MorphoRuEval2017-JZ-gold.conllu'
+        'dataOpenTest/GramEval2020-SynTagRus-dev.conllu',
+        'dataTrain/GramEval2020-SynTagRus-train-v2.conllu',
+        'dataTrain/MorphoRuEval2017-JZ-gold.conllu'
     ],
 }
 
 S3_DIR = '03_bert_morph'
 S3_NEWS = join(S3_DIR, NEWS)
-S3_WIKI = join(S3_DIR, WIKI)
 S3_FICTION = join(S3_DIR, FICTION)
 
 VOCAB = 'vocab.txt'
@@ -121,3 +113,17 @@ BERT_LR = float(getenv('bert_lr', 0.0002))
 LR = float(getenv('lr', 0.001))
 LR_GAMMA = float(getenv('lr_gamma', 0.8))
 EPOCHS = int(getenv('epochs', 5))
+
+
+def process_batch(model, criterion, batch):
+    input, target = batch
+
+    pred = model(input.value)
+    pred = pad_masked(pred, input.mask)
+    mask = pad_masked(input.mask, input.mask)
+
+    loss = criterion(pred, target.value, target.mask)
+
+    pred = pred.argmax(-1)
+    pred = Masked(pred, mask)
+    return batch.processed(loss, pred)

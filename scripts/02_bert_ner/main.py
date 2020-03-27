@@ -10,7 +10,6 @@ import torch
 from torch import optim
 
 from naeval.ner.datasets import (
-    load_bsnlp,
     load_factru,
     load_ne5,
 )
@@ -52,31 +51,29 @@ from slovnet.encoders.bert import BERTNEREncoder
 from slovnet.score import (
     NERBatchScore,
     NERScoreMeter,
-    score_ner_batch as score_batch
+    score_ner_batch
 )
-from slovnet.mask import split_masked
-from slovnet.loop import (
-    every,
-    process_bert_ner_batch as process_batch
+from slovnet.mask import (
+    Masked,
+    split_masked,
+    pad_masked
 )
+from slovnet.loop import every
 
 
 DATA_DIR = 'data'
 MODEL_DIR = 'model'
 BERT_DIR = 'bert'
+RAW_DIR = join(DATA_DIR, 'raw')
 
-CORUS_DIR = expanduser('~/proj/corus-data/')
-CORUS_NE5 = join(CORUS_DIR, 'Collection5')
-CORUS_BSNLP = join(CORUS_DIR, 'bsnlp')
-CORUS_FACTRU = join(CORUS_DIR, 'factRuEval-2016-master')
+CORUS_NE5 = join(RAW_DIR, 'Collection5')
+CORUS_FACTRU = join(RAW_DIR, 'factRuEval-2016-master')
 
 NE5 = join(DATA_DIR, 'ne5.jl.gz')
-BSNLP = join(DATA_DIR, 'bsnlp.jl.gz')
 FACTRU = join(DATA_DIR, 'factru.jl.gz')
 
 S3_DIR = '02_bert_ner'
 S3_NE5 = join(S3_DIR, NE5)
-S3_BSNLP = join(S3_DIR, BSNLP)
 S3_FACTRU = join(S3_DIR, FACTRU)
 
 VOCAB = 'vocab.txt'
@@ -113,3 +110,16 @@ BERT_LR = float(getenv('bert_lr', 0.000045))
 LR = float(getenv('lr', 0.0075))
 LR_GAMMA = float(getenv('lr_gamma', 0.45))
 EPOCHS = int(getenv('epochs', 5))
+
+
+def process_batch(model, criterion, batch):
+    input, target = batch
+
+    pred = model(input.value)
+    pred = pad_masked(pred, input.mask)
+    mask = pad_masked(input.mask, input.mask)
+
+    loss = criterion(pred, target.value, target.mask)
+
+    pred = Masked(pred, mask)
+    return batch.processed(loss, pred)
