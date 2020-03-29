@@ -23,11 +23,6 @@ from .conll import format_conll_tag
 #######
 
 
-def sent_spans(sent, spans):
-    spans = envelop_spans(sent, spans)
-    return offset_spans(spans, -sent.start)
-
-
 class SpanMarkup(Record):
     __attributes__ = ['text', 'spans']
     __annotations__ = {
@@ -41,10 +36,9 @@ class SpanMarkup(Record):
     @property
     def sents(self):
         for sent in sentenize(self.text):
-            yield SpanMarkup(
-                sent.text,
-                list(sent_spans(sent, self.spans))
-            )
+            spans = envelop_spans(sent, self.spans)
+            spans = offset_spans(spans, -sent.start)
+            yield SpanMarkup(sent.text, list(spans))
 
     def to_bio(self, tokens):
         tags = spans_bio(tokens, self.spans)
