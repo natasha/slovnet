@@ -47,7 +47,6 @@ from slovnet.score import (
     score_mlm_batches
 )
 from slovnet.loss import flatten_cross_entropy
-from slovnet.loop import every
 
 
 DATA_DIR = 'data'
@@ -92,6 +91,10 @@ TRAIN_BOARD = '01_train'
 TEST_BOARD = '02_test'
 
 DEVICE = CUDA0
+
+
+def every(step, period):
+    return step > 0 and step % period == 0
 
 
 def process_batch(model, criterion, batch):
