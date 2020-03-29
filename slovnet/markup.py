@@ -13,7 +13,7 @@ from .span import (
     envelop_spans,
     offset_spans
 )
-from .conllu import format_conllu_tag
+from .conll import format_conll_tag
 
 
 ########
@@ -116,7 +116,7 @@ class MorphToken(Record):
 
     @property
     def tag(self):
-        return format_conllu_tag(self.pos, self.feats)
+        return format_conll_tag(self.pos, self.feats)
 
 
 class MorphMarkup(Record):

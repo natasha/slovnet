@@ -1,6 +1,6 @@
 
 
-def format_conllu_tag(pos, feats):
+def format_conll_tag(pos, feats):
     if not feats:
         return pos
 
@@ -11,7 +11,7 @@ def format_conllu_tag(pos, feats):
     return '%s|%s' % (pos, feats)
 
 
-def parse_conllu_tag(tag):
+def parse_conll_tag(tag):
     if '|' not in tag:
         return tag
 
