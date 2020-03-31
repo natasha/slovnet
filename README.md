@@ -304,12 +304,12 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 
 ## Development
 
-Rent GPU:
+Rent Vast GPU:
 
 ```bash
-vast search offers | grep '1 x  RTX 2080 Ti'
-vast create instance 420232 --image alexkuk/my-vast --disk 20
-vast destroy instance 488817
+vast search offers | grep '1 x  GTX 1080 Ti'
+vast create instance 488499 --image alexkuk/my-vast --disk 20
+vast destroy instance 498074
 watch vast show instances
 
 ssh -Nf vast -L 8888:localhost:8888 -L 6006:localhost:6006
@@ -322,10 +322,62 @@ rsync -u --exclude data --exclude runs -rv 'vast:~/slovnet/*' .
 
 ```
 
+Rent YC GPU:
+
+```bash
+yc compute instance create \
+  --name gpu \
+  --zone ru-central1-a \
+  --network-interface subnet-name=default,nat-ip-version=ipv4 \
+  --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-1804-lts-ngc,type=network-ssd,size=20 \
+  --cores=8 \
+  --memory=96 \
+  --gpus=1 \
+  --ssh-key ~/.ssh/id_rsa.pub \
+  --folder-name default \
+  --platform-id gpu-standard-v1 \
+  --preemptible
+
+sudo locale-gen ru_RU.UTF-8
+
+sudo apt-get update
+sudo apt-get install -y \
+  python3-pip
+
+sudo pip3 install \
+  torch \
+  tqdm \
+  jupyter \
+  tensorboard \
+  numpy
+
+mkdir runs
+nohup tensorboard \
+  --logdir=runs \
+  --host=0.0.0.0 \
+  --port=6006 \
+  --reload_interval=1 &
+
+nohup jupyter notebook \
+  --no-browser \
+  --allow-root \
+  --ip=0.0.0.0 \
+  --port=8888 \
+  --NotebookApp.token='' \
+  --NotebookApp.password='' &
+
+ssh -Nf gpu -L 8888:localhost:8888 -L 6006:localhost:6006
+
+scp ~/.slovnet.json gpu:~
+rsync --exclude data -rv . gpu:~/slovnet
+rsync -u --exclude data -rv 'gpu:~/slovnet/*' .
+
+```
+
 Intall dev:
 
 ```bash
-pip3 install -e slovnet
 pip3 install -r slovnet/requirements/dev.txt
+pip3 install -e slovnet
 
 ```
