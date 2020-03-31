@@ -7,6 +7,7 @@ from slovnet.chop import chop, chop_drop
 from slovnet.batch import Batch
 from slovnet.mask import Masked, pad_masked
 from slovnet.bert import bert_subs
+from slovnet.const import CPU
 
 from .buffer import ShuffleBuffer, LenBuffer
 
@@ -294,12 +295,14 @@ class BERTInferInput(Record):
 
 class BERTNERInferEncoder:
     def __init__(self, words_vocab, tags_vocab,
-                 seq_len=128, batch_size=8):
+                 seq_len=128, batch_size=8, device=CPU):
         self.words_vocab = words_vocab
         self.tags_vocab = tags_vocab
 
         self.seq_len = seq_len
         self.batch_size = batch_size
+
+        self.device = device
 
     def item(self, item):
         word_ids, mask = [], []
@@ -323,7 +326,7 @@ class BERTNERInferEncoder:
         word_id = pad_sequence(word_id, self.words_vocab.pad_id)
         word_mask = pad_sequence(word_mask, False)
         pad_mask = word_id == self.words_vocab.pad_id
-        return BERTInferInput(word_id, word_mask, pad_mask)
+        return BERTInferInput(word_id, word_mask, pad_mask).to(self.device)
 
     def encode(self, items):
         items = (self.item(_) for _ in items)
