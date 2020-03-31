@@ -6,12 +6,6 @@ from .pad import pad_sequence
 class Masked(Record):
     __attributes__ = ['value', 'mask']
 
-    def to(self, device):
-        return Masked(
-            self.value.to(device),
-            self.mask.to(device)
-        )
-
 
 def split_masked(input, mask):
     sizes = mask.sum(dim=-1).tolist()

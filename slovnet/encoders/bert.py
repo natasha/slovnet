@@ -203,23 +203,9 @@ class BERTSyntaxTrainItem(Record):
 class BERTSyntaxInput(Record):
     __attributes__ = ['word_id', 'word_mask', 'pad_mask']
 
-    def to(self, device):
-        return BERTSyntaxInput(
-            self.word_id.to(device),
-            self.word_mask.to(device),
-            self.pad_mask.to(device)
-        )
-
 
 class BERTSyntaxTarget(Record):
     __attributes__ = ['head_id', 'rel_id', 'mask']
-
-    def to(self, device):
-        return BERTSyntaxTarget(
-            self.head_id.to(device),
-            self.rel_id.to(device),
-            self.mask.to(device)
-        )
 
 
 class BERTSyntaxTrainEncoder:

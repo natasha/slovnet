@@ -124,3 +124,11 @@ class Record(object):
         text = file.read().decode('ascii')
         data = json.loads(text)
         return cls.from_json(data)
+
+    def to(self, device):
+        cls = type(self)
+        args = [
+            getattr(self, _).to(device)
+            for _ in self.__attributes__
+        ]
+        return cls(*args)
