@@ -25,13 +25,9 @@ from slovnet.io import (
     dump_lines
 )
 from slovnet.s3 import S3
-from slovnet.board import Board
+from slovnet.board import TensorBoard
 from slovnet.const import CUDA0
 
-from slovnet.model.state import (
-    load_model,
-    dump_model
-)
 from slovnet.model.bert import (
     RuBERTConfig,
     BERTEmbedding,
@@ -40,7 +36,7 @@ from slovnet.model.bert import (
     BERTMLM
 )
 from slovnet.vocab import BERTVocab
-from slovnet.encoders.bert import BERTMLMEncoder
+from slovnet.encoders.bert import BERTMLMTrainEncoder
 from slovnet.score import (
     MLMScoreMeter,
     score_mlm_batch,

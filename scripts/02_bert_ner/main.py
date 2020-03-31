@@ -19,11 +19,14 @@ from slovnet.io import (
     format_jl,
     parse_jl,
 
-    load_lines,
     load_gz_lines,
     dump_gz_lines
 )
-from slovnet.board import Board
+from slovnet.board import (
+    TensorBoard,
+    LogBoard,
+    MultiBoard
+)
 from slovnet.const import (
     TRAIN, TEST,
     PER, LOC, ORG,
@@ -31,10 +34,6 @@ from slovnet.const import (
 )
 from slovnet.token import tokenize
 
-from slovnet.model.state import (
-    load_model,
-    dump_model
-)
 from slovnet.model.bert import (
     RuBERTConfig,
     BERTEmbedding,
@@ -47,7 +46,7 @@ from slovnet.markup import (
     show_span_markup
 )
 from slovnet.vocab import BERTVocab, BIOTagsVocab
-from slovnet.encoders.bert import BERTNEREncoder
+from slovnet.encoders.bert import BERTNERTrainEncoder
 from slovnet.score import (
     NERBatchScore,
     NERScoreMeter,

@@ -17,23 +17,19 @@ from slovnet.io import (
     format_jl,
     parse_jl,
 
-    load_lines,
-    dump_lines,
-
     load_gz_lines,
     dump_gz_lines
 )
-from slovnet.board import Board
+from slovnet.board import (
+    TensorBoard,
+    LogBoard,
+    MultiBoard
+)
 from slovnet.const import (
     TRAIN, TEST,
     PAD, CUDA0,
 )
-from slovnet.token import tokenize
 
-from slovnet.model.state import (
-    load_model,
-    dump_model
-)
 from slovnet.model.bert import (
     RuBERTConfig,
     BERTEmbedding,
@@ -43,7 +39,7 @@ from slovnet.model.bert import (
 )
 from slovnet.markup import MorphMarkup
 from slovnet.vocab import BERTVocab, Vocab
-from slovnet.encoders.bert import BERTMorphEncoder
+from slovnet.encoders.bert import BERTMorphTrainEncoder
 from slovnet.loss import masked_flatten_cross_entropy
 from slovnet.score import (
     MorphScoreMeter,
