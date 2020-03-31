@@ -1,6 +1,7 @@
 # coding: utf8
 
 from .record import Record
+from .io import load_lines
 from .const import (
     B, I, O,
 
@@ -37,6 +38,11 @@ class Vocab(Record):
 
     def _repr_pretty_(self, printer, cycle):
         printer.text(repr(self))
+
+    @classmethod
+    def load(cls, path):
+        items = list(load_lines(path))
+        return cls(items)
 
 
 class BERTVocab(Vocab):
