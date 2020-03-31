@@ -17,5 +17,10 @@ def tokenize(text):
         )
 
 
-def find_tokens(text, words):
-    pass
+def find_tokens(text, chunks):
+    offset = 0
+    for chunk in chunks:
+        start = text.find(chunk, offset)
+        stop = start + len(chunk)
+        yield Token(start, stop, chunk)
+        offset = stop
