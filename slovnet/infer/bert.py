@@ -7,17 +7,12 @@ from slovnet.record import Record
 from slovnet.token import tokenize
 from slovnet.bert import bert_subs
 from slovnet.chop import chop_weighted
+from slovnet.mask import pad_masked
 from slovnet.markup import BIOMarkup
 
 
 class SubsToken(Record):
     __attributes__ = ['text', 'subs']
-
-    @property
-    def weight(self):
-        if not self.subs:
-            return 1
-        return len(self.subs)
 
 
 class BERTInferItem(Record):
@@ -49,7 +44,11 @@ def text_items(texts, vocab):
 
 def segment_items(items, seq_len):
     for item in items:
-        chunks = chop_weighted(item.tokens, seq_len, weight=lambda _: _.weight)
+        chunks = chop_weighted(
+            item.tokens,
+            seq_len - 2,  # consider <cls>, <sep> spec tokens
+            weight=lambda _: len(_.subs)
+        )
         for chunk in chunks:
             yield BERTInferItem(item.id, chunk)
 
@@ -75,17 +74,19 @@ class BERTNERInfer:
         self.model = model
         self.encoder = encoder
 
-    def apply(self, inputs):
+    def process(self, inputs):
         with torch.no_grad():
             for input in inputs:
                 pred = self.model(input.word_id, input.pad_mask)
-                yield from self.model.ner.crf.decode(pred, input.word_mask)
+                pred = pad_masked(pred, input.word_mask)
+                mask = pad_masked(input.word_mask, input.word_mask)
+                yield from self.model.ner.crf.decode(pred, mask)
 
     def __call__(self, texts):
         items = text_items(texts, self.encoder.words_vocab)
         items = list(segment_items(items, self.encoder.seq_len))
         inputs = self.encoder.encode(items)
-        preds = self.apply(inputs)
+        preds = self.process(inputs)
         preds = self.encoder.decode(preds)
 
         for item, pred in zip(items, preds):
