@@ -8,7 +8,7 @@ from .bio import (
 )
 
 
-class Share(Record):
+class Acc(Record):
     __attributes__ = ['correct', 'total']
 
     def __init__(self, correct=0, total=0):
@@ -57,10 +57,10 @@ class F1(Record):
 
     def __init__(self, prec=None, recall=None):
         if not prec:
-            prec = Share()
+            prec = Acc()
         self.prec = prec
         if not recall:
-            recall = Share()
+            recall = Acc()
         self.recall = recall
 
     def add(self, other):
@@ -103,13 +103,13 @@ def topk_acc(pred, target, ks=(1, 2, 4, 8), ignore_id=-100):
     total = mask.sum().item()
     for k in ks:
         count = correct[:k].sum().item()
-        yield Share(count, total)
+        yield Acc(count, total)
 
 
 def acc(a, b):
     correct = (a == b).sum().item()
     total = len(a)
-    return Share(correct, total)
+    return Acc(correct, total)
 
 
 class BatchScore(Record):
@@ -292,7 +292,7 @@ class MorphScoreMeter(ScoreMeter):
         if not loss:
             loss = Mean()
         if not acc:
-            acc = Share()
+            acc = Acc()
         self.loss = loss
         self.acc = acc
 
@@ -346,9 +346,9 @@ class SyntaxScoreMeter(Record):
         if not loss:
             loss = Mean()
         if not uas:
-            uas = Share()
+            uas = Acc()
         if not las:
-            las = Share()
+            las = Acc()
         self.loss = loss
         self.uas = uas
         self.las = las
@@ -375,7 +375,7 @@ def uas(pred, target):
 
     total = len(pred)
     correct = (pred == target).sum().item()
-    return Share(correct, total)
+    return Acc(correct, total)
 
 
 def las(head_pred, head_target, rel_pred, rel_target):
@@ -387,7 +387,7 @@ def las(head_pred, head_target, rel_pred, rel_target):
     total = len(head_pred)
     match = (head_pred == head_target) & (rel_pred == rel_target)
     correct = match.sum().item()
-    return Share(correct, total)
+    return Acc(correct, total)
 
 
 def score_syntax_batch(batch):
