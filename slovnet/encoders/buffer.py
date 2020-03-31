@@ -3,7 +3,7 @@ from collections import defaultdict
 from random import shuffle
 
 
-class Buffer(object):
+class Buffer:
     def __call__(self, items):
         for item in items:
             self.append(item)
