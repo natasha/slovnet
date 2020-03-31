@@ -29,10 +29,6 @@ class SpanMarkup(Record):
         'spans': [Span]
     }
 
-    def __init__(self, text, spans):
-        self.text = text
-        self.spans = spans
-
     @property
     def sents(self):
         for sent in sentenize(self.text):
@@ -56,19 +52,12 @@ class SpanMarkup(Record):
 class TagToken(Record):
     __attributes__ = ['text', 'tag']
 
-    def __init__(self, text, tag):
-        self.text = text
-        self.tag = tag
-
 
 class TagMarkup(Record):
     __attributes__ = ['tokens']
     __annotations__ = {
         'tokens': [TagToken]
     }
-
-    def __init__(self, tokens):
-        self.tokens = tokens
 
     @property
     def words(self):
@@ -103,11 +92,6 @@ class BIOMarkup(TagMarkup):
 class MorphToken(Record):
     __attributes__ = ['text', 'pos', 'feats']
 
-    def __init__(self, text, pos, feats):
-        self.text = text
-        self.pos = pos
-        self.feats = feats
-
     @property
     def tag(self):
         return format_conll_tag(self.pos, self.feats)
@@ -118,9 +102,6 @@ class MorphMarkup(Record):
     __annotations__ = {
         'tokens': [MorphToken]
     }
-
-    def __init__(self, tokens):
-        self.tokens = tokens
 
 
 #######
@@ -133,18 +114,9 @@ class MorphMarkup(Record):
 class SyntaxToken(Record):
     __attributes__ = ['id', 'text', 'head_id', 'rel']
 
-    def __init__(self, id, text, head_id, rel):
-        self.id = id
-        self.text = text
-        self.head_id = head_id
-        self.rel = rel
-
 
 class SyntaxMarkup(Record):
     __attributes__ = ['tokens']
     __annotations__ = {
         'tokens': [SyntaxToken]
     }
-
-    def __init__(self, tokens):
-        self.tokens = tokens

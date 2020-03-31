@@ -20,6 +20,11 @@ class Record(object):
     __attributes__ = []
     __annotations__ = {}
 
+    def __init__(self, *args, **kwargs):
+        for key, value in zip(self.__attributes__, args):
+            self.__dict__[key] = value
+        self.__dict__.update(kwargs)
+
     def __eq__(self, other):
         return (
             type(self) == type(other)

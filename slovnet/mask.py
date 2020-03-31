@@ -6,10 +6,6 @@ from .pad import pad_sequence
 class Masked(Record):
     __attributes__ = ['value', 'mask']
 
-    def __init__(self, value, mask):
-        self.value = value
-        self.mask = mask
-
     def to(self, device):
         return Masked(
             self.value.to(device),

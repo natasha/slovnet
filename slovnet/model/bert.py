@@ -15,18 +15,6 @@ class BERTConfig(Record):
         'dropout', 'norm_eps'
     ]
 
-    def __init__(self, vocab_size, seq_len, emb_dim,
-                 layers_num, heads_num, hidden_dim,
-                 dropout, norm_eps):
-        self.vocab_size = vocab_size
-        self.seq_len = seq_len
-        self.emb_dim = emb_dim
-        self.layers_num = layers_num
-        self.heads_num = heads_num
-        self.hidden_dim = hidden_dim
-        self.dropout = dropout
-        self.norm_eps = norm_eps
-
 
 class RuBERTConfig(BERTConfig):
     def __init__(self,
@@ -304,10 +292,6 @@ def select_words(input, mask):
 
 class SyntaxPred(Record):
     __attributes__ = ['head_id', 'rel_id']
-
-    def __init__(self, head_id, rel_id):
-        self.head_id = head_id
-        self.rel_id = rel_id
 
 
 class BERTSyntax(nn.Module):

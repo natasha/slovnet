@@ -10,9 +10,6 @@ class Tar(Record):
 
     mode = 'r'
 
-    def __init__(self, path):
-        self.path = path
-
     def __enter__(self):
         self.tar = tarfile.open(self.path, self.mode)
         return self

@@ -9,11 +9,6 @@ from .record import Record
 class Sent(Record):
     __attributes__ = ['start', 'stop', 'text']
 
-    def __init__(self, start, stop, text):
-        self.start = start
-        self.stop = stop
-        self.text = text
-
 
 def split_lines(text):
     for match in re.finditer(r'([^\r\n]+)', text):
