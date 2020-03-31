@@ -19,15 +19,3 @@ def chop_drop(items, size):
         yield chunk
 
 
-def chop_fill(items, size):
-    previous = None
-    chunks = chop(items, size)
-    for chunk in chunks:
-        if len(chunk) < size:
-            if previous:  # last chunk
-                chunk = (previous + chunk)[-size:]
-            else:  # |items| < size
-                repeat = size // len(chunk) + 1
-                chunk = (chunk * repeat)[:size]
-        yield chunk
-        previous = chunk
