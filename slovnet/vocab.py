@@ -1,7 +1,10 @@
 # coding: utf8
 
 from .record import Record
-from .io import load_lines
+from .io import (
+    load_lines,
+    dump_lines
+)
 from .const import (
     B, I, O,
 
@@ -43,6 +46,9 @@ class Vocab(Record):
     def load(cls, path):
         items = list(load_lines(path))
         return cls(items)
+
+    def dump(self, path):
+        dump_lines(self.items, path)
 
 
 class BERTVocab(Vocab):
