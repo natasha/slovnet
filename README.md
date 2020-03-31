@@ -89,6 +89,7 @@ LOC                                LOC---
 <a href="https://github.com/natasha/slovnet/releases/download/v0.0.0/slovnet_ner_v1.tar">slovnet_ner_v1.tar</a> 1.5 MB
 
 ## Evaluation
+<a name="evalualtion"></a>
 
 4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus">Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>.
 
@@ -103,6 +104,7 @@ LOC                                LOC---
 
 For every column top 3 results are highlighted. In each case `slovnet` and `deeppavlov_bert` are 5-10% better then other systems:
 
+<!--- ner1 --->
 <table border="0" class="dataframe">
   <thead>
     <tr>
@@ -228,12 +230,14 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
     </tr>
   </tbody>
 </table>
+<!--- ner1 --->
 
 * `init` — time between system launch and first response. It is convenient for testing and devops to have model that starts quickly. `deeppavlov_bert` and `texterra` take >30 sec to start, `slovnet` takes just ~1 sec.
 * `disk` — file size of artefacts one needs to download before using the system: model weights, embeddings, binaries, vocabs. It is inconvenient to deploy large models in production. `deeppavlov` models require >1 GB download, `slovnet` is just 30 MB including embeddings.
 * `ram` — average memory consumption. `deeppavlov` systems and `texterra` are memory heavy, `slovnet` consumes ~200 MB of RAM.
 * `speed` — number of news articles processed per second, one article is ~1 KB of text. `deeppavlov` systems process texts in batches on GPU, but they are still slover than `tomita`, `mitie` and `slovnet` that run on single CPU.
 
+<!--- ner2 --->
 <table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -246,11 +250,11 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
   </thead>
   <tbody>
     <tr>
-      <th>slovnet</th>
-      <td><b>0.9</b></td>
-      <td><b>30</b></td>
-      <td><b>180</b></td>
-      <td><b>33.9</b></td>
+      <th>deeppavlov</th>
+      <td>5.9</td>
+      <td>1024</td>
+      <td>3072</td>
+      <td><b>24.3 (gpu)</b></td>
     </tr>
     <tr>
       <th>deeppavlov_bert</th>
@@ -258,13 +262,6 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>2048</td>
       <td>6144</td>
       <td>13.1 (gpu)</td>
-    </tr>
-    <tr>
-      <th>deeppavlov</th>
-      <td>5.9</td>
-      <td>1024</td>
-      <td>3072</td>
-      <td>24.3 (gpu)</td>
     </tr>
     <tr>
       <th>pullenti</th>
@@ -288,6 +285,13 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td><b>29.8</b></td>
     </tr>
     <tr>
+      <th>natasha</th>
+      <td><b>2.0</b></td>
+      <td><b>1</b></td>
+      <td><b>160</b></td>
+      <td>8.8</td>
+    </tr>
+    <tr>
       <th>mitie</th>
       <td>28.3</td>
       <td>327</td>
@@ -296,6 +300,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
     </tr>
   </tbody>
 </table>
+<!--- ner2 --->
 
 ## Support
 
