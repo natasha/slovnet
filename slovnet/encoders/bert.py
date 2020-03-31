@@ -1,77 +1,29 @@
 
-import re
-
 import torch
 
 from slovnet.record import Record
 from slovnet.pad import pad_sequence
-from slovnet.chop import chop_drop
+from slovnet.chop import chop, chop_drop
 from slovnet.batch import Batch
 from slovnet.mask import Masked, pad_masked
+from slovnet.bert import bert_subs
 
 from .buffer import ShuffleBuffer, LenBuffer
 
 
-def wordpiece(text, vocab, prefix='##'):
-    start = 0
-    stop = size = len(text)
-    parts = []
-    while start < size:
-        part = text[start:stop]
-        if start > 0:
-            part = prefix + part
-        if part in vocab.item_ids:
-            parts.append(part)
-            start = stop
-            stop = size
-        else:
-            stop -= 1
-            if stop < start:
-                return
-    return parts
-
-
-##########
+########
 #
-#   MLM
+#   TRAIN
 #
 ########
 
 
-def mlm_split(text):
-    # diff with bert tokenizer 28 / 10000 ~0.3%
-    # школа №3 -> школа, №3
-    # @diet_prada -> @, diet, _, prada
-    return re.findall(r'\w+|[^\w\s]', text)
+##########
+#   MLM
+########
 
 
-def mlm_ids(texts, vocab):
-    for text in texts:
-        chunks = mlm_split(text)
-        for chunk in chunks:
-            parts = wordpiece(chunk, vocab)
-            if not parts:
-                yield vocab.unk_id
-            else:
-                for part in parts:
-                    yield vocab.encode(part)
-
-
-def mlm_seqs(ids, vocab, size):
-    for chunk in chop_drop(ids, size - 2):
-        yield [vocab.cls_id] + chunk + [vocab.sep_id]
-
-
-def mlm_mask(input, vocab, prob=0.15):
-    prob = torch.full(input.shape, prob)
-
-    spec = (input == vocab.cls_id) | (input == vocab.sep_id)
-    prob.masked_fill_(spec, 0)  # do not mask cls, sep
-
-    return torch.bernoulli(prob).bool()
-
-
-class BERTMLMEncoder:
+class BERTMLMTrainEncoder:
     def __init__(self, vocab,
                  seq_len=512, batch_size=8, shuffle_size=1,
                  mask_prob=0.15, ignore_id=-100):
@@ -84,54 +36,105 @@ class BERTMLMEncoder:
         self.mask_prob = mask_prob
         self.ignore_id = ignore_id
 
+    def items(self, texts):
+        for text in texts:
+            subs = bert_subs(text, self.vocab)
+            for sub in subs:
+                yield self.vocab.encode(sub)
+
+    def seqs(self, items):
+        for chunk in chop_drop(items, self.seq_len - 2):
+            yield [self.vocab.cls_id] + chunk + [self.vocab.sep_id]
+
+    def mask(self, input):
+        prob = torch.full(input.shape, self.mask_prob)
+
+        spec = (input == self.vocab.cls_id) | (input == self.vocab.sep_id)
+        prob.masked_fill_(spec, 0)  # do not mask cls, sep
+
+        return torch.bernoulli(prob).bool()
+
+    def batch(self, chunk):
+        input = torch.tensor(chunk).long()
+        target = input.clone()
+
+        mask = self.mask(input)
+        input[mask] = self.vocab.mask_id
+        target[~mask] = self.ignore_id
+
+        return Batch(input, target)
+
     def __call__(self, texts):
-        ids = mlm_ids(texts, self.vocab)
-        seqs = mlm_seqs(ids, self.vocab, self.seq_len)
+        items = self.items(texts)
+        seqs = self.seqs(items)
         seqs = self.shuffle(seqs)
-        inputs = chop_drop(seqs, self.batch_size)
-
-        for input in inputs:
-            input = torch.tensor(input).long()
-            target = input.clone()
-
-            mask = mlm_mask(input, self.vocab, self.mask_prob)
-            input[mask] = self.vocab.mask_id
-            target[~mask] = self.ignore_id
-
-            yield Batch(input, target)
+        chunks = chop(seqs, self.batch_size)
+        for chunk in chunks:
+            yield self.batch(chunk)
 
 
 #########
-#
 #   NER
-#
 ######
 
 
-def ner_items(markups, words_vocab, tags_vocab):
-    for markup in markups:
-        for token in markup.tokens:
-            parts = wordpiece(token.text, words_vocab)
-            tag_id = tags_vocab.encode(token.tag)
-            if not parts:
-                yield (words_vocab.unk_id, tag_id, True)
-            else:
-                for index, part in enumerate(parts):
+class BERTNERTrainEncoder:
+    def __init__(self, words_vocab, tags_vocab,
+                 seq_len=512, batch_size=8, shuffle_size=1):
+        self.words_vocab = words_vocab
+        self.tags_vocab = tags_vocab
+
+        self.seq_len = seq_len
+        self.batch_size = batch_size
+
+        self.shuffle = ShuffleBuffer(shuffle_size)
+
+    def items(self, markups):
+        for markup in markups:
+            for token in markup.tokens:
+                subs = bert_subs(token.text, self.words_vocab)
+                tag_id = self.tags_vocab.encode(token.tag)
+                for index, sub in enumerate(subs):
                     yield (
-                        words_vocab.encode(part),
+                        self.words_vocab.encode(sub),
                         tag_id,
                         index == 0  # use first subtoken
                     )
 
+    def seqs(self, items):
+        cls = (self.words_vocab.cls_id, self.tags_vocab.pad_id, False)
+        sep = (self.words_vocab.sep_id, self.tags_vocab.pad_id, False)
+        for chunk in chop_drop(items, self.seq_len - 2):
+            yield [cls] + chunk + [sep]
 
-def ner_seqs(items, words_vocab, tags_vocab, size):
-    cls = (words_vocab.cls_id, tags_vocab.pad_id, False)
-    sep = (words_vocab.sep_id, tags_vocab.pad_id, False)
-    for chunk in chop_drop(items, size - 2):
-        yield [cls] + chunk + [sep]
+    def batch(self, chunk):
+        chunk = torch.tensor(chunk)  # batch x seq x (word, mask, tag)
+        word_id, tag_id, mask = chunk.unbind(-1)
+        word_id, tag_id, mask = word_id.long(), tag_id.long(), mask.bool()
+
+        input = Masked(word_id, mask)
+        target = Masked(
+            pad_masked(tag_id, input.mask),
+            pad_masked(input.mask, input.mask)
+        )
+
+        return Batch(input, target)
+
+    def __call__(self, markups):
+        items = self.items(markups)
+        seqs = self.seqs(items)
+        seqs = self.shuffle(seqs)
+        chunks = chop(seqs, self.batch_size)
+        for chunk in chunks:
+            yield self.batch(chunk)
 
 
-class BERTNEREncoder:
+###########
+#   MORPH
+#######
+
+
+class BERTMorphTrainEncoder:
     def __init__(self, words_vocab, tags_vocab,
                  seq_len=512, batch_size=8, shuffle_size=1):
         self.words_vocab = words_vocab
@@ -142,216 +145,84 @@ class BERTNEREncoder:
 
         self.shuffle = ShuffleBuffer(shuffle_size)
 
-    def __call__(self, markups):
-        items = ner_items(markups, self.words_vocab, self.tags_vocab)
-        seqs = ner_seqs(items, self.words_vocab, self.tags_vocab, self.seq_len)
-        seqs = self.shuffle(seqs)
-        chunks = chop_drop(seqs, self.batch_size)
-
-        for chunk in chunks:
-            chunk = torch.tensor(chunk)  # batch x seq x (word, mask, tag)
-            word_id, tag_id, mask = chunk.unbind(-1)
-            word_id, tag_id, mask = word_id.long(), tag_id.long(), mask.bool()
-
-            input = Masked(word_id, mask)
-            target = Masked(
-                pad_masked(tag_id, input.mask),
-                pad_masked(input.mask, input.mask)
-            )
-
-            yield Batch(input, target)
-
-
-###########
-#
-#   MORPH
-#
-#######
-
-
-def morph_items(markups, words_vocab, tags_vocab):
-    for markup in markups:
-        for token in markup.tokens:
-            parts = wordpiece(token.text, words_vocab)
-            tag_id = tags_vocab.encode(token.tag)
-            if not parts:
-                yield (words_vocab.unk_id, tag_id, True)
-            else:
-                for index, part in enumerate(parts):
+    def items(self, markups):
+        for markup in markups:
+            for token in markup.tokens:
+                subs = bert_subs(token.text, self.words_vocab)
+                tag_id = self.tags_vocab.encode(token.tag)
+                for index, sub in enumerate(subs):
                     yield (
-                        words_vocab.encode(part),
+                        self.words_vocab.encode(sub),
                         tag_id,
                         index == 0
                     )
 
+    def seqs(self, items):
+        cls = (self.words_vocab.cls_id, self.tags_vocab.pad_id, False)
+        sep = (self.words_vocab.sep_id, self.tags_vocab.pad_id, False)
+        for chunk in chop_drop(items, self.seq_len - 2):
+            yield [cls] + chunk + [sep]
 
-def morph_seqs(items, words_vocab, tags_vocab, size):
-    cls = (words_vocab.cls_id, tags_vocab.pad_id, False)
-    sep = (words_vocab.sep_id, tags_vocab.pad_id, False)
-    for chunk in chop_drop(items, size - 2):
-        yield [cls] + chunk + [sep]
+    def batch(self, chunk):
+        chunk = torch.tensor(chunk)  # batch x seq x (word, mask, tag)
+        word_id, tag_id, mask = chunk.unbind(-1)
+        word_id, tag_id, mask = word_id.long(), tag_id.long(), mask.bool()
 
+        input = Masked(word_id, mask)
+        target = Masked(
+            pad_masked(tag_id, input.mask),
+            pad_masked(input.mask, input.mask)
+        )
 
-class BERTMorphEncoder:
-    def __init__(self, words_vocab, tags_vocab,
-                 seq_len=512, batch_size=8, shuffle_size=1):
-        self.words_vocab = words_vocab
-        self.tags_vocab = tags_vocab
-
-        self.seq_len = seq_len
-        self.batch_size = batch_size
-
-        self.shuffle = ShuffleBuffer(shuffle_size)
+        return Batch(input, target)
 
     def __call__(self, markups):
-        items = morph_items(markups, self.words_vocab, self.tags_vocab)
-        seqs = morph_seqs(items, self.words_vocab, self.tags_vocab, self.seq_len)
+        items = self.items(markups)
+        seqs = self.seqs(items)
         seqs = self.shuffle(seqs)
-        chunks = chop_drop(seqs, self.batch_size)
-
+        chunks = chop(seqs, self.batch_size)
         for chunk in chunks:
-            chunk = torch.tensor(chunk)  # batch x seq x (word, mask, tag)
-            word_id, tag_id, mask = chunk.unbind(-1)
-            word_id, tag_id, mask = word_id.long(), tag_id.long(), mask.bool()
-
-            input = Masked(word_id, mask)
-            target = Masked(
-                pad_masked(tag_id, input.mask),
-                pad_masked(input.mask, input.mask)
-            )
-
-            yield Batch(input, target)
+            yield self.batch(chunk)
 
 
 ########
-#
 #   SYNTAX
-#
 ####
-
-
-class SyntaxItem(Record):
-    __attributes__ = ['word_ids', 'mask', 'head_ids', 'rel_ids']
-
-    def __init__(self, word_ids, mask, head_ids, rel_ids):
-        self.word_ids = word_ids
-        self.mask = mask
-        self.head_ids = head_ids
-        self.rel_ids = rel_ids
-
-    def __len__(self):
-        return len(self.head_ids)
 
 
 ROOT_ID = '0'
 
 
-def syntax_item(markup, words_vocab, rels_vocab):
-    word_ids, mask, head_ids, rel_ids = [], [], [], []
-    ids = {ROOT_ID: 0}
-    for index, token in enumerate(markup.tokens, 1):
-        ids[token.id] = index
-        head_ids.append(token.head_id)
+class BERTSyntaxTrainItem(Record):
+    __attributes__ = ['word_ids', 'mask', 'head_ids', 'rel_ids']
 
-        id = rels_vocab.encode(token.rel)
-        rel_ids.append(id)
-
-        parts = wordpiece(token.text, words_vocab)
-        if not parts:
-            word_ids.append(words_vocab.unk_id)
-            mask.append(True)
-        else:
-            for index, part in enumerate(parts):
-                id = words_vocab.encode(part)
-                word_ids.append(id)
-                mask.append(index == 0)
-
-    word_ids = [words_vocab.cls_id] + word_ids + [words_vocab.sep_id]
-    mask = [False] + mask + [False]
-    head_ids = [ids[_] for _ in head_ids]
-    return SyntaxItem(word_ids, mask, head_ids, rel_ids)
+    def __len__(self):
+        return len(self.rel_ids)
 
 
-def syntax_items(markups, words_vocab, rels_vocab):
-    for markup in markups:
-        yield syntax_item(markup, words_vocab, rels_vocab)
-
-
-def syntax_chop(items, max_seq_len, max_items):
-    buffer = []
-    accum = 0
-    for item in items:
-        size = len(item.word_ids)
-
-        if size > max_seq_len:  # 0.02% sents longer then 128
-            continue
-
-        buffer.append(item)
-        accum += size
-
-        if accum >= max_items:
-            yield buffer
-            buffer = []
-            accum = 0
-
-    if buffer:
-        yield buffer
-
-
-class SyntaxInput(Record):
+class BERTSyntaxInput(Record):
     __attributes__ = ['word_id', 'word_mask', 'pad_mask']
 
-    def __init__(self, word_id, word_mask, pad_mask):
-        self.word_id = word_id
-        self.word_mask = word_mask
-        self.pad_mask = pad_mask
-
     def to(self, device):
-        return SyntaxInput(
+        return BERTSyntaxInput(
             self.word_id.to(device),
             self.word_mask.to(device),
             self.pad_mask.to(device)
         )
 
 
-class SyntaxTarget(Record):
+class BERTSyntaxTarget(Record):
     __attributes__ = ['head_id', 'rel_id', 'mask']
 
-    def __init__(self, head_id, rel_id, mask):
-        self.head_id = head_id
-        self.rel_id = rel_id
-        self.mask = mask
-
     def to(self, device):
-        return SyntaxTarget(
+        return BERTSyntaxTarget(
             self.head_id.to(device),
             self.rel_id.to(device),
             self.mask.to(device)
         )
 
 
-def syntax_batch(items, words_vocab, rels_vocab):
-    word_id, mask, head_id, rel_id = [], [], [], []
-    for item in items:
-        word_id.append(torch.tensor(item.word_ids, dtype=torch.long))
-        mask.append(torch.tensor(item.mask, dtype=torch.bool))
-        head_id.append(torch.tensor(item.head_ids, dtype=torch.long))
-        rel_id.append(torch.tensor(item.rel_ids, dtype=torch.long))
-
-    word_id = pad_sequence(word_id, fill=words_vocab.pad_id)
-    word_mask = pad_sequence(mask, fill=False)
-    pad_mask = word_id == words_vocab.pad_id
-    input = SyntaxInput(word_id, word_mask, pad_mask)
-
-    head_id = pad_sequence(head_id)
-    rel_id = pad_sequence(rel_id, fill=rels_vocab.pad_id)
-    mask = rel_id == rels_vocab.pad_id
-    target = SyntaxTarget(head_id, rel_id, mask)
-
-    return Batch(input, target)
-
-
-class BERTSyntaxEncoder:
+class BERTSyntaxTrainEncoder:
     def __init__(self, words_vocab, rels_vocab,
                  seq_len=512, batch_size=8,
                  shuffle_size=1, len_size=1):
@@ -362,14 +233,118 @@ class BERTSyntaxEncoder:
         self.batch_size = batch_size
 
         self.shuffle = ShuffleBuffer(shuffle_size)
-        self.len = LenBuffer(len_size)
+        self.group = LenBuffer(len_size)
+
+    def item(self, markup):
+        word_ids, mask, head_ids, rel_ids = [], [], [], []
+        ids = {ROOT_ID: 0}
+
+        for index, token in enumerate(markup.tokens, 1):
+            ids[token.id] = index
+            head_ids.append(token.head_id)
+
+            rel_id = self.rels_vocab.encode(token.rel)
+            rel_ids.append(rel_id)
+
+            subs = bert_subs(token.text, self.words_vocab)
+            for index, sub in enumerate(subs):
+                word_id = self.words_vocab.encode(sub)
+                word_ids.append(word_id)
+                mask.append(index == 0)
+
+        word_ids = [self.words_vocab.cls_id] + word_ids + [self.words_vocab.sep_id]
+        mask = [False] + mask + [False]
+        head_ids = [ids[_] for _ in head_ids]
+        return BERTSyntaxTrainItem(word_ids, mask, head_ids, rel_ids)
+
+    def batch(self, items):
+        word_id, mask, head_id, rel_id = [], [], [], []
+        for item in items:
+            word_id.append(torch.tensor(item.word_ids, dtype=torch.long))
+            mask.append(torch.tensor(item.mask, dtype=torch.bool))
+            head_id.append(torch.tensor(item.head_ids, dtype=torch.long))
+            rel_id.append(torch.tensor(item.rel_ids, dtype=torch.long))
+
+        word_id = pad_sequence(word_id, fill=self.words_vocab.pad_id)
+        word_mask = pad_sequence(mask, fill=False)
+        pad_mask = word_id == self.words_vocab.pad_id
+        input = BERTSyntaxInput(word_id, word_mask, pad_mask)
+
+        head_id = pad_sequence(head_id)
+        rel_id = pad_sequence(rel_id, fill=self.rels_vocab.pad_id)
+        mask = rel_id == self.rels_vocab.pad_id
+        target = BERTSyntaxTarget(head_id, rel_id, mask)
+
+        return Batch(input, target)
 
     def __call__(self, markups):
-        items = syntax_items(markups, self.words_vocab, self.rels_vocab)
+        items = (self.item(_) for _ in markups)
+        # 0.02% sents longer then 128, just drop them
+        items = (_ for _ in items if len(_.word_ids) <= self.seq_len)
         items = self.shuffle(items)
-        chunks = self.len(items)
+        groups = self.group(items)
 
-        max_items = self.seq_len * self.batch_size
+        for group in groups:
+            chunks = chop(group, self.batch_size)
+            for chunk in chunks:
+                yield self.batch(chunk)
+
+
+#########
+#
+#   INFER
+#
+########
+
+
+class BERTInferInput(Record):
+    __attributes__ = ['word_id', 'word_mask', 'pad_mask']
+
+
+#########
+#   NER
+#######
+
+
+class BERTNERInferEncoder:
+    def __init__(self, words_vocab, tags_vocab,
+                 seq_len=128, batch_size=8):
+        self.words_vocab = words_vocab
+        self.tags_vocab = tags_vocab
+
+        self.seq_len = seq_len
+        self.batch_size = batch_size
+
+    def item(self, item):
+        word_ids, mask = [], []
+        for token in item.tokens:
+            for index, sub in enumerate(token.subs):
+                word_id = self.words_vocab.encode(sub)
+                word_ids.append(word_id)
+                mask.append(index == 0)
+
+        size = self.seq_len - 2
+        return (
+            [self.words_vocab.cls_id] + word_ids[:size] + [self.words_vocab.sep_id],
+            [False] + mask[:size] + [False]
+        )
+
+    def input(self, items):
+        word_id, word_mask = [], []
+        for word_ids, mask in items:
+            word_id.append(torch.tensor(word_ids, dtype=torch.long))
+            word_mask.append(torch.tensor(mask, dtype=torch.bool))
+        word_id = pad_sequence(word_id, self.words_vocab.pad_id)
+        word_mask = pad_sequence(word_mask, False)
+        pad_mask = word_id == self.words_vocab.pad_id
+        return BERTInferInput(word_id, word_mask, pad_mask)
+
+    def encode(self, items):
+        items = (self.item(_) for _ in items)
+        chunks = chop(items, self.batch_size)
         for chunk in chunks:
-            for chunk in syntax_chop(chunk, self.seq_len, max_items):
-                yield syntax_batch(chunk, self.words_vocab, self.rels_vocab)
+            yield self.input(chunk)
+
+    def decode(self, preds):
+        for pred in preds:
+            yield [self.tags_vocab.decode(_) for _ in pred]
