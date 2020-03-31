@@ -19,3 +19,16 @@ def chop_drop(items, size):
         yield chunk
 
 
+def chop_weighted(items, size, weight):
+    buffer = []
+    accum = 0
+    for item in items:
+        value = weight(item)
+        if accum + value > size:
+            yield buffer
+            buffer = []
+            accum = 0
+        buffer.append(item)
+        accum += value
+    if buffer:
+        yield buffer
