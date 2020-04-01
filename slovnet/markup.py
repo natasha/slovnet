@@ -1,8 +1,11 @@
 
-from ipymarkup import (
-    show_span_box_markup,
-    show_dep_markup
-)
+try:
+    from ipymarkup import (
+        show_span_box_markup,
+        show_dep_markup
+    )
+except ImportError:
+    pass
 
 from .record import Record
 from .bio import (
