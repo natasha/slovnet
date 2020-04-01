@@ -122,6 +122,6 @@ def process_batch(model, criterion, batch):
 
     loss = criterion(pred, target.value, target.mask)
 
-    pred = pred.argmax(-1)
+    pred = model.morph.decode(pred)
     pred = Masked(pred, mask)
     return batch.processed(loss, pred)

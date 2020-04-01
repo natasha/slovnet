@@ -179,6 +179,9 @@ class BERTMorphHead(nn.Module, StateMixin):
 
         self.proj = nn.Linear(emb_dim, tags_num)
 
+    def decode(self, pred):
+        return pred.argmax(-1)
+
     def forward(self, input):
         return self.proj(input)
 
@@ -242,6 +245,12 @@ class BERTSyntaxHead(nn.Module, StateMixin):
         nn.init.uniform_(self.root, -0.1, 0.1)
         nn.init.eye_(self.kernel)
 
+    def decode(self, pred):
+        # TODO
+        # multiple roots
+        # loops
+        return pred.argmax(-1)
+
     def forward(self, input):
         input = append_root(input, self.root)
         head = self.head(input)
@@ -286,6 +295,9 @@ class BERTSyntaxRel(nn.Module, StateMixin):
     def reset_parameters(self):
         nn.init.uniform_(self.root, -0.1, 0.1)
         nn.init.xavier_uniform_(self.kernel)
+
+    def decode(self, pred):
+        return pred.argmax(-1)
 
     def forward(self, input, head_id):
         head = self.head(select_head(input, self.root, head_id))

@@ -130,7 +130,7 @@ def process_batch(model, criterion, batch):
         + criterion(pred.rel_id, target.rel_id)
     )
 
-    pred.head_id = pred.head_id.argmax(-1)
-    pred.rel_id = pred.rel_id.argmax(-1)
+    pred.head_id = model.head.decode(head_id)
+    pred.rel_id = model.rel.decode(rel_id)
 
     return batch.processed(loss, pred)
