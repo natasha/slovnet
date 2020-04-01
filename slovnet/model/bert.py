@@ -6,6 +6,7 @@ from torch.nn import functional as F
 from slovnet.record import Record
 
 from .state import StateMixin
+from .device import DeviceMixin
 from .crf import CRF
 
 
@@ -118,7 +119,7 @@ class BERTMLMHead(nn.Module, StateMixin):
         return self.linear2(x)
 
 
-class BERTMLM(nn.Module):
+class BERTMLM(nn.Module, DeviceMixin):
     def __init__(self, emb, encoder, mlm):
         super(BERTMLM, self).__init__()
         self.emb = emb
@@ -151,7 +152,7 @@ class BERTNERHead(nn.Module, StateMixin):
         return self.proj(input)
 
 
-class BERTNER(nn.Module):
+class BERTNER(nn.Module, DeviceMixin):
     def __init__(self, emb, encoder, ner):
         super(BERTNER, self).__init__()
         self.emb = emb
@@ -186,7 +187,7 @@ class BERTMorphHead(nn.Module, StateMixin):
         return self.proj(input)
 
 
-class BERTMorph(nn.Module):
+class BERTMorph(nn.Module, DeviceMixin):
     def __init__(self, emb, encoder, morph):
         super(BERTMorph, self).__init__()
         self.emb = emb
@@ -321,7 +322,7 @@ class SyntaxPred(Record):
     __attributes__ = ['head_id', 'rel_id']
 
 
-class BERTSyntax(nn.Module):
+class BERTSyntax(nn.Module, DeviceMixin):
     def __init__(self, emb, encoder, head, rel):
         super(BERTSyntax, self).__init__()
         self.emb = emb
