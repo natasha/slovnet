@@ -39,7 +39,7 @@ class TensorBoard(Board):
 class LogBoard(Board):
     def add_scalar(self, key, value):
         log('{:>4} {:.4f} {}'.format(self.steps, value, key))
-    
+
 
 class MultiBoard(Board):
     __attributes__ = ['boards']
