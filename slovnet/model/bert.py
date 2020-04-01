@@ -194,9 +194,9 @@ class BERTMorph(nn.Module, DeviceMixin):
         self.encoder = encoder
         self.morph = morph
 
-    def forward(self, input):
+    def forward(self, input, mask=None):
         x = self.emb(input)
-        x = self.encoder(x)
+        x = self.encoder(x, mask)
         return self.morph(x)
 
 
@@ -330,11 +330,16 @@ class BERTSyntax(nn.Module, DeviceMixin):
         self.head = head
         self.rel = rel
 
-    def forward(self, input, word_mask, pad_mask, head_id):
+    def forward(self, input, word_mask, pad_mask, target_head_id=None):
         x = self.emb(input)
         x = self.encoder(x, pad_mask)
         x = select_words(x, word_mask)
+
+        head_id = self.head(x)
+        if target_head_id is None:
+            target_head_id = self.head.decode(head_id)
+
         return SyntaxPred(
-            head_id=self.head(x),
-            rel_id=self.rel(x, head_id)
+            head_id=head_id,
+            rel_id=self.rel(x, target_head_id)
         )

@@ -1,5 +1,8 @@
 
-from ipymarkup import show_span_box_markup as show_span_markup  # noqa
+from ipymarkup import (
+    show_span_box_markup,
+    show_dep_markup
+)
 
 from .record import Record
 from .bio import (
@@ -13,7 +16,10 @@ from .span import (
     envelop_spans,
     offset_spans
 )
-from .conll import format_conll_tag
+from .conll import (
+    format_conll_tag,
+    parse_conll_tag
+)
 
 
 ########
@@ -39,7 +45,11 @@ class SpanMarkup(Record):
     def to_bio(self, tokens):
         tags = spans_bio(tokens, self.spans)
         words = [_.text for _ in tokens]
-        return BIOMarkup.from_pairs(zip(words, tags))
+        return BIOMarkup.from_tuples(zip(words, tags))
+
+
+def show_span_markup(markup):
+    show_span_box_markup(markup.text, markup.spans)
 
 
 ########
@@ -68,10 +78,10 @@ class TagMarkup(Record):
         return [_.tag for _ in self.tokens]
 
     @classmethod
-    def from_pairs(cls, pairs):
+    def from_tuples(cls, tuples):
         return cls([
             TagToken(word, tag)
-            for word, tag in pairs
+            for word, tag in tuples
         ])
 
 
@@ -89,7 +99,7 @@ class BIOMarkup(TagMarkup):
 ########
 
 
-class MorphToken(Record):
+class MorphToken(TagToken):
     __attributes__ = ['text', 'pos', 'feats']
 
     @property
@@ -97,11 +107,46 @@ class MorphToken(Record):
         return format_conll_tag(self.pos, self.feats)
 
 
-class MorphMarkup(Record):
+class MorphMarkup(TagMarkup):
     __attributes__ = ['tokens']
     __annotations__ = {
         'tokens': [MorphToken]
     }
+
+    @classmethod
+    def from_tuples(cls, tuples):
+        tokens = []
+        for word, tag in tuples:
+            pos, feats = parse_conll_tag(tag)
+            tokens.append(MorphToken(word, pos, feats))
+        return cls(tokens)
+
+
+def format_morph_markup(markup, size=20):
+    for word, tag in zip(markup.words, markup.tags):
+        word = word.rjust(size)
+        yield f'{word} {tag}'
+
+
+def show_morph_markup(markup):
+    for line in format_morph_markup(markup):
+        print(line)
+
+
+def format_morph_markup_diff(a, b, size=20):
+    for word, a_token, b_token in zip(a.words, a.tokens, b.tokens):
+        word = word.rjust(size)
+        a_tag = format_conll_tag(a_token.pos, a_token.feats)
+        yield f'{word}   {a_tag}'
+        if a_token != b_token:
+            word = ' ' * size
+            b_tag = format_conll_tag(b_token.pos, b_token.feats)
+            yield f'{word} ! {b_tag}'
+
+
+def show_morph_markup_diff(a, b):
+    for line in format_morph_markup_diff(a, b):
+        print(line)
 
 
 #######
@@ -111,12 +156,36 @@ class MorphMarkup(Record):
 #######
 
 
-class SyntaxToken(Record):
+class SyntaxToken(TagToken):
     __attributes__ = ['id', 'text', 'head_id', 'rel']
 
 
-class SyntaxMarkup(Record):
+class SyntaxMarkup(TagMarkup):
     __attributes__ = ['tokens']
     __annotations__ = {
         'tokens': [SyntaxToken]
     }
+
+    @classmethod
+    def from_tuples(cls, tuples):
+        return cls([
+            SyntaxToken(id, text, head_id, rel)
+            for id, text, head_id, rel in tuples
+        ])
+
+
+def syntax_markup_deps(tokens):
+    for token in tokens:
+        id = int(token.id)
+        head_id = int(token.head_id)
+        rel = token.rel
+        id = id - 1
+        if head_id == 0:  # skip root=0
+            continue
+        head_id = head_id - 1
+        yield head_id, id, rel
+
+
+def show_syntax_markup(markup):
+    deps = syntax_markup_deps(markup.tokens)
+    show_dep_markup(markup.words, deps)

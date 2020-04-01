@@ -13,7 +13,7 @@ def format_conll_tag(pos, feats):
 
 def parse_conll_tag(tag):
     if '|' not in tag:
-        return tag
+        return tag, {}
 
     pos, feats = tag.split('|', 1)
     feats = dict(

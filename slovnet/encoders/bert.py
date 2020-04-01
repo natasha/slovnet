@@ -7,20 +7,14 @@ from slovnet.chop import chop, chop_drop
 from slovnet.batch import Batch
 from slovnet.mask import Masked, pad_masked
 from slovnet.bert import bert_subs
-from slovnet.const import CPU
 
 from .buffer import ShuffleBuffer, LenBuffer
 
 
-########
-#
-#   TRAIN
-#
-########
-
-
 ##########
+#
 #   MLM
+#
 ########
 
 
@@ -75,7 +69,9 @@ class BERTMLMTrainEncoder:
 
 
 #########
+#
 #   NER
+#
 ######
 
 
@@ -131,7 +127,9 @@ class BERTNERTrainEncoder:
 
 
 ###########
+#
 #   MORPH
+#
 #######
 
 
@@ -187,7 +185,9 @@ class BERTMorphTrainEncoder:
 
 
 ########
+#
 #   SYNTAX
+#
 ####
 
 
@@ -288,21 +288,13 @@ class BERTInferInput(Record):
     __attributes__ = ['word_id', 'word_mask', 'pad_mask']
 
 
-#########
-#   NER
-#######
-
-
-class BERTNERInferEncoder:
-    def __init__(self, words_vocab, tags_vocab,
-                 seq_len=128, batch_size=8, device=CPU):
+class BERTInferEncoder:
+    def __init__(self, words_vocab,
+                 seq_len=128, batch_size=8):
         self.words_vocab = words_vocab
-        self.tags_vocab = tags_vocab
 
         self.seq_len = seq_len
         self.batch_size = batch_size
-
-        self.device = device
 
     def item(self, item):
         word_ids, mask = [], []
@@ -326,14 +318,10 @@ class BERTNERInferEncoder:
         word_id = pad_sequence(word_id, self.words_vocab.pad_id)
         word_mask = pad_sequence(word_mask, False)
         pad_mask = word_id == self.words_vocab.pad_id
-        return BERTInferInput(word_id, word_mask, pad_mask).to(self.device)
+        return BERTInferInput(word_id, word_mask, pad_mask)
 
-    def encode(self, items):
+    def __call__(self, items):
         items = (self.item(_) for _ in items)
         chunks = chop(items, self.batch_size)
         for chunk in chunks:
             yield self.input(chunk)
-
-    def decode(self, preds):
-        for pred in preds:
-            yield [self.tags_vocab.decode(_) for _ in pred]
