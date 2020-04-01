@@ -343,6 +343,9 @@ yc compute instance create \
   --platform-id gpu-standard-v1 \
   --preemptible
 
+yc compute instance list
+yc compute instance delete fhmj2ftcm32qgqt4igjf
+
 sudo locale-gen ru_RU.UTF-8
 
 sudo apt-get update
