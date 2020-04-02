@@ -38,8 +38,8 @@ HEAD = getenv('HEAD', 'head.pt')
 REL = getenv('REL', 'rel.pt')
 
 DEVICE = getenv('DEVICE', CUDA0)
-SEQ_LEN = int(getenv('SEQ_LEN', 128))
-BATCH_SIZE = int(getenv('BATCH_SIZE', 16))
+SEQ_LEN = int(getenv('SEQ_LEN', 512))
+BATCH_SIZE = int(getenv('BATCH_SIZE', 32))
 
 HOST = getenv('HOST', '0.0.0.0')
 PORT = int(getenv('PORT', 8080))

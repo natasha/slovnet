@@ -36,8 +36,8 @@ ENCODER = getenv('ENCODER', 'encoder.pt')
 MORPH = getenv('MORPH', 'morph.pt')
 
 DEVICE = getenv('DEVICE', CUDA0)
-SEQ_LEN = int(getenv('SEQ_LEN', 128))
-BATCH_SIZE = int(getenv('BATCH_SIZE', 32))
+SEQ_LEN = int(getenv('SEQ_LEN', 256))
+BATCH_SIZE = int(getenv('BATCH_SIZE', 64))
 
 HOST = getenv('HOST', '0.0.0.0')
 PORT = int(getenv('PORT', 8080))
