@@ -131,74 +131,60 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
   </thead>
   <tbody>
     <tr>
-      <th>slovnet</th>
-      <td><b>0.960</b></td>
-      <td><b>0.905</b></td>
-      <td><b>0.808</b></td>
-      <td><b>0.982</b></td>
-      <td><b>0.907</b></td>
-      <td><b>0.992</b></td>
-      <td><b>0.981</b></td>
-      <td><b>0.958</b></td>
-      <td><b>0.949</b></td>
-      <td><b>0.833</b></td>
-      <td><b>0.735</b></td>
+      <th>deeppavlov</th>
+      <td>0.910</td>
+      <td><b>0.886</b></td>
+      <td><b>0.742</b></td>
+      <td><b>0.944</b></td>
+      <td><b>0.798</b></td>
+      <td>0.942</td>
+      <td><b>0.919</b></td>
+      <td><b>0.881</b></td>
+      <td>0.866</td>
+      <td>0.767</td>
+      <td><b>0.624</b></td>
     </tr>
     <tr>
       <th>deeppavlov_bert</th>
       <td><b>0.971</b></td>
-      <td><b>0.925</b></td>
-      <td><b>0.823</b></td>
-      <td><b>0.984</b></td>
-      <td><b>0.917</b></td>
+      <td><b>0.928</b></td>
+      <td><b>0.825</b></td>
+      <td><b>0.980</b></td>
+      <td><b>0.916</b></td>
       <td><b>0.997</b></td>
-      <td><b>0.991</b></td>
-      <td><b>0.977</b></td>
-      <td><b>0.955</b></td>
+      <td><b>0.990</b></td>
+      <td><b>0.976</b></td>
+      <td><b>0.954</b></td>
       <td><b>0.840</b></td>
-      <td><b>0.738</b></td>
-    </tr>
-    <tr>
-      <th>deeppavlov</th>
-      <td>0.909</td>
-      <td><b>0.885</b></td>
-      <td><b>0.735</b></td>
-      <td><b>0.944</b></td>
-      <td><b>0.797</b></td>
-      <td>0.942</td>
-      <td><b>0.919</b></td>
-      <td><b>0.880</b></td>
-      <td>0.866</td>
-      <td>0.767</td>
-      <td><b>0.623</b></td>
+      <td><b>0.741</b></td>
     </tr>
     <tr>
       <th>pullenti</th>
-      <td>0.903</td>
+      <td>0.905</td>
       <td>0.814</td>
-      <td>0.684</td>
-      <td>0.941</td>
-      <td>0.641</td>
-      <td><b>0.947</b></td>
+      <td>0.686</td>
+      <td>0.939</td>
+      <td>0.639</td>
+      <td><b>0.952</b></td>
       <td>0.862</td>
-      <td>0.681</td>
-      <td><b>0.896</b></td>
-      <td>0.766</td>
+      <td>0.683</td>
+      <td><b>0.900</b></td>
+      <td>0.769</td>
       <td>0.566</td>
     </tr>
     <tr>
       <th>texterra</th>
       <td>0.900</td>
       <td>0.800</td>
-      <td>0.601</td>
+      <td>0.597</td>
       <td>0.888</td>
-      <td>0.565</td>
+      <td>0.561</td>
       <td>0.901</td>
       <td>0.777</td>
-      <td>0.593</td>
+      <td>0.594</td>
       <td>0.858</td>
       <td>0.783</td>
-      <td>0.540</td>
+      <td>0.548</td>
     </tr>
     <tr>
       <th>tomita</th>
@@ -210,23 +196,51 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>0.945</td>
       <td></td>
       <td></td>
-      <td>0.880</td>
+      <td>0.881</td>
       <td></td>
       <td></td>
     </tr>
     <tr>
+      <th>natasha</th>
+      <td>0.867</td>
+      <td>0.753</td>
+      <td>0.297</td>
+      <td>0.873</td>
+      <td>0.347</td>
+      <td>0.852</td>
+      <td>0.709</td>
+      <td>0.394</td>
+      <td>0.836</td>
+      <td>0.755</td>
+      <td>0.350</td>
+    </tr>
+    <tr>
       <th>mitie</th>
       <td>0.888</td>
-      <td>0.859</td>
-      <td>0.531</td>
+      <td>0.861</td>
+      <td>0.532</td>
       <td>0.849</td>
       <td>0.452</td>
       <td>0.753</td>
       <td>0.642</td>
-      <td>0.430</td>
-      <td>0.733</td>
-      <td><b>0.800</b></td>
-      <td>0.520</td>
+      <td>0.432</td>
+      <td>0.736</td>
+      <td><b>0.801</b></td>
+      <td>0.524</td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td><b>0.973</b></td>
+      <td><b>0.928</b></td>
+      <td><b>0.831</b></td>
+      <td><b>0.991</b></td>
+      <td><b>0.911</b></td>
+      <td><b>0.996</b></td>
+      <td><b>0.989</b></td>
+      <td><b>0.976</b></td>
+      <td><b>0.960</b></td>
+      <td><b>0.838</b></td>
+      <td><b>0.733</b></td>
     </tr>
   </tbody>
 </table>
@@ -245,7 +259,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <th>init, s</th>
       <th>disk, mb</th>
       <th>ram, mb</th>
-      <th>speed, articles/s</th>
+      <th>speed, it/s</th>
     </tr>
   </thead>
   <tbody>
@@ -297,6 +311,13 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>327</td>
       <td>261</td>
       <td><b>32.8</b></td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td>5.0</td>
+      <td>473</td>
+      <td>1959</td>
+      <td>17.5 (gpu)</td>
     </tr>
   </tbody>
 </table>
