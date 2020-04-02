@@ -1,11 +1,11 @@
-FROM python:3.6
+FROM pytorch/pytorch:1.4-cuda10.1-cudnn7-runtime
 
 RUN S3=https://storage.yandexcloud.net/natasha-slovnet \
-    && wget $S3/01_bert_news/rubert/vocab.txt \
-    && wget $S3/03_bert_morph/model/tags_vocab.txt \
-    && wget $S3/01_bert_news/model/emb.pt \
-    && wget $S3/03_bert_morph/model/encoder.pt \
-    && wget $S3/03_bert_morph/model/morph.pt
+    && curl -O $S3/01_bert_news/rubert/vocab.txt \
+    && curl -O $S3/03_bert_morph/model/tags_vocab.txt \
+    && curl -O $S3/01_bert_news/model/emb.pt \
+    && curl -O $S3/03_bert_morph/model/encoder.pt \
+    && curl -O $S3/03_bert_morph/model/morph.pt
 
 COPY requirements/app.txt requirements.txt
 RUN pip install -r requirements.txt
