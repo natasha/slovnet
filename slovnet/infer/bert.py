@@ -161,6 +161,7 @@ class BERTNERInfer(BERTInfer):
 class BERTMorphInfer(BERTInfer):
     def process(self, inputs):
         for input in inputs:
+            input = input.to(self.model.device)
             pred = self.model(input.word_id, input.pad_mask)
             pred = self.model.morph.decode(pred)
             yield from split_masked(pred, input.word_mask)
@@ -195,6 +196,7 @@ def check_syntax_items(items, seq_len):
 class BERTSyntaxInfer(BERTInfer):
     def process(self, inputs):
         for input in inputs:
+            input = input.to(self.model.device)
             pred = self.model(input.word_id, input.word_mask, input.pad_mask)
             head_id = self.model.head.decode(pred.head_id)
             rel_id = self.model.rel.decode(pred.rel_id)
