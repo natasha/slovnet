@@ -43,6 +43,8 @@ BATCH_SIZE = int(getenv('BATCH_SIZE', 16))
 
 HOST = getenv('HOST', '0.0.0.0')
 PORT = int(getenv('PORT', 8080))
+MB = 1024 * 1024
+MAX_SIZE = int(getenv('MAX_SIZE', 100 * MB))
 
 
 log('Load vocabs: %r, %r' % (WORDS_VOCAB, RELS_VOCAB))
@@ -96,7 +98,8 @@ async def handle(request):
     return web.json_response(data)
 
 
-app = web.Application()
+log('Max size: %r' % (MAX_SIZE // MB))
+app = web.Application(client_max_size=MAX_SIZE)
 app.add_routes([web.post('/', handle)])
 
 web.run_app(app, host=HOST, port=PORT)
