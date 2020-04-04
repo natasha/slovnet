@@ -182,17 +182,6 @@ class BERTMorphInfer(BERTInfer):
             yield MorphMarkup.from_tuples(tuples)
 
 
-def check_syntax_items(items, seq_len):
-    sizes = {len(_.tokens) for _ in items}
-    if len(sizes) != 1:
-        raise ValueError('expected same size, got %r' % sorted(sizes))
-
-    for item in items:
-        size = sum(len(_.subs) for _ in item.tokens)
-        if size > seq_len:
-            raise ValueError('expected size <= %r, got' % (seq_len, size))
-
-
 class BERTSyntaxInfer(BERTInfer):
     def process(self, inputs):
         for input in inputs:
@@ -204,7 +193,6 @@ class BERTSyntaxInfer(BERTInfer):
 
     def __call__(self, chunk):
         items = list(word_items(chunk, self.encoder.words_vocab))
-        check_syntax_items(items, self.encoder.seq_len - 2)
         inputs = self.encoder(items)
         preds = self.process(inputs)
         preds = self.decoder(preds)
