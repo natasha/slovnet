@@ -262,7 +262,7 @@ class BERTSyntaxHead(Module):
 
 
 def select_head(input, root, index):
-    batch_size, seq_size, emb_dim = input.shape
+    batch_size, seq_len, emb_dim = input.shape
     input = append_root(input, root)  # batch x seq + 1 x emb
 
     # for root select root
@@ -270,8 +270,8 @@ def select_head(input, root, index):
     index = torch.cat((zero, index), dim=-1)  # batch x seq + 1 x emb
 
     # prep for gather
-    index = index.view(batch_size, seq_size + 1, 1)
-    index = index.expand(batch_size, seq_size + 1, emb_dim)
+    index = index.view(batch_size, seq_len + 1, 1)
+    index = index.expand(batch_size, seq_len + 1, emb_dim)
 
     input = torch.gather(input, dim=-2, index=index)
     return strip_root(input)  # batch x seq x emb
@@ -303,15 +303,15 @@ class BERTSyntaxRel(Module):
         head = self.head(select_head(input, self.root, head_id))
         tail = self.tail(input)
 
-        batch_size, seq_size, _ = input.shape
+        batch_size, seq_len, _ = input.shape
         x = head.matmul(self.kernel)  # batch x seq x hidden * rel
-        x = x.view(batch_size, seq_size, self.rel_dim, self.hidden_dim)
-        x = x.matmul(tail.view(batch_size, seq_size, self.hidden_dim, 1))
-        return x.view(batch_size, seq_size, self.rel_dim)
+        x = x.view(batch_size, seq_len, self.rel_dim, self.hidden_dim)
+        x = x.matmul(tail.view(batch_size, seq_len, self.hidden_dim, 1))
+        return x.view(batch_size, seq_len, self.rel_dim)
 
 
 def select_words(input, mask):
-    batch_size, seq_size, emb_dim = input.shape
+    batch_size, seq_len, emb_dim = input.shape
     # assert mask.sum(-1) all the same
     select_size = mask.sum().item() // batch_size
     return input[mask].view(batch_size, select_size, emb_dim)
