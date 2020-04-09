@@ -89,7 +89,6 @@ LOC                                LOC---
 <a href="https://github.com/natasha/slovnet/releases/download/v0.0.0/slovnet_ner_v1.tar">slovnet_ner_v1.tar</a> 1.5 MB
 
 ## Evaluation
-<a name="evalualtion"></a>
 
 4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus">Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>.
 
@@ -330,25 +329,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 
 ## Development
 
-Rent Vast GPU:
-
-```bash
-vast search offers | grep '1 x  GTX 1080 Ti'
-vast create instance 488499 --image alexkuk/my-vast --disk 20
-vast destroy instance 498074
-watch vast show instances
-
-ssh -Nf vast -L 8888:localhost:8888 -L 6006:localhost:6006
-http://localhost:8888/notebooks/
-http://localhost:6006/
-
-scp ~/.slovnet.json vast:~
-rsync --exclude data --exclude notes -rv . vast:~/slovnet
-rsync -u --exclude data --exclude runs -rv 'vast:~/slovnet/*' .
-
-```
-
-Rent YC GPU:
+Rent GPU:
 
 ```bash
 yc compute instance create \
@@ -367,30 +348,32 @@ yc compute instance create \
 yc compute instance list
 yc compute instance delete fhmj2ftcm32qgqt4igjf
 
+```
+
+Setup instance:
+
+```
 sudo locale-gen ru_RU.UTF-8
 
 sudo apt-get update
 sudo apt-get install -y \
   python3-pip
 
-sudo pip3 install \
-  torch \
-  tqdm \
+sudo pip3 install -v \
   jupyter \
-  tensorboard \
-  numpy
+  tensorboard
 
 mkdir runs
 nohup tensorboard \
   --logdir=runs \
-  --host=0.0.0.0 \
+  --host=localhost \
   --port=6006 \
   --reload_interval=1 &
 
 nohup jupyter notebook \
   --no-browser \
   --allow-root \
-  --ip=0.0.0.0 \
+  --ip=localhost \
   --port=8888 \
   --NotebookApp.token='' \
   --NotebookApp.password='' &
