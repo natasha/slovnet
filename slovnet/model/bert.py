@@ -5,8 +5,7 @@ from torch.nn import functional as F
 
 from slovnet.record import Record
 
-from .state import StateMixin
-from .device import DeviceMixin
+from .base import Module
 from .crf import CRF
 
 
@@ -35,7 +34,7 @@ class RuBERTConfig(BERTConfig):
         )
 
 
-class BERTEmbedding(nn.Module, StateMixin):
+class BERTEmbedding(Module):
     def __init__(self, vocab_size, seq_len, emb_dim, dropout=0.1, norm_eps=1e-12):
         super(BERTEmbedding, self).__init__()
         self.word = nn.Embedding(vocab_size, emb_dim)
@@ -72,7 +71,7 @@ def BERTLayer(emb_dim, heads_num, hidden_dim, dropout=0.1, norm_eps=1e-12):
     return layer
 
 
-class BERTEncoder(nn.Module, StateMixin):
+class BERTEncoder(Module):
     def __init__(self, layers_num, emb_dim, heads_num, hidden_dim,
                  dropout=0.1, norm_eps=1e-12):
         super(BERTEncoder, self).__init__()
@@ -105,7 +104,7 @@ class BERTEncoder(nn.Module, StateMixin):
 #########
 
 
-class BERTMLMHead(nn.Module, StateMixin):
+class BERTMLMHead(Module):
     def __init__(self, emb_dim, vocab_size, norm_eps=1e-12):
         super(BERTMLMHead, self).__init__()
         self.linear1 = nn.Linear(emb_dim, emb_dim)
@@ -119,7 +118,7 @@ class BERTMLMHead(nn.Module, StateMixin):
         return self.linear2(x)
 
 
-class BERTMLM(nn.Module, DeviceMixin):
+class BERTMLM(Module):
     def __init__(self, emb, encoder, mlm):
         super(BERTMLM, self).__init__()
         self.emb = emb
@@ -139,7 +138,7 @@ class BERTMLM(nn.Module, DeviceMixin):
 ######
 
 
-class BERTNERHead(nn.Module, StateMixin):
+class BERTNERHead(Module):
     def __init__(self, emb_dim, tags_num):
         super(BERTNERHead, self).__init__()
         self.emb_dim = emb_dim
@@ -152,7 +151,7 @@ class BERTNERHead(nn.Module, StateMixin):
         return self.proj(input)
 
 
-class BERTNER(nn.Module, DeviceMixin):
+class BERTNER(Module):
     def __init__(self, emb, encoder, ner):
         super(BERTNER, self).__init__()
         self.emb = emb
@@ -172,7 +171,7 @@ class BERTNER(nn.Module, DeviceMixin):
 ######
 
 
-class BERTMorphHead(nn.Module, StateMixin):
+class BERTMorphHead(Module):
     def __init__(self, emb_dim, tags_num):
         super(BERTMorphHead, self).__init__()
         self.emb_dim = emb_dim
@@ -187,7 +186,7 @@ class BERTMorphHead(nn.Module, StateMixin):
         return self.proj(input)
 
 
-class BERTMorph(nn.Module, DeviceMixin):
+class BERTMorph(Module):
     def __init__(self, emb, encoder, morph):
         super(BERTMorph, self).__init__()
         self.emb = emb
@@ -207,7 +206,7 @@ class BERTMorph(nn.Module, DeviceMixin):
 #######
 
 
-class FF(nn.Module):
+class FF(Module):
     def __init__(self, input_dim, hidden_dim, dropout):
         super(FF, self).__init__()
         self.proj = nn.Linear(input_dim, hidden_dim)
@@ -221,7 +220,7 @@ class FF(nn.Module):
 
 
 def append_root(input, root):
-    batch_size, seq_size, emb_dim = input.shape
+    batch_size, seq_len, emb_dim = input.shape
     root = root.repeat(batch_size).view(batch_size, 1, emb_dim)
     return torch.cat((root, input), dim=1)
 
@@ -231,7 +230,7 @@ def strip_root(input):
     return input.contiguous()
 
 
-class BERTSyntaxHead(nn.Module, StateMixin):
+class BERTSyntaxHead(Module):
     def __init__(self, input_dim, hidden_dim, dropout=0.1):
         super(BERTSyntaxHead, self).__init__()
         self.head = FF(input_dim, hidden_dim, dropout)
@@ -278,7 +277,7 @@ def select_head(input, root, index):
     return strip_root(input)  # batch x seq x emb
 
 
-class BERTSyntaxRel(nn.Module, StateMixin):
+class BERTSyntaxRel(Module):
     def __init__(self, input_dim, hidden_dim, rel_dim, dropout=0.1):
         super(BERTSyntaxRel, self).__init__()
         self.input_dim = input_dim
@@ -322,7 +321,7 @@ class SyntaxPred(Record):
     __attributes__ = ['head_id', 'rel_id']
 
 
-class BERTSyntax(nn.Module, DeviceMixin):
+class BERTSyntax(Module):
     def __init__(self, emb, encoder, head, rel):
         super(BERTSyntax, self).__init__()
         self.emb = emb

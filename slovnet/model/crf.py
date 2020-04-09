@@ -2,8 +2,10 @@
 import torch
 from torch import nn
 
+from .base import Module
 
-class CRF(nn.Module):
+
+class CRF(Module):
     # https://github.com/kmkurn/pytorch-crf/blob/master/torchcrf/__init__.py
 
     def __init__(self, tags_num):
