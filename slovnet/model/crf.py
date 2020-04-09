@@ -20,7 +20,10 @@ class CRF(Module):
     def extra_repr(self):
         return 'tags_num=%d' % self.tags_num
 
-    def forward(self, emissions, tags, mask):
+    def forward(self, emissions, tags, mask=None):
+        if mask is None:
+            mask = torch.ones_like(tags).bool()
+
         emissions = emissions.transpose(1, 0)  # seq x batch x tags
         tags = tags.transpose(1, 0)  # seq x batch
         mask = mask.transpose(1, 0)
@@ -54,8 +57,11 @@ class CRF(Module):
             score = torch.where(mask_, score_, score)
         return torch.logsumexp(score, dim=-1)  # batch
 
-    def decode(self, emissions, mask):
+    def decode(self, emissions, mask=None):
         batch_size, seq_len, tags_num = emissions.shape
+        if mask is None:
+            mask = torch.ones((batch_size, seq_len)).bool().to(emissions.device)
+
         emissions = emissions.transpose(1, 0)
         mask = mask.transpose(1, 0)
 
