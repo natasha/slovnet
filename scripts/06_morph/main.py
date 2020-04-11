@@ -84,13 +84,13 @@ S3_MODEL_SHAPE = join(S3_DIR, MODEL_SHAPE)
 S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
 S3_MODEL_MORPH = join(S3_DIR, MODEL_MORPH)
 
-BOARD_NAME = getenv('board_name', '06_morph')
+BOARD_NAME = getenv('board_name', '06_morph_10000')
 RUNS_DIR = 'runs'
 
 TRAIN_BOARD = '01_train'
 TEST_BOARD = '02_test'
 
-SEED = int(getenv('seed', 17))
+SEED = int(getenv('seed', 65))
 DEVICE = getenv('device', CUDA0)
 
 SHAPE_DIM = int(getenv('shape_dim', 30))
@@ -98,8 +98,8 @@ LAYERS_NUM = int(getenv('layers_num', 3))
 LAYER_DIM = int(getenv('layer_dim', 64))
 KERNEL_SIZE = int(getenv('kernel_size', 3))
 
-LR = float(getenv('lr', 0.005))
-LR_GAMMA = float(getenv('lr_gamma', 0.7))
+LR = float(getenv('lr', 0.0033))
+LR_GAMMA = float(getenv('lr_gamma', 0.9))
 EPOCHS = int(getenv('epochs', 5))
 
 LAYER_DIMS = [
