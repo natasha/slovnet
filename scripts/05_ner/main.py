@@ -70,7 +70,7 @@ RAW_DIR = join(DATA_DIR, 'raw')
 S3_DIR = '05_ner'
 
 RAW_NERUS = join(RAW_DIR, 'nerus_lenta.conllu.gz')
-NERUS_TOTAL = 739346
+NERUS_TOTAL = 739341
 
 NERUS = join(DATA_DIR, 'nerus.jl.gz')
 S3_NERUS = join(S3_DIR, NERUS)
@@ -86,7 +86,7 @@ S3_MODEL_SHAPE = join(S3_DIR, MODEL_SHAPE)
 S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
 S3_MODEL_NER = join(S3_DIR, MODEL_NER)
 
-BOARD_NAME = getenv('board_name', '05_ner_02')
+BOARD_NAME = getenv('board_name', '05_ner_700k')
 RUNS_DIR = 'runs'
 
 TRAIN_BOARD = '01_train'
@@ -101,16 +101,13 @@ LAYER_DIM = int(getenv('layer_dim', 64))
 KERNEL_SIZE = int(getenv('kernel_size', 3))
 
 LR = float(getenv('lr', 0.005))
-LR_GAMMA = float(getenv('lr_gamma', 0.7))
+LR_GAMMA = float(getenv('lr_gamma', 0.75))
 EPOCHS = int(getenv('epochs', 5))
 
-
-def layer_dims(num, dim):
-    # 256, 128, 64
-    return [dim * 2**(num - 1 - _) for _ in range(num)]
-
-
-LAYER_DIMS = layer_dims(LAYERS_NUM, LAYER_DIM)
+LAYER_DIMS = [
+    LAYER_DIM * 2**_
+    for _ in reversed(range(LAYERS_NUM))
+]
 
 
 def adapt_markup(record):
