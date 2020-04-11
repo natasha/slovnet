@@ -359,6 +359,8 @@ sudo apt-get update
 sudo apt-get install -y \
   python3-pip
 
+# grpcio long install ~10m, not using prebuilt wheel
+# "it is not compatible with this Python" 
 sudo pip3 install -v \
   jupyter \
   tensorboard
