@@ -59,6 +59,6 @@ class MorphInfer(TagInfer):
         preds = self.process(inputs)
         preds = self.decoder(preds)
 
-        for item, pred in zip(item, preds):
+        for item, pred in zip(items, preds):
             tuples = zip(item, pred)
             yield MorphMarkup.from_tuples(tuples)
