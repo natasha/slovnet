@@ -86,7 +86,7 @@ S3_MODEL_SHAPE = join(S3_DIR, MODEL_SHAPE)
 S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
 S3_MODEL_NER = join(S3_DIR, MODEL_NER)
 
-BOARD_NAME = getenv('board_name', '05_ner_700k')
+BOARD_NAME = getenv('board_name', '05_ner_10000')
 RUNS_DIR = 'runs'
 
 TRAIN_BOARD = '01_train'
@@ -102,7 +102,7 @@ KERNEL_SIZE = int(getenv('kernel_size', 3))
 
 LR = float(getenv('lr', 0.005))
 LR_GAMMA = float(getenv('lr_gamma', 0.75))
-EPOCHS = int(getenv('epochs', 5))
+EPOCHS = int(getenv('epochs', 3))
 
 LAYER_DIMS = [
     LAYER_DIM * 2**_
