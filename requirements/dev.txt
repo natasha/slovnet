@@ -7,4 +7,4 @@ razdel>=0.5.0
 corus>=0.6.0
 naeval>=0.1.0
 ipymarkup>=0.6.0
-nerus>=1.6.0
+nerus>=1.7.0
