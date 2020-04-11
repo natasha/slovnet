@@ -107,6 +107,8 @@ def topk_acc(pred, target, ks=(1, 2, 4, 8), ignore_id=-100):
 
 
 def acc(a, b):
+    a = a.flatten()
+    b = b.flatten()
     correct = (a == b).sum().item()
     total = len(a)
     return Acc(correct, total)
@@ -309,17 +311,10 @@ class MorphScoreMeter(ScoreMeter):
         board.add_scalar('02_acc', self.acc.value)
 
 
-def masked_acc(a, b):
-    return acc(
-        a.value[a.mask],
-        b.value[b.mask]
-    )
-
-
 def score_morph_batch(batch):
     return MorphBatchScore(
         batch.loss.item(),
-        masked_acc(batch.pred, batch.target)
+        acc(batch.pred, batch.target)
     )
 
 

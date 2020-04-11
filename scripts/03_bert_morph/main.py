@@ -41,6 +41,7 @@ from slovnet.markup import MorphMarkup
 from slovnet.vocab import BERTVocab, Vocab
 from slovnet.encoders.bert import BERTMorphTrainEncoder
 from slovnet.loss import masked_flatten_cross_entropy
+from slovnet.batch import ProcessedBatch
 from slovnet.score import (
     MorphScoreMeter,
     score_morph_batch
@@ -123,5 +124,10 @@ def process_batch(model, criterion, batch):
     loss = criterion(pred, target.value, target.mask)
 
     pred = model.morph.decode(pred)
-    pred = Masked(pred, mask)
-    return batch.processed(loss, pred)
+    pred = pred[mask]
+
+    # unmask pred, target to fit in score batch
+    target = target.value[target.mask]
+
+    return ProcessedBatch(input, target, loss, pred)
+
