@@ -49,12 +49,19 @@ class TagEncoder(Module):
         self.layers = nn.ModuleList(layers)
         self.dim = layer_dims[-1]
 
-    def forward(self, input):  # batch x seq x emb
+    def forward(self, input, mask=None):  # batch x seq x emb
         input = input.transpose(2, 1)  # batch x emb x seq
+
+        if mask is not None:
+            mask = mask.unsqueeze(1)  # batch x 1 x seq
+
         for layer in self.layers:
             input = layer(input)  # batch x dim x seq
-        input = input.transpose(2, 1)  # batch x seq x dim
-        return input
+
+            if mask is not None:
+                input[mask.expand_as(input)] = 0
+
+        return input.transpose(2, 1)  # batch x seq x dim
 
 
 #######
@@ -84,9 +91,9 @@ class NER(Module):
         self.encoder = encoder
         self.ner = ner
 
-    def forward(self, *input):
+    def forward(self, *input, mask=None):
         x = self.emb(*input)
-        x = self.encoder(x)
+        x = self.encoder(x, mask)
         return self.ner(x)
 
 
@@ -119,7 +126,7 @@ class Morph(Module):
         self.encoder = encoder
         self.morph = morph
 
-    def forward(self, *input):
+    def forward(self, *input, mask=None):
         x = self.emb(*input)
-        x = self.encoder(x)
+        x = self.encoder(x, mask)
         return self.morph(x)

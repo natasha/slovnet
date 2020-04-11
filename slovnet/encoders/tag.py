@@ -65,12 +65,11 @@ class TagInferEncoder:
 
         self.batch_size = batch_size
 
-    def item(self, markup):
+    def item(self, words):
         word_ids, shape_ids = [], []
-        for token in markup.tokens:
-            shape = word_shape(token.text)
-            word = token.text.lower()
-            word_id = self.words_vocab.encode(word)
+        for word in words:
+            shape = word_shape(word)
+            word_id = self.words_vocab.encode(word.lower())
             shape_id = self.shapes_vocab.encode(shape)
             word_ids.append(word_id)
             shape_ids.append(shape_id)
