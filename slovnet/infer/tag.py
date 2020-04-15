@@ -6,6 +6,8 @@ from slovnet.markup import (
     MorphMarkup
 )
 
+from .base import Infer
+
 
 class TagDecoder:
     def __init__(self, tags_vocab):
@@ -16,18 +18,11 @@ class TagDecoder:
             yield [self.tags_vocab.decode(_) for _ in pred]
 
 
-class TagInfer:
-    def __init__(self, model, encoder, decoder):
-        self.model = model
-        self.encoder = encoder
-        self.decoder = decoder
-
-
 def text_words(text):
     return [_.text for _ in tokenize(text)]
 
 
-class NERInfer(TagInfer):
+class NERInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             input = input.to(self.model.device)
@@ -46,7 +41,7 @@ class NERInfer(TagInfer):
             yield markup.to_span(text)
 
 
-class MorphInfer(TagInfer):
+class MorphInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             input = input.to(self.model.device)

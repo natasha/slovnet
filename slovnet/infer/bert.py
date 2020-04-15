@@ -12,6 +12,8 @@ from slovnet.markup import (
     SyntaxMarkup
 )
 
+from .base import Infer
+
 
 ##########
 #
@@ -123,14 +125,7 @@ class BERTSyntaxDecoder:
 ######
 
 
-class BERTInfer:
-    def __init__(self, model, encoder, decoder):
-        self.model = model
-        self.encoder = encoder
-        self.decoder = decoder
-
-
-class BERTNERInfer(BERTInfer):
+class BERTNERInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             input = input.to(self.model.device)
@@ -158,7 +153,7 @@ class BERTNERInfer(BERTInfer):
             yield markup.to_span(text)
 
 
-class BERTMorphInfer(BERTInfer):
+class BERTMorphInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             input = input.to(self.model.device)
@@ -182,7 +177,7 @@ class BERTMorphInfer(BERTInfer):
             yield MorphMarkup.from_tuples(tuples)
 
 
-class BERTSyntaxInfer(BERTInfer):
+class BERTSyntaxInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             input = input.to(self.model.device)
