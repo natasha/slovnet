@@ -28,6 +28,10 @@ CLS = '<cls>'
 SEP = '<sep>'
 MASK = '<mask>'
 
+WORD = 'word'
+SHAPE = 'shape'
+TAG = 'tag'
+
 #####
 #  BIO
 #######

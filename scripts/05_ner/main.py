@@ -30,6 +30,7 @@ from slovnet.board import (
 from slovnet.const import (
     TRAIN, TEST,
     PER, LOC, ORG,
+    WORD, SHAPE, TAG,
     CUDA0,
     PAD
 )
@@ -62,11 +63,17 @@ from slovnet.score import (
     score_ner_batch
 )
 
+from slovnet.exec.pack import (
+    Meta,
+    DumpPack
+)
+
 
 DATA_DIR = 'data'
 MODEL_DIR = 'model'
 NAVEC_DIR = 'navec'
 RAW_DIR = join(DATA_DIR, 'raw')
+PACK_DIR = 'pack'
 S3_DIR = '05_ner'
 
 RAW_NERUS = join(RAW_DIR, 'nerus_lenta.conllu.gz')
@@ -85,6 +92,10 @@ MODEL_NER = join(MODEL_DIR, 'ner.pt')
 S3_MODEL_SHAPE = join(S3_DIR, MODEL_SHAPE)
 S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
 S3_MODEL_NER = join(S3_DIR, MODEL_NER)
+
+ID = 'slovnet_ner_news_v1'
+PACK = join(PACK_DIR, ID + '.tar')
+S3_PACK = join(S3_DIR, PACK)
 
 BOARD_NAME = getenv('board_name', '05_ner_10000')
 RUNS_DIR = 'runs'

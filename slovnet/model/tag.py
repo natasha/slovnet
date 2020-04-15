@@ -1,6 +1,4 @@
 
-from collections import OrderedDict
-
 import torch
 from torch import nn
 
@@ -21,16 +19,22 @@ class TagEmbedding(Module):
         return torch.cat([word, shape], dim=-1)
 
 
-def TagEncoderLayer(in_dim, out_dim, kernel_size):
-    padding = (kernel_size - 1) // 2
-    return nn.Sequential(OrderedDict([
-        ('conv', nn.Conv1d(
+class TagEncoderLayer(Module):
+    def __init__(self, in_dim, out_dim, kernel_size):
+        super(TagEncoderLayer, self).__init__()
+
+        padding = (kernel_size - 1) // 2
+        self.conv = nn.Conv1d(
             in_dim, out_dim, kernel_size,
             padding=padding
-        )),
-        ('relu', nn.ReLU()),
-        ('norm', nn.BatchNorm1d(out_dim))
-    ]))
+        )
+        self.relu = nn.ReLU()
+        self.norm = nn.BatchNorm1d(out_dim)
+
+    def __call__(self, input):
+        x = self.conv(input)
+        x = self.relu(x)
+        return self.norm(x)
 
 
 def gen_tag_encoder_layers(input_dim, layer_dims, kernel_size):
@@ -91,8 +95,8 @@ class NER(Module):
         self.encoder = encoder
         self.ner = ner
 
-    def forward(self, *input, mask=None):
-        x = self.emb(*input)
+    def forward(self, word_id, shape_id, mask=None):
+        x = self.emb(word_id, shape_id)
         x = self.encoder(x, mask)
         return self.ner(x)
 
@@ -126,7 +130,7 @@ class Morph(Module):
         self.encoder = encoder
         self.morph = morph
 
-    def forward(self, *input, mask=None):
-        x = self.emb(*input)
+    def forward(self, word_id, shape_id, mask=None):
+        x = self.emb(word_id, shape_id)
         x = self.encoder(x, mask)
         return self.morph(x)

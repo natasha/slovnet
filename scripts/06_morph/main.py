@@ -29,7 +29,8 @@ from slovnet.board import (
 )
 from slovnet.const import (
     TRAIN, TEST,
-    CUDA0, PAD
+    CUDA0, PAD,
+    WORD, SHAPE, TAG
 )
 from slovnet.token import tokenize
 from slovnet.shape import SHAPES
@@ -58,11 +59,17 @@ from slovnet.score import (
     score_morph_batch
 )
 
+from slovnet.exec.pack import (
+    Meta,
+    DumpPack
+)
+
 
 DATA_DIR = 'data'
 MODEL_DIR = 'model'
 NAVEC_DIR = 'navec'
 RAW_DIR = join(DATA_DIR, 'raw')
+PACK_DIR = 'pack'
 S3_DIR = '06_morph'
 
 RAW_NERUS = join(RAW_DIR, 'nerus_lenta.conllu.gz')
@@ -83,6 +90,10 @@ S3_TAGS_VOCAB = join(S3_DIR, TAGS_VOCAB)
 S3_MODEL_SHAPE = join(S3_DIR, MODEL_SHAPE)
 S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
 S3_MODEL_MORPH = join(S3_DIR, MODEL_MORPH)
+
+ID = 'slovnet_morph_news_v1'
+PACK = join(PACK_DIR, ID + '.tar')
+S3_PACK = join(S3_DIR, PACK)
 
 BOARD_NAME = getenv('board_name', '06_morph_10000')
 RUNS_DIR = 'runs'

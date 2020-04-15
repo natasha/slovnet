@@ -21,6 +21,9 @@ class Tar(Record):
         member = self.tar.getmember(name)
         return self.tar.extractfile(member)
 
+    def read(self, name):
+        return self.open(name).read()
+
     def list(self, prefix=None):
         for member in self.tar:
             name = member.name
