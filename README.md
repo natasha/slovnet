@@ -39,7 +39,7 @@ SlovNet is a Python library for deep-learning based NLP modeling for Russian lan
 
 ## Install
 
-During inference `slovnet` depends only on `numpy`. Library supports Python 3.5+.
+During inference `slovnet` depends only on `numpy`. Library supports Python 3.5+, PyPy 3.
 
 ```bash
 $ pip install slovnet
