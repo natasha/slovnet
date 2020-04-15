@@ -5,7 +5,7 @@ IMAGE = natasha/slovnet-morph
 image:
 	cd $(ROOT); docker build \
 		-t $(IMAGE) \
-		-f docker/slovnet-morph/Dockerfile .
+		-f docker/slovnet-morph/torch/Dockerfile .
 
 push:
 	docker push $(IMAGE)

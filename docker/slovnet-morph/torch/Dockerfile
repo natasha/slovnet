@@ -14,4 +14,4 @@ RUN pip install -r requirements.txt
 COPY . .
 RUN pip install -e .
 
-CMD python docker/slovnet-morph/app.py
+CMD python docker/slovnet-morph/torch/app.py

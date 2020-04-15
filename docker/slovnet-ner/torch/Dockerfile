@@ -13,4 +13,4 @@ RUN pip install -r requirements.txt
 COPY . .
 RUN pip install -e .
 
-CMD python docker/slovnet-ner/app.py
+CMD python docker/slovnet-ner/torch/app.py
