@@ -1,4 +1,3 @@
-# coding: utf8
 
 from .record import Record
 from .io import (
