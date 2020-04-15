@@ -49,7 +49,6 @@ class NERInfer(Infer):
 class MorphInfer(Infer):
     def process(self, inputs):
         for input in inputs:
-            print(input)
             pred = self.model(input.word_id, input.shape_id, input.mask)
             pred = self.model.morph.decode(pred)
             yield from split_masked(pred, ~input.mask)
