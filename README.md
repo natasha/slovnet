@@ -7,7 +7,6 @@ SlovNet is a Python library for deep-learning based NLP modeling for Russian lan
 
 ## Downloads
 
-Currently two models are published:
 <table>
 
 <tr>
@@ -50,7 +49,7 @@ $ pip install slovnet
 
 Download model weights and vocabs package, use links from <a href="#downloads">downloads section</a>. Optionally install <a href="https://github.com/natasha/ipymarkup">Ipymarkup</a> to visualize NER markup.
 
-Slovnet annotators have list of items as input and same size iterator over markups as output. Internally items are processed in batches of size `batch_size`. Default size is 8, larger batch — more RAM, better CPU utilization
+Slovnet annotators have list of items as input and same size iterator over markups as output. Internally items are processed in batches of size `batch_size`. Default size is 8, larger batch — more RAM, better CPU utilization.
 
 ### NER
 
@@ -112,12 +111,12 @@ Morphology annotator processes tokenized text. To split the input into sentencie
 >>> for sent in sentenize(text):
 >>>     tokens = [_.text for _ in tokenize(sent.text)]
 >>>     chunk.append(tokens)
-[['Европейский', 'союз', 'добавил', 'в', 'санкционный', 'список', 'девять', 'политических', 'деятелей', 'из', 'самопровозглашенных', 'республик', 'Донбасса', '—', 'Донецкой', 'народной', 'республики', '(', 'ДНР', ')', 'и', 'Луганской', 'народной', 'республики', '(', 'ЛНР', ')', '—', 'в', 'связи', 'с', 'прошедшими', 'там', 'выборами', '.'], ['Об', 'этом', 'говорится', 'в', 'документе', ',', 'опубликованном', 'в', 'официальном', 'журнале', 'Евросоюза', '.']]
+>>> chunk[:1]
+[['Европейский', 'союз', 'добавил', 'в', 'санкционный', 'список', 'девять', 'политических', 'деятелей', 'из', 'самопровозглашенных', 'республик', 'Донбасса', '—', 'Донецкой', 'народной', 'республики', '(', 'ДНР', ')', 'и', 'Луганской', 'народной', 'республики', '(', 'ЛНР', ')', '—', 'в', 'связи', 'с', 'прошедшими', 'там', 'выборами', '.']]
 
 >>> morph = Morph('slovnet_morph_news_v1.tar')
 
 >>> markup = next(morph(chunk))
-
 >>> for token in markup.tokens:
 >>>     print(f'{token.text:>20} {token.tag}')
          Европейский ADJ|Case=Nom|Degree=Pos|Gender=Masc|Number=Sing
@@ -169,9 +168,7 @@ In addition to quality metrics we measure speed and models size, parameters that
 
 ### NER
 
-4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus">Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>.
-
-`slovnet` is compared to:
+4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus">Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>. `slovnet` is compared to:
 
 * `deeppavlov` — biLSTM + CRF by DeepPavlov, see <a href="https://arxiv.org/pdf/1709.09686.pdf">their 2017 paper</a> for more.
 * `deeppavlov_bert` — BERT based NER, current SOTA for Russian language, see <a href="https://www.youtube.com/watch?v=eKTA8i8s-zs">video presentation</a> describing the approach.
@@ -419,16 +416,14 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 
 ### Morphology
 
-Datasets from <a href="https://github.com/natasha/corus#load_gramru">GramEval2020</a> are used for evaluation.
-
-`slovnet` is compated to a number of existing morphology taggers:
+Datasets from <a href="https://github.com/natasha/corus#load_gramru">GramEval2020</a> are used for evaluation. `slovnet` is compated to a number of existing morphology taggers:
 
 * `deeppavlov` and `deeppavlov_bert` — Char biLSTM and BERT based models, see <a href="http://docs.deeppavlov.ai/en/master/features/models/morphotagger.html">Deeppavlov docs</a>.
 * <a href="https://github.com/Koziev/rupostagger">`rupostagger`</a>
 * <a href="https://github.com/IlyaGusev/rnnmorph">`rnnmorph`</a> — first place on morphoRuEval-2017.
 * <a href="https://github.com/chomechome/maru">`maru`</a>
 * `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe</a> with model trained on SynTagRus.
-* `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained to @buriy</a> 
+* `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained to @buriy</a>.
 
 For every column top 3 results are highlighted. `slovnet` was trained only on news dataset:
 
