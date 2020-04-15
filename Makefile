@@ -1,6 +1,8 @@
 
 test:
-	pytest -vv --pep8 --flakes slovnet
+	pytest -vv --pep8 --flakes slovnet \
+		--cov-report term-missing --cov-report xml \
+		--cov-config setup.cfg --cov slovnet/exec
 
 wheel:
 	python setup.py bdist_wheel
