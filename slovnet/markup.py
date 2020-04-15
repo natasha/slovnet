@@ -128,7 +128,7 @@ class MorphMarkup(TagMarkup):
 def format_morph_markup(markup, size=20):
     for word, tag in zip(markup.words, markup.tags):
         word = word.rjust(size)
-        yield f'{word} {tag}'
+        yield '%s %s' % (word, tag)
 
 
 def show_morph_markup(markup):
@@ -140,11 +140,11 @@ def format_morph_markup_diff(a, b, size=20):
     for word, a_token, b_token in zip(a.words, a.tokens, b.tokens):
         word = word.rjust(size)
         a_tag = format_conll_tag(a_token.pos, a_token.feats)
-        yield f'{word}   {a_tag}'
+        yield '%s   %s' % (word, a_tag)
         if a_token != b_token:
             word = ' ' * size
             b_tag = format_conll_tag(b_token.pos, b_token.feats)
-            yield f'{word} ! {b_tag}'
+            yield '%s ! %s' % (word, b_tag)
 
 
 def show_morph_markup_diff(a, b):
