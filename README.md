@@ -3,11 +3,44 @@
 
 [![Build Status](https://travis-ci.org/natasha/slovnet.svg?branch=master)](https://travis-ci.org/natasha/slovnet)
 
-SlovNet is a Python library for deep-learning based NLP modeling for Russian language. Library is integrated with other <a href="https://github.com/natasha/">Natasha</a> projects: <a href="https://github.com/natasha/nerus">large NER corpus</a> and <a href="https://github.com/natasha/navec">compact Russian embeddings</a>. SlovNet provides high quality practical model for Russian NER, it is 1-2% worse than current BERT SOTA by DeepPavlov but 60 times smaller in size (~30 MB) and works fast on CPU (~30 news articles/sec), see <a href="#evaluation">evaluation section</a> for more.
+SlovNet is a Python library for deep-learning based NLP modeling for Russian language. Library is integrated with other <a href="https://github.com/natasha/">Natasha</a> projects: <a href="https://github.com/natasha/nerus">Nerus</a> — large automatically annotated corpus, <a href="https://github.com/natasha/razdel">Razdel</a> — sentence segmenter, tokenizer and <a href="https://github.com/natasha/navec">Navec</a> — compact Russian embeddings. SlovNet provides high quality practical models for Russian NER and morphology. NER is 1-2% worse than current BERT SOTA by DeepPavlov but 60 times smaller in size (~30 MB) and works fast on CPU (~25 news articles/sec). Morphology tagger has comparable accuracy on news dataset with large SOTA BERT models, takes 50 times less space (~30 MB), works faster on CPU (~500 sentences/sec). See <a href="#evaluation">evaluation section</a> for more.
+
+## Downloads
+
+Currently two models are published:
+<table>
+
+<tr>
+<th>Model</th>
+<th>Size</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>
+  <a href="https://storage.yandexcloud.net/natasha-slovnet/05_ner/pack/slovnet_ner_news_v1.tar">slovnet_ner_news_v1.tar</a>
+</td>
+<td>27MB</td>
+<td>
+  Russian NER, standart PER, LOC, ORG annotation, trained on news articles.
+</td>
+</tr>
+
+<tr>
+<td>
+  <a href="https://storage.yandexcloud.net/natasha-slovnet/06_morph/pack/slovnet_morph_news_v1.tar">slovnet_morph_news_v1.tar</a>
+</td>
+<td>27MB</td>
+<td>
+  Russian morphology optimized for news articles.
+</td>
+</tr>
+
+</table>
 
 ## Install
 
-During inference `slovnet` depends only on `numpy`. Library supports Python 2.7+, 3.4+ и PyPy 3. PyPy 2 is excluded since it is hard to install `numpy` for PyPy 2.
+During inference `slovnet` depends only on `numpy`. Library supports Python 3.5+.
 
 ```bash
 $ pip install slovnet
@@ -15,80 +48,126 @@ $ pip install slovnet
 
 ## Usage
 
-Download <a href="https://github.com/natasha/navec#downloads">news Navec embeddings</a> and <a href="#downloads">SlovNet news NER model</a>:
+Download model weights and vocabs package, use links from <a href="#downloads">downloads section</a>. Optionally install <a href="https://github.com/natasha/ipymarkup">Ipymarkup</a> to visualize NER markup.
+
+Slovnet annotators have list of items as input and same size iterator over markups as output. Internally items are processed in batches of size `batch_size`. Default size is 8, larger batch — more RAM, better CPU utilization
+
+### NER
+
 
 ```python
->>> from navec import Navec
->>> from slovnet import NERTagger
->>> from ipymarkup import show_ascii_markup
+>>> from slovnet import NER
+>>> from ipymarkup import show_span_ascii_markup as show_markup
 
 >>> text = 'Европейский союз добавил в санкционный список девять политических деятелей из самопровозглашенных республик Донбасса — Донецкой народной республики (ДНР) и Луганской народной республики (ЛНР) — в связи с прошедшими там выборами. Об этом говорится в документе, опубликованном в официальном журнале Евросоюза. В новом списке фигурирует Леонид Пасечник, который по итогам выборов стал главой ЛНР. Помимо него там присутствуют Владимир Бидевка и Денис Мирошниченко, председатели законодательных органов ДНР и ЛНР, а также Ольга Позднякова и Елена Кравченко, председатели ЦИК обеих республик. Выборы прошли в непризнанных республиках Донбасса 11 ноября. На них удержали лидерство действующие руководители и партии — Денис Пушилин и «Донецкая республика» в ДНР и Леонид Пасечник с движением «Мир Луганщине» в ЛНР. Президент Франции Эмманюэль Макрон и канцлер ФРГ Ангела Меркель после встречи с украинским лидером Петром Порошенко осудили проведение выборов, заявив, что они нелегитимны и «подрывают территориальную целостность и суверенитет Украины». Позже к осуждению присоединились США с обещаниями новых санкций для России.'
 
->>> navec = Navec.load('navec_news_v1_1B_250K_300d_100q.tar')
+>>> ner = NER('slovnet_ner_news_v1.tar', batch_size=4)
 
->>> tagger = NERTagger.load('slovnet_ner_v1.tar', navec)
->>> markup = tagger(text)
->>> markup
-SpanMarkup(
-    text='Европейский союз добавил в санкционный список девять политических деятелей из самопровозглашенных республик Донбасса — Донецкой народной республики (ДНР) и Луганской народной республики (ЛНР) — в связи с прошедшими там выборами. Об этом говорится в документе, опубликованном в официальном журнале Евросоюза. В новом списке фигурирует Леонид Пасечник, который по итогам выборов стал главой ЛНР. Помимо него там присутствуют Владимир Бидевка и Денис Мирошниченко, председатели законодательных органов ДНР и ЛНР, а также Ольга Позднякова и Елена Кравченко, председатели ЦИК обеих республик. Выборы прошли в непризнанных республиках Донбасса 11 ноября. На них удержали лидерство действующие руководители и партии — Денис Пушилин и «Донецкая республика» в ДНР и Леонид Пасечник с движением «Мир Луганщине» в ЛНР. Президент Франции Эмманюэль Макрон и канцлер ФРГ Ангела Меркель после встречи с украинским лидером Петром Порошенко осудили проведение выборов, заявив, что они нелегитимны и «подрывают территориальную целостность и суверенитет Украины». Позже к осуждению присоединились США с обещаниями новых санкций для России.',
-    spans=[Span(
-         start=0,
-         stop=16,
-         type='LOC'
-     ), Span(
-         start=108,
-         stop=116,
-         type='LOC'
-     ), Span(
-         start=119,
-         stop=153,
-         type='LOC'
-     )
- ...
-])
-
->>> show_ascii_markup(markup.text, markup.spans)
-
+>>> markup = next(ner([text]))
+>>> show_markup(markup.text, markup.spans)
 Европейский союз добавил в санкционный список девять политических 
-LOC-------------                                                  
+LOC─────────────                                                  
 деятелей из самопровозглашенных республик Донбасса — Донецкой народной
-                                          LOC-----   LOC--------------
+                                          LOC─────   LOC──────────────
  республики (ДНР) и Луганской народной республики (ЛНР) — в связи с 
------------------   LOC--------------------------------             
+─────────────────   LOC────────────────────────────────             
 прошедшими там выборами. Об этом говорится в документе, опубликованном
  в официальном журнале Евросоюза. В новом списке фигурирует Леонид 
-                       LOC------                            PER----
+                       LOC──────                            PER────
 Пасечник, который по итогам выборов стал главой ЛНР. Помимо него там 
---------                                        LOC                  
+────────                                        LOC                  
 присутствуют Владимир Бидевка и Денис Мирошниченко, председатели 
-             PER-------------   PER---------------               
+             PER─────────────   PER───────────────               
 законодательных органов ДНР и ЛНР, а также Ольга Позднякова и Елена 
-                        LOC   LOC          PER-------------   PER---
+                        LOC   LOC          PER─────────────   PER───
 Кравченко, председатели ЦИК обеих республик. Выборы прошли в 
----------               ORG                                  
+─────────               ORG                                  
 непризнанных республиках Донбасса 11 ноября. На них удержали лидерство
-                         LOC-----                                     
+                         LOC─────                                     
  действующие руководители и партии — Денис Пушилин и «Донецкая 
-                                     PER----------    ORG------
+                                     PER──────────    ORG──────
 республика» в ДНР и Леонид Пасечник с движением «Мир Луганщине» в ЛНР.
-----------    LOC   PER------------              ORG----------    LOC 
+──────────    LOC   PER────────────              ORG──────────    LOC 
  Президент Франции Эмманюэль Макрон и канцлер ФРГ Ангела Меркель после
-           LOC---- PER-------------           LOC PER-----------      
+           LOC──── PER─────────────           LOC PER───────────      
  встречи с украинским лидером Петром Порошенко осудили проведение 
-                              PER-------------                    
+                              PER─────────────                    
 выборов, заявив, что они нелегитимны и «подрывают территориальную 
 целостность и суверенитет Украины». Позже к осуждению присоединились 
-                          LOC----                                    
+                          LOC────                                    
 США с обещаниями новых санкций для России.
-LOC                                LOC--- 
+LOC                                LOC─── 
 
 ```
 
-## Downloads
+### Morphology
 
-<a href="https://github.com/natasha/slovnet/releases/download/v0.0.0/slovnet_ner_v1.tar">slovnet_ner_v1.tar</a> 1.5 MB
+Morphology annotator processes tokenized text. To split the input into sentencies and tokens use <a href="https://github.com/natasha/razdel">Razdel</a>.
+
+```python
+>>> from razdel import sentenize, tokenize
+>>> from slovnet import Morph
+
+>>> chunk = []
+>>> for sent in sentenize(text):
+>>>     tokens = [_.text for _ in tokenize(sent.text)]
+>>>     chunk.append(tokens)
+[['Европейский', 'союз', 'добавил', 'в', 'санкционный', 'список', 'девять', 'политических', 'деятелей', 'из', 'самопровозглашенных', 'республик', 'Донбасса', '—', 'Донецкой', 'народной', 'республики', '(', 'ДНР', ')', 'и', 'Луганской', 'народной', 'республики', '(', 'ЛНР', ')', '—', 'в', 'связи', 'с', 'прошедшими', 'там', 'выборами', '.'], ['Об', 'этом', 'говорится', 'в', 'документе', ',', 'опубликованном', 'в', 'официальном', 'журнале', 'Евросоюза', '.']]
+
+>>> morph = Morph('slovnet_morph_news_v1.tar')
+
+>>> markup = next(morph(chunk))
+
+>>> for token in markup.tokens:
+>>>     print(f'{token.text:>20} {token.tag}')
+         Европейский ADJ|Case=Nom|Degree=Pos|Gender=Masc|Number=Sing
+                союз NOUN|Animacy=Inan|Case=Nom|Gender=Masc|Number=Sing
+             добавил VERB|Aspect=Perf|Gender=Masc|Mood=Ind|Number=Sing|Tense=Past|VerbForm=Fin|Voice=Act
+                   в ADP
+         санкционный ADJ|Animacy=Inan|Case=Acc|Degree=Pos|Gender=Masc|Number=Sing
+              список NOUN|Animacy=Inan|Case=Acc|Gender=Masc|Number=Sing
+              девять NUM|Case=Nom
+        политических ADJ|Case=Gen|Degree=Pos|Number=Plur
+            деятелей NOUN|Animacy=Anim|Case=Gen|Gender=Masc|Number=Plur
+                  из ADP
+ самопровозглашенных ADJ|Case=Gen|Degree=Pos|Number=Plur
+           республик NOUN|Animacy=Inan|Case=Gen|Gender=Fem|Number=Plur
+            Донбасса PROPN|Animacy=Inan|Case=Gen|Gender=Masc|Number=Sing
+                   — PUNCT
+            Донецкой ADJ|Case=Gen|Degree=Pos|Gender=Fem|Number=Sing
+            народной ADJ|Case=Gen|Degree=Pos|Gender=Fem|Number=Sing
+          республики NOUN|Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing
+                   ( PUNCT
+                 ДНР PROPN|Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing
+                   ) PUNCT
+                   и CCONJ
+           Луганской ADJ|Case=Gen|Degree=Pos|Gender=Fem|Number=Sing
+            народной ADJ|Case=Gen|Degree=Pos|Gender=Fem|Number=Sing
+          республики NOUN|Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing
+                   ( PUNCT
+                 ЛНР PROPN|Animacy=Inan|Case=Gen|Gender=Fem|Number=Sing
+                   ) PUNCT
+                   — PUNCT
+                   в ADP
+               связи NOUN|Animacy=Inan|Case=Loc|Gender=Fem|Number=Sing
+                   с ADP
+          прошедшими VERB|Aspect=Perf|Case=Ins|Number=Plur|Tense=Past|VerbForm=Part|Voice=Act
+                 там ADV|Degree=Pos
+            выборами NOUN|Animacy=Inan|Case=Ins|Gender=Masc|Number=Plur
+                   . PUNCT
+
+```
 
 ## Evaluation
+
+In addition to quality metrics we measure speed and models size, parameters that are important in practise:
+
+* `init` — time between system launch and first response. It is convenient for testing and devops to have model that starts quickly.
+* `disk` — file size of artefacts one needs to download before using the system: model weights, embeddings, binaries, vocabs. It is inconvenient to deploy large models in production.
+* `ram` — average CPU/GPU RAM usage.
+* `speed` — number of input items processed per second: news article texts, tokenized sentencies.
+
+### NER
 
 4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus">Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>.
 
@@ -259,11 +338,6 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 </table>
 <!--- ner1 --->
 
-* `init` — time between system launch and first response. It is convenient for testing and devops to have model that starts quickly. `deeppavlov_bert` and `texterra` take >30 sec to start, `slovnet` takes just ~1 sec.
-* `disk` — file size of artefacts one needs to download before using the system: model weights, embeddings, binaries, vocabs. It is inconvenient to deploy large models in production. `deeppavlov` models require >1 GB download, `slovnet` is just 30 MB including embeddings.
-* `ram` — average memory consumption. `deeppavlov` systems and `texterra` are memory heavy, `slovnet` consumes ~200 MB of RAM.
-* `speed` — number of news articles processed per second, one article is ~1 KB of text. `deeppavlov` systems process texts in batches on GPU, but they are still slover than `tomita`, `mitie` and `slovnet` that run on single CPU.
-
 <!--- ner2 --->
 <table border="0" class="dataframe">
   <thead>
@@ -287,8 +361,8 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <th>slovnet</th>
       <td><b>1.0</b></td>
       <td><b>27</b></td>
-      <td>2048</td>
-      <td>18.0</td>
+      <td><b>205</b></td>
+      <td>25.3</td>
     </tr>
     <tr>
       <th>deeppavlov</th>
@@ -308,7 +382,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <th>pullenti</th>
       <td>2.9</td>
       <td><b>16</b></td>
-      <td><b>253</b></td>
+      <td>253</td>
       <td>6.0</td>
     </tr>
     <tr>
@@ -342,6 +416,189 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
   </tbody>
 </table>
 <!--- ner2 --->
+
+### Morphology
+
+Datasets from <a href="https://github.com/natasha/corus#load_gramru">GramEval2020</a> are used for evaluation.
+
+`slovnet` is compated to a number of existing morphology taggers:
+
+* `deeppavlov` and `deeppavlov_bert` — Char biLSTM and BERT based models, see <a href="http://docs.deeppavlov.ai/en/master/features/models/morphotagger.html">Deeppavlov docs</a>.
+* <a href="https://github.com/Koziev/rupostagger">`rupostagger`</a>
+* <a href="https://github.com/IlyaGusev/rnnmorph">`rnnmorph`</a> — first place on morphoRuEval-2017.
+* <a href="https://github.com/chomechome/maru">`maru`</a>
+* `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe</a> with model trained on SynTagRus.
+* `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained to @buriy</a> 
+
+For every column top 3 results are highlighted. `slovnet` was trained only on news dataset:
+
+<!--- morph1 --->
+<table border="0" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>news</th>
+      <th>wiki</th>
+      <th>fiction</th>
+      <th>social</th>
+      <th>poetry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>rupostagger</th>
+      <td>0.673</td>
+      <td>0.645</td>
+      <td>0.661</td>
+      <td>0.641</td>
+      <td>0.636</td>
+    </tr>
+    <tr>
+      <th>rnnmorph</th>
+      <td>0.896</td>
+      <td>0.812</td>
+      <td>0.890</td>
+      <td>0.860</td>
+      <td>0.838</td>
+    </tr>
+    <tr>
+      <th>maru</th>
+      <td>0.894</td>
+      <td>0.808</td>
+      <td>0.887</td>
+      <td>0.861</td>
+      <td>0.840</td>
+    </tr>
+    <tr>
+      <th>udpipe</th>
+      <td>0.918</td>
+      <td>0.811</td>
+      <td><b>0.957</b></td>
+      <td><b>0.870</b></td>
+      <td>0.776</td>
+    </tr>
+    <tr>
+      <th>spacy</th>
+      <td>0.919</td>
+      <td>0.812</td>
+      <td>0.938</td>
+      <td>0.836</td>
+      <td>0.729</td>
+    </tr>
+    <tr>
+      <th>deeppavlov</th>
+      <td>0.940</td>
+      <td><b>0.841</b></td>
+      <td>0.944</td>
+      <td>0.870</td>
+      <td><b>0.857</b></td>
+    </tr>
+    <tr>
+      <th>deeppavlov_bert</th>
+      <td><b>0.951</b></td>
+      <td><b>0.868</b></td>
+      <td><b>0.964</b></td>
+      <td><b>0.892</b></td>
+      <td><b>0.865</b></td>
+    </tr>
+    <tr>
+      <th>slovnet</th>
+      <td><b>0.961</b></td>
+      <td>0.815</td>
+      <td>0.905</td>
+      <td>0.807</td>
+      <td>0.664</td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td><b>0.982</b></td>
+      <td><b>0.884</b></td>
+      <td><b>0.990</b></td>
+      <td><b>0.890</b></td>
+      <td><b>0.856</b></td>
+    </tr>
+  </tbody>
+</table>
+<!--- morph1 --->
+
+<!--- morph2 --->
+<table border="0" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>init, s</th>
+      <th>disk, mb</th>
+      <th>ram, mb</th>
+      <th>speed, it/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>rupostagger</th>
+      <td><b>4.8</b></td>
+      <td><b>3</b></td>
+      <td><b>118</b></td>
+      <td>48.0</td>
+    </tr>
+    <tr>
+      <th>rnnmorph</th>
+      <td>8.7</td>
+      <td><b>10</b></td>
+      <td>289</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <th>maru</th>
+      <td>15.8</td>
+      <td>44</td>
+      <td>370</td>
+      <td>36.4</td>
+    </tr>
+    <tr>
+      <th>udpipe</th>
+      <td>6.9</td>
+      <td>45</td>
+      <td><b>242</b></td>
+      <td>56.2</td>
+    </tr>
+    <tr>
+      <th>spacy</th>
+      <td>10.9</td>
+      <td>89</td>
+      <td>579</td>
+      <td>30.6</td>
+    </tr>
+    <tr>
+      <th>deeppavlov</th>
+      <td><b>4.0</b></td>
+      <td>32</td>
+      <td>10240</td>
+      <td><b>90.0 (gpu)</b></td>
+    </tr>
+    <tr>
+      <th>deeppavlov_bert</th>
+      <td>20.0</td>
+      <td>1393</td>
+      <td>8704</td>
+      <td>85.0 (gpu)</td>
+    </tr>
+    <tr>
+      <th>slovnet</th>
+      <td><b>1.0</b></td>
+      <td><b>27</b></td>
+      <td><b>115</b></td>
+      <td><b>532.0</b></td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td>5.0</td>
+      <td>475</td>
+      <td>8087</td>
+      <td><b>285.0 (gpu)</b></td>
+    </tr>
+  </tbody>
+</table>
+<!--- morph2 --->
 
 ## Support
 
