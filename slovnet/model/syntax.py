@@ -4,7 +4,7 @@ from torch import nn
 from torch.nn import functional as F
 
 from slovnet.record import Record
-from slovnet.mask import pad_masked, fill_masked
+from slovnet.mask import fill_masked
 
 from .base import Module
 from .cnn import CNNEncoder as SyntaxEncoder
@@ -32,7 +32,7 @@ def append_root(input, root):
 
 def strip_root(input):
     input = input[:, 1:, :]
-    return input.contiguous()    
+    return input.contiguous()
 
 
 def append_root_mask(mask):

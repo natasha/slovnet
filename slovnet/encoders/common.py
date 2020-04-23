@@ -1,9 +1,10 @@
 
+import torch
+
 from slovnet.record import Record
 from slovnet.pad import pad_sequence
 from slovnet.chop import chop
 from slovnet.shape import word_shape
-from slovnet.batch import Batch
 
 
 class WordShapeInferInput(Record):

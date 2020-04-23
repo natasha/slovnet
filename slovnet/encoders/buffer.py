@@ -1,5 +1,4 @@
 
-from collections import defaultdict
 from random import shuffle
 
 
@@ -46,4 +45,3 @@ class SortBuffer(Buffer):
         for item in self.buffer:
             yield item
         self.reset()
-    

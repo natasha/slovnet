@@ -2,16 +2,12 @@
 import torch
 
 from slovnet.record import Record
-from slovnet.pad import pad_sequence
 from slovnet.chop import chop, chop_drop
 from slovnet.shape import word_shape
 from slovnet.batch import Batch
 
 from .buffer import ShuffleBuffer
-from .common import (
-    WordShapeInferInput as TagInferInput,
-    WordShapeInferEncoder as TagInferEncoder
-)
+from .common import WordShapeInferEncoder as TagInferEncoder
 
 
 class TagTrainInput(Record):

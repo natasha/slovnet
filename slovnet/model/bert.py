@@ -4,7 +4,7 @@ from torch import nn
 from torch.nn import functional as F
 
 from slovnet.record import Record
-from slovnet.mask import pad_masked, fill_masked
+from slovnet.mask import pad_masked
 
 from .base import Module
 from .tag import (
@@ -158,7 +158,6 @@ class BERTTag(Module):
         x = self.emb(input)
         x = self.encoder(x, mask)
         return self.head(x)
-
 
 
 BERTNER = BERTTag

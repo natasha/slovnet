@@ -92,7 +92,7 @@ class ExecVisitor(Visitor):
     def visit_Tag(self, item):
         from slovnet.model.tag import NERHead, MorphHead
 
-        cls = type(item.head) 
+        cls = type(item.head)
         if cls is NERHead:
             Tag = exec.NER
         elif cls is MorphHead:
