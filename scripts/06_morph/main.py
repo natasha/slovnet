@@ -63,6 +63,7 @@ from slovnet.exec.pack import (
     Meta,
     DumpPack
 )
+from slovnet import api
 
 
 DATA_DIR = 'data'
@@ -73,7 +74,7 @@ PACK_DIR = 'pack'
 S3_DIR = '06_morph'
 
 RAW_NERUS = join(RAW_DIR, 'nerus_lenta.conllu.gz')
-NERUS_TOTAL = 8152696
+NERUS_TOTAL = 739346
 
 NERUS = join(DATA_DIR, 'nerus.jl.gz')
 S3_NERUS = join(S3_DIR, NERUS)
