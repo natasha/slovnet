@@ -1,5 +1,6 @@
 
 from .record import Record
+from .mask import mask_like
 from .bio import (
     I,
     bio_io,
@@ -80,7 +81,7 @@ class F1(Record):
         self.recall.reset()
 
 
-def topk_acc(pred, target, ks=(1, 2, 4, 8), ignore_id=-100):
+def topk_acc(pred, target, ks=(1, 2, 4, 8), mask=None):
     k = max(ks)
     pred = pred.topk(
         k,
@@ -89,10 +90,9 @@ def topk_acc(pred, target, ks=(1, 2, 4, 8), ignore_id=-100):
         sorted=True
     ).indices
 
-    pred = pred.view(-1, k)
-    target = target.flatten()
+    if mask is None:
+        mask = mask_like(target)
 
-    mask = (target != ignore_id)
     target = target[mask]
     pred = pred[mask].view(-1, k)  # restore shape
 
@@ -106,9 +106,12 @@ def topk_acc(pred, target, ks=(1, 2, 4, 8), ignore_id=-100):
         yield Acc(count, total)
 
 
-def acc(a, b):
-    a = a.flatten()
-    b = b.flatten()
+def acc(a, b, mask=None):
+    if mask is None:
+        mask = mask_like(a)
+
+    a = a[mask]
+    b = b[mask]
     correct = (a == b).sum().item()
     total = len(a)
     return Acc(correct, total)
@@ -364,20 +367,26 @@ class SyntaxScoreMeter(Record):
         board.add_scalar('03_las', self.las.value)
 
 
-def uas(pred, target):
-    pred = pred.flatten()
-    target = target.flatten()
+def uas(pred, target, mask=None):
+    if mask is None:
+        mask = mask_like(target)
+
+    pred = pred[mask]
+    target = target[mask]
 
     total = len(pred)
     correct = (pred == target).sum().item()
     return Acc(correct, total)
 
 
-def las(head_pred, head_target, rel_pred, rel_target):
-    head_pred = head_pred.flatten()
-    head_target = head_target.flatten()
-    rel_pred = rel_pred.flatten()
-    rel_target = rel_target.flatten()
+def las(head_pred, head_target, rel_pred, rel_target, mask=None):
+    if mask is None:
+        mask = mask_like(head_target)
+
+    head_pred = head_pred[mask]
+    head_target = head_target[mask]
+    rel_pred = rel_pred[mask]
+    rel_target = rel_target[mask]
 
     total = len(head_pred)
     match = (head_pred == head_target) & (rel_pred == rel_target)
@@ -389,9 +398,10 @@ def score_syntax_batch(batch):
     input, target, loss, pred = batch
     return SyntaxBatchScore(
         loss.item(),
-        uas(pred.head_id, target.head_id),
+        uas(pred.head_id, target.head_id, target.mask),
         las(
             pred.head_id, target.head_id,
-            pred.rel_id, target.rel_id
+            pred.rel_id, target.rel_id,
+            target.mask
         )
     )

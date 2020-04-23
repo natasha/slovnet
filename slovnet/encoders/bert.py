@@ -21,7 +21,7 @@ from .buffer import ShuffleBuffer, LenBuffer
 class BERTMLMTrainEncoder:
     def __init__(self, vocab,
                  seq_len=512, batch_size=8, shuffle_size=1,
-                 mask_prob=0.15, ignore_id=-100):
+                 mask_prob=0.15):
         self.vocab = vocab
         self.seq_len = seq_len
         self.batch_size = batch_size
@@ -55,9 +55,8 @@ class BERTMLMTrainEncoder:
 
         mask = self.mask(input)
         input[mask] = self.vocab.mask_id
-        target[~mask] = self.ignore_id
 
-        return Batch(input, target)
+        return Batch(input, Masked(target, mask))
 
     def __call__(self, texts):
         items = self.items(texts)

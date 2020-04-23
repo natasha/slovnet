@@ -42,7 +42,7 @@ from slovnet.score import (
     score_mlm_batch,
     score_mlm_batches
 )
-from slovnet.loss import flatten_cross_entropy
+from slovnet.loss import masked_flatten_cross_entropy
 
 
 DATA_DIR = 'data'
@@ -95,7 +95,7 @@ def every(step, period):
 
 def process_batch(model, criterion, batch):
     pred = model(batch.input)
-    loss = criterion(pred, batch.target)
+    loss = criterion(pred, batch.target.value, batch.target.mask)
     return batch.processed(loss, pred)
 
 
