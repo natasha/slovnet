@@ -79,7 +79,7 @@ model.emb.shape.load(SHAPE)
 log('Load encoder: %r' % ENCODER)
 model.encoder.load(ENCODER)
 log('Load morph: %r' % MORPH)
-model.morph.load(MORPH)
+model.head.load(MORPH)
 log('Device: %r' % DEVICE)
 model = model.to(DEVICE)
 

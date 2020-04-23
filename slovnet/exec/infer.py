@@ -32,7 +32,7 @@ class NERInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             pred = self.model(input.word_id, input.shape_id, input.mask)
-            yield from self.model.ner.crf.decode(pred, ~input.mask)
+            yield from self.model.head.crf.decode(pred, ~input.mask)
 
     def __call__(self, texts):
         items = [text_words(_) for _ in texts]
@@ -50,7 +50,7 @@ class MorphInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             pred = self.model(input.word_id, input.shape_id, input.mask)
-            pred = self.model.morph.decode(pred)
+            pred = self.model.head.decode(pred)
             yield from split_masked(pred, ~input.mask)
 
     def __call__(self, items):

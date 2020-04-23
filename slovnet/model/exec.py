@@ -59,21 +59,21 @@ class ExecVisitor(Visitor):
             self.visit(codes)
         )
 
-    def visit_TagEmbedding(self, item):
-        return exec.TagEmbedding(
+    def visit_WordShapeEmbedding(self, item):
+        return exec.WordShapeEmbedding(
             self.visit(item.word),
             self.visit(item.shape)
         )
 
-    def visit_TagEncoderLayer(self, item):
-        return exec.TagEncoderLayer(
+    def visit_CNNEncoderLayer(self, item):
+        return exec.CNNEncoderLayer(
             self.visit(item.conv),
             self.visit(item.relu),
             self.visit(item.norm)
         )
 
-    def visit_TagEncoder(self, item):
-        return exec.TagEncoder([
+    def visit_CNNEncoder(self, item):
+        return exec.CNNEncoder([
             self.visit(_)
             for _ in item.layers
         ])
@@ -84,23 +84,24 @@ class ExecVisitor(Visitor):
             self.visit(item.crf)
         )
 
-    def visit_NER(self, item):
-        return exec.NER(
-            self.visit(item.emb),
-            self.visit(item.encoder),
-            self.visit(item.ner)
-        )
-
     def visit_MorphHead(self, item):
         return exec.MorphHead(
             self.visit(item.proj)
         )
 
-    def visit_Morph(self, item):
-        return exec.Morph(
+    def visit_Tag(self, item):
+        from slovnet.model.tag import NERHead, MorphHead
+
+        cls = type(item.head) 
+        if cls is NERHead:
+            Tag = exec.NER
+        elif cls is MorphHead:
+            Tag = exec.Morph
+
+        return Tag(
             self.visit(item.emb),
             self.visit(item.encoder),
-            self.visit(item.morph)
+            self.visit(item.head)
         )
 
     def visit_CRF(self, item):
@@ -110,7 +111,8 @@ class ExecVisitor(Visitor):
 
 
 class ExecMixin:
-    @property
-    def as_exec(self):
+    # super stange error if as_exec property
+    # torch Module does some magic
+    def to_exec(self):
         visitor = ExecVisitor()
         return visitor(self)

@@ -4,9 +4,18 @@ from torch import nn
 from torch.nn import functional as F
 
 from slovnet.record import Record
+from slovnet.mask import pad_masked, fill_masked
 
 from .base import Module
-from .crf import CRF
+from .tag import (
+    NERHead as BERTNERHead,
+    MorphHead as BERTMorphHead
+)
+from .syntax import (
+    SyntaxHead as BERTSyntaxHead,
+    SyntaxRel as BERTSyntaxRel,
+    SyntaxPred
+)
 
 
 class BERTConfig(Record):
@@ -119,84 +128,41 @@ class BERTMLMHead(Module):
 
 
 class BERTMLM(Module):
-    def __init__(self, emb, encoder, mlm):
+    def __init__(self, emb, encoder, head):
         super(BERTMLM, self).__init__()
         self.emb = emb
         self.encoder = encoder
-        self.mlm = mlm
+        self.head = head
 
     def forward(self, input):
         x = self.emb(input)
         x = self.encoder(x)
-        return self.mlm(x)
+        return self.head(x)
 
 
 #########
 #
-#   NER
+#   TAG
 #
 ######
 
 
-class BERTNERHead(Module):
-    def __init__(self, emb_dim, tags_num):
-        super(BERTNERHead, self).__init__()
-        self.emb_dim = emb_dim
-        self.tags_num = tags_num
-
-        self.proj = nn.Linear(emb_dim, tags_num)
-        self.crf = CRF(tags_num)
-
-    def forward(self, input):
-        return self.proj(input)
-
-
-class BERTNER(Module):
-    def __init__(self, emb, encoder, ner):
-        super(BERTNER, self).__init__()
+class BERTTag(Module):
+    def __init__(self, emb, encoder, head):
+        super(BERTTag, self).__init__()
         self.emb = emb
         self.encoder = encoder
-        self.ner = ner
+        self.head = head
 
     def forward(self, input, mask=None):
         x = self.emb(input)
         x = self.encoder(x, mask)
-        return self.ner(x)
+        return self.head(x)
 
 
-#########
-#
-#   MORPH
-#
-######
 
-
-class BERTMorphHead(Module):
-    def __init__(self, emb_dim, tags_num):
-        super(BERTMorphHead, self).__init__()
-        self.emb_dim = emb_dim
-        self.tags_num = tags_num
-
-        self.proj = nn.Linear(emb_dim, tags_num)
-
-    def decode(self, pred):
-        return pred.argmax(-1)
-
-    def forward(self, input):
-        return self.proj(input)
-
-
-class BERTMorph(Module):
-    def __init__(self, emb, encoder, morph):
-        super(BERTMorph, self).__init__()
-        self.emb = emb
-        self.encoder = encoder
-        self.morph = morph
-
-    def forward(self, input, mask=None):
-        x = self.emb(input)
-        x = self.encoder(x, mask)
-        return self.morph(x)
+BERTNER = BERTTag
+BERTMorph = BERTTag
 
 
 #######
@@ -204,121 +170,6 @@ class BERTMorph(Module):
 #   SYNTAX
 #
 #######
-
-
-class FF(Module):
-    def __init__(self, input_dim, hidden_dim, dropout):
-        super(FF, self).__init__()
-        self.proj = nn.Linear(input_dim, hidden_dim)
-        self.relu = nn.ReLU()
-        self.drop = nn.Dropout(dropout)
-
-    def forward(self, input):
-        x = self.proj(input)
-        x = self.relu(x)
-        return self.drop(x)
-
-
-def append_root(input, root):
-    batch_size, seq_len, emb_dim = input.shape
-    root = root.repeat(batch_size).view(batch_size, 1, emb_dim)
-    return torch.cat((root, input), dim=1)
-
-
-def strip_root(input):
-    input = input[:, 1:, :]
-    return input.contiguous()
-
-
-class BERTSyntaxHead(Module):
-    def __init__(self, input_dim, hidden_dim, dropout=0.1):
-        super(BERTSyntaxHead, self).__init__()
-        self.head = FF(input_dim, hidden_dim, dropout)
-        self.tail = FF(input_dim, hidden_dim, dropout)
-
-        self.root = nn.Parameter(torch.empty(input_dim))
-        self.kernel = nn.Parameter(torch.empty(hidden_dim, hidden_dim))
-
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        nn.init.uniform_(self.root, -0.1, 0.1)
-        nn.init.eye_(self.kernel)
-
-    def decode(self, pred):
-        # TODO
-        # multiple roots
-        # loops
-        return pred.argmax(-1)
-
-    def forward(self, input):
-        input = append_root(input, self.root)
-        head = self.head(input)
-        tail = self.tail(input)
-
-        x = head.matmul(self.kernel)
-        x = x.matmul(tail.transpose(-2, -1))
-        return strip_root(x)
-
-
-def select_head(input, root, index):
-    batch_size, seq_len, emb_dim = input.shape
-    input = append_root(input, root)  # batch x seq + 1 x emb
-
-    # for root select root
-    zero = torch.zeros(batch_size, 1).long().to(input.device)
-    index = torch.cat((zero, index), dim=-1)  # batch x seq + 1 x emb
-
-    # prep for gather
-    index = index.view(batch_size, seq_len + 1, 1)
-    index = index.expand(batch_size, seq_len + 1, emb_dim)
-
-    input = torch.gather(input, dim=-2, index=index)
-    return strip_root(input)  # batch x seq x emb
-
-
-class BERTSyntaxRel(Module):
-    def __init__(self, input_dim, hidden_dim, rel_dim, dropout=0.1):
-        super(BERTSyntaxRel, self).__init__()
-        self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
-        self.rel_dim = rel_dim
-
-        self.head = FF(input_dim, hidden_dim, dropout)
-        self.tail = FF(input_dim, hidden_dim, dropout)
-
-        self.root = nn.Parameter(torch.empty(input_dim))
-        self.kernel = nn.Parameter(torch.empty(hidden_dim, hidden_dim * rel_dim))
-
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        nn.init.uniform_(self.root, -0.1, 0.1)
-        nn.init.xavier_uniform_(self.kernel)
-
-    def decode(self, pred):
-        return pred.argmax(-1)
-
-    def forward(self, input, head_id):
-        head = self.head(select_head(input, self.root, head_id))
-        tail = self.tail(input)
-
-        batch_size, seq_len, _ = input.shape
-        x = head.matmul(self.kernel)  # batch x seq x hidden * rel
-        x = x.view(batch_size, seq_len, self.rel_dim, self.hidden_dim)
-        x = x.matmul(tail.view(batch_size, seq_len, self.hidden_dim, 1))
-        return x.view(batch_size, seq_len, self.rel_dim)
-
-
-def select_words(input, mask):
-    batch_size, seq_len, emb_dim = input.shape
-    # assert mask.sum(-1) all the same
-    select_size = mask.sum().item() // batch_size
-    return input[mask].view(batch_size, select_size, emb_dim)
-
-
-class SyntaxPred(Record):
-    __attributes__ = ['head_id', 'rel_id']
 
 
 class BERTSyntax(Module):
@@ -329,14 +180,15 @@ class BERTSyntax(Module):
         self.head = head
         self.rel = rel
 
-    def forward(self, input, word_mask, pad_mask, target_head_id=None):
+    def forward(self, input, word_mask, pad_mask,
+                target_mask, target_head_id=None):
         x = self.emb(input)
         x = self.encoder(x, pad_mask)
-        x = select_words(x, word_mask)
+        x = pad_masked(x, word_mask)
 
         head_id = self.head(x)
         if target_head_id is None:
-            target_head_id = self.head.decode(head_id)
+            target_head_id = self.head.decode(head_id, target_mask)
 
         return SyntaxPred(
             head_id=head_id,

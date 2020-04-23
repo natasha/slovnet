@@ -8,14 +8,14 @@ from slovnet.shape import word_shape
 from slovnet.batch import Batch
 
 from .buffer import ShuffleBuffer
+from .common import (
+    WordShapeInferInput as TagInferInput,
+    WordShapeInferEncoder as TagInferEncoder
+)
 
 
 class TagTrainInput(Record):
     __attributes__ = ['word_id', 'shape_id']
-
-
-class TagInferInput(Record):
-    __attributes__ = ['word_id', 'shape_id', 'mask']
 
 
 class TagTrainEncoder:
@@ -55,38 +55,3 @@ class TagTrainEncoder:
         chunks = chop(seqs, self.batch_size)
         for chunk in chunks:
             yield self.batch(chunk)
-
-
-class TagInferEncoder:
-    def __init__(self, words_vocab, shapes_vocab,
-                 batch_size=8):
-        self.words_vocab = words_vocab
-        self.shapes_vocab = shapes_vocab
-
-        self.batch_size = batch_size
-
-    def item(self, words):
-        word_ids, shape_ids = [], []
-        for word in words:
-            shape = word_shape(word)
-            word_id = self.words_vocab.encode(word.lower())
-            shape_id = self.shapes_vocab.encode(shape)
-            word_ids.append(word_id)
-            shape_ids.append(shape_id)
-        return word_ids, shape_ids
-
-    def input(self, items):
-        word_id, shape_id = [], []
-        for word_ids, shape_ids in items:
-            word_id.append(torch.tensor(word_ids, dtype=torch.long))
-            shape_id.append(torch.tensor(shape_ids, dtype=torch.long))
-        word_id = pad_sequence(word_id, self.words_vocab.pad_id)
-        shape_id = pad_sequence(shape_id, self.shapes_vocab.pad_id)
-        mask = word_id == self.words_vocab.pad_id
-        return TagInferInput(word_id, shape_id, mask)
-
-    def __call__(self, items):
-        items = (self.item(_) for _ in items)
-        chunks = chop(items, self.batch_size)
-        for chunk in chunks:
-            yield self.input(chunk)

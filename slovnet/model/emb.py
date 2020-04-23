@@ -49,3 +49,16 @@ class NavecEmbedding(PQEmbedding):
 
     def extra_repr(self):
         return 'id=%r, indexes=[...], codes=[...]' % self.id
+
+
+class WordShapeEmbedding(Module):
+    def __init__(self, word, shape):
+        super(WordShapeEmbedding, self).__init__()
+        self.word = word
+        self.shape = shape
+        self.dim = word.dim + shape.dim
+
+    def forward(self, word_id, shape_id):
+        word = self.word(word_id)
+        shape = self.shape(shape_id)
+        return torch.cat([word, shape], dim=-1)

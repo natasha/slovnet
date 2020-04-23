@@ -85,7 +85,7 @@ model.emb.shape.load(SHAPE)
 log('Load encoder: %r' % ENCODER)
 model.encoder.load(ENCODER)
 log('Load ner: %r' % NER)
-model.ner.load(NER)
+model.head.load(NER)
 log('Device: %r' % DEVICE)
 model = model.to(DEVICE)
 

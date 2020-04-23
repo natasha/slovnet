@@ -213,14 +213,7 @@ class NavecEmbedding(Embedding):
         return output.reshape(*shape, self.dim)
 
 
-######
-#
-#   TAG
-#
-#######
-
-
-class TagEmbedding(Module):
+class WordShapeEmbedding(Module):
     __attributes__ = ['word', 'shape']
     __annotations__ = {
         'word': NavecEmbedding,
@@ -233,7 +226,14 @@ class TagEmbedding(Module):
         return np.concatenate([word, shape], axis=-1)
 
 
-class TagEncoderLayer(Module):
+######
+#
+#   CNN
+#
+#######
+
+
+class CNNEncoderLayer(Module):
     __attributes__ = ['conv', 'relu', 'norm']
     __annotations__ = {
         'conv': Conv1d,
@@ -247,10 +247,10 @@ class TagEncoderLayer(Module):
         return self.norm(x)
 
 
-class TagEncoder(Module):
+class CNNEncoder(Module):
     __attributes__ = ['layers']
     __annotations__ = {
-        'layers': [TagEncoderLayer]
+        'layers': [CNNEncoderLayer]
     }
 
     def __call__(self, input, mask):
@@ -267,7 +267,7 @@ class TagEncoder(Module):
 
 #######
 #
-#   NER
+#   TAG
 #
 ######
 
@@ -283,27 +283,6 @@ class NERHead(Module):
         return self.proj(input)
 
 
-class NER(Module):
-    __attributes__ = ['emb', 'encoder', 'ner']
-    __annotations__ = {
-        'emb': TagEmbedding,
-        'encoder': TagEncoder,
-        'ner': NERHead
-    }
-
-    def __call__(self, word_id, shape_id, mask):
-        x = self.emb(word_id, shape_id)
-        x = self.encoder(x, mask)
-        return self.ner(x)
-
-
-#######
-#
-#   MORPH
-#
-######
-
-
 class MorphHead(Module):
     __attributes__ = ['proj']
     __annotations__ = {
@@ -317,18 +296,30 @@ class MorphHead(Module):
         return pred.argmax(-1)
 
 
-class Morph(Module):
-    __attributes__ = ['emb', 'encoder', 'morph']
-    __annotations__ = {
-        'emb': TagEmbedding,
-        'encoder': TagEncoder,
-        'morph': MorphHead
-    }
+class Tag(Module):
+    __attributes__ = ['emb', 'encoder', 'head']
 
     def __call__(self, word_id, shape_id, mask):
         x = self.emb(word_id, shape_id)
         x = self.encoder(x, mask)
-        return self.morph(x)
+        return self.head(x)
+
+
+class NER(Tag):
+    __annotations__ = {
+        'emb': WordShapeEmbedding,
+        'encoder': CNNEncoder,
+        'head': NERHead
+    }
+
+
+class Morph(Tag):
+    __annotations__ = {
+        'emb': WordShapeEmbedding,
+        'encoder': CNNEncoder,
+        'head': MorphHead
+    }
+
 
 
 #######
