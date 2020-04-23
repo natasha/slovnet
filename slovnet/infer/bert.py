@@ -13,6 +13,8 @@ from slovnet.markup import (
 )
 
 from .base import Infer
+from .tag import TagDecoder as BERTTagDecoder
+from .syntax import SyntaxDecoder as BERTSyntaxDecoder
 
 
 ##########
@@ -87,35 +89,6 @@ def join_items(items):
         tokens = flatten(_.tokens for _ in group)
         pred = flatten(_.pred for _ in group)
         yield BERTInferItem(id, tokens, pred)
-
-
-#######
-#
-#  DECODER
-#
-######
-
-
-class BERTTagsDecoder:
-    def __init__(self, tags_vocab):
-        self.tags_vocab = tags_vocab
-
-    def __call__(self, preds):
-        for pred in preds:
-            yield [self.tags_vocab.decode(_) for _ in pred]
-
-
-class BERTSyntaxDecoder:
-    def __init__(self, rels_vocab):
-        self.rels_vocab = rels_vocab
-
-    def __call__(self, preds):
-        for pred in preds:
-            head_ids, rel_ids = pred
-            ids = [str(_ + 1) for _ in range(len(head_ids))]
-            head_ids = [str(_) for _ in head_ids.tolist()]
-            rels = [self.rels_vocab.decode(_) for _ in rel_ids]
-            yield ids, head_ids, rels
 
 
 #######

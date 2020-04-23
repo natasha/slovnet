@@ -8,6 +8,7 @@ from slovnet.shape import word_shape
 from slovnet.batch import Batch
 
 from .buffer import SortBuffer
+from .common import WordShapeInferEncoder as SyntaxInferEncoder
 
 
 ROOT_ID = '0'

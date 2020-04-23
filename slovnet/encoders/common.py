@@ -37,7 +37,7 @@ class WordShapeInferEncoder:
         word_id = pad_sequence(word_id, self.words_vocab.pad_id)
         shape_id = pad_sequence(shape_id, self.shapes_vocab.pad_id)
         mask = word_id == self.words_vocab.pad_id
-        return TagInferInput(word_id, shape_id, mask)
+        return WordShapeInferInput(word_id, shape_id, mask)
 
     def __call__(self, items):
         items = (self.item(_) for _ in items)
