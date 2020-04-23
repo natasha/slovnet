@@ -1,10 +1,16 @@
 
+import torch
+
 from .record import Record
 from .pad import pad_sequence
 
 
 class Masked(Record):
     __attributes__ = ['value', 'mask']
+
+
+def mask_like(input):
+    return torch.ones_like(input, dtype=torch.bool)
 
 
 def split_masked(input, mask):
@@ -15,3 +21,7 @@ def split_masked(input, mask):
 def pad_masked(input, mask, fill=0):
     seqs = split_masked(input, mask)
     return pad_sequence(seqs, fill)
+
+
+def fill_masked(input, mask, fill=0):
+    return fill * mask + input * ~mask

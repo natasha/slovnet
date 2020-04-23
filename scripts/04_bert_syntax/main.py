@@ -41,7 +41,7 @@ from slovnet.model.bert import (
 from slovnet.markup import SyntaxMarkup
 from slovnet.vocab import BERTVocab, Vocab
 from slovnet.encoders.bert import BERTSyntaxTrainEncoder
-from slovnet.loss import flatten_cross_entropy
+from slovnet.loss import masked_flatten_cross_entropy
 from slovnet.score import (
     SyntaxScoreMeter,
     score_syntax_batch
@@ -122,15 +122,15 @@ def process_batch(model, criterion, batch):
 
     pred = model(
         input.word_id, input.word_mask, input.pad_mask,
-        target.head_id
+        target.mask, target.head_id
     )
 
     loss = (
-        criterion(pred.head_id, target.head_id)
-        + criterion(pred.rel_id, target.rel_id)
+        criterion(pred.head_id, target.head_id, target.mask)
+        + criterion(pred.rel_id, target.rel_id, target.mask)
     )
 
-    pred.head_id = model.head.decode(head_id)
-    pred.rel_id = model.rel.decode(rel_id)
+    pred.head_id = model.head.decode(pred.head_id, target.mask)
+    pred.rel_id = model.rel.decode(pred.rel_id, target.mask)
 
     return batch.processed(loss, pred)

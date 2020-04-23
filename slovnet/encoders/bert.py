@@ -8,7 +8,7 @@ from slovnet.batch import Batch
 from slovnet.mask import Masked, pad_masked
 from slovnet.bert import bert_subs
 
-from .buffer import ShuffleBuffer, LenBuffer
+from .buffer import ShuffleBuffer, SortBuffer
 
 
 ##########
@@ -29,7 +29,6 @@ class BERTMLMTrainEncoder:
         self.shuffle = ShuffleBuffer(shuffle_size)
 
         self.mask_prob = mask_prob
-        self.ignore_id = ignore_id
 
     def items(self, texts):
         for text in texts:
@@ -211,15 +210,14 @@ class BERTSyntaxTarget(Record):
 class BERTSyntaxTrainEncoder:
     def __init__(self, words_vocab, rels_vocab,
                  seq_len=512, batch_size=8,
-                 shuffle_size=1, len_size=1):
+                 sort_size=1):
         self.words_vocab = words_vocab
         self.rels_vocab = rels_vocab
 
         self.seq_len = seq_len
         self.batch_size = batch_size
 
-        self.shuffle = ShuffleBuffer(shuffle_size)
-        self.group = LenBuffer(len_size)
+        self.sort = SortBuffer(sort_size, key=lambda _: len(_.tokens))
 
     def item(self, markup):
         word_ids, mask, head_ids, rel_ids = [], [], [], []
@@ -258,22 +256,19 @@ class BERTSyntaxTrainEncoder:
 
         head_id = pad_sequence(head_id)
         rel_id = pad_sequence(rel_id, fill=self.rels_vocab.pad_id)
-        mask = rel_id == self.rels_vocab.pad_id
+        mask = rel_id != self.rels_vocab.pad_id
         target = BERTSyntaxTarget(head_id, rel_id, mask)
 
         return Batch(input, target)
 
     def __call__(self, markups):
+        markups = self.sort(markups)
         items = (self.item(_) for _ in markups)
         # 0.02% sents longer then 128, just drop them
         items = (_ for _ in items if len(_.word_ids) <= self.seq_len)
-        items = self.shuffle(items)
-        groups = self.group(items)
-
-        for group in groups:
-            chunks = chop(group, self.batch_size)
-            for chunk in chunks:
-                yield self.batch(chunk)
+        chunks = chop(items, self.batch_size)
+        for chunk in chunks:
+            yield self.batch(chunk)
 
 
 #########
