@@ -8,7 +8,7 @@ from slovnet.shape import word_shape
 
 
 class WordShapeInferInput(Record):
-    __attributes__ = ['word_id', 'shape_id', 'mask']
+    __attributes__ = ['word_id', 'shape_id', 'pad_mask']
 
 
 class WordShapeInferEncoder:
@@ -36,8 +36,8 @@ class WordShapeInferEncoder:
             shape_id.append(torch.tensor(shape_ids, dtype=torch.long))
         word_id = pad_sequence(word_id, self.words_vocab.pad_id)
         shape_id = pad_sequence(shape_id, self.shapes_vocab.pad_id)
-        mask = word_id == self.words_vocab.pad_id
-        return WordShapeInferInput(word_id, shape_id, mask)
+        pad_mask = word_id == self.words_vocab.pad_id
+        return WordShapeInferInput(word_id, shape_id, pad_mask)
 
     def __call__(self, items):
         items = (self.item(_) for _ in items)
