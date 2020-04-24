@@ -2,7 +2,7 @@ FROM pytorch/pytorch:1.4-cuda10.1-cudnn7-runtime
 
 RUN S3=https://storage.yandexcloud.net/natasha-slovnet \
     GH=https://github.com/natasha/navec/releases/download/v0.0.0/ \
-    && curl -O $S3/06_morph/model/shape.pt \
+    && curl -O $S3/07_syntax/model/shape.pt \
     && curl -O $S3/07_syntax/model/encoder.pt \
     && curl -O $S3/07_syntax/model/head.pt \
     && curl -O $S3/07_syntax/model/rel.pt \
