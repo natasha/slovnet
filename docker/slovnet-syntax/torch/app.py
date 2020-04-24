@@ -109,8 +109,8 @@ async def handle(request):
     log('Post chunk size: %r' % len(chunk))
     markups = list(infer(chunk))
 
-    tags = sum(len(_.tags) for _ in markups)
-    log('Infer tags: %r', tags)
+    tokens = sum(len(_.tokens) for _ in markups)
+    log('Infer tokens: %r', tokens)
 
     data = [_.as_json for _ in markups]
     return web.json_response(data)
