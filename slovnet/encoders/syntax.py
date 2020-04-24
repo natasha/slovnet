@@ -8,7 +8,7 @@ from slovnet.shape import word_shape
 from slovnet.batch import Batch
 
 from .buffer import SortBuffer
-from .common import WordShapeInferEncoder as SyntaxInferEncoder
+from .common import WordShapeInferEncoder
 
 
 ROOT_ID = '0'
@@ -84,3 +84,7 @@ class SyntaxTrainEncoder:
         chunks = chop(items, self.batch_size)
         for chunk in chunks:
             yield self.batch(chunk)
+
+
+class SyntaxInferEncoder(WordShapeInferEncoder):
+    pass

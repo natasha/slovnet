@@ -8,12 +8,12 @@ from slovnet.mask import pad_masked
 
 from .base import Module
 from .tag import (
-    NERHead as BERTNERHead,
-    MorphHead as BERTMorphHead
+    NERHead,
+    MorphHead
 )
 from .syntax import (
-    SyntaxHead as BERTSyntaxHead,
-    SyntaxRel as BERTSyntaxRel,
+    SyntaxHead,
+    SyntaxRel,
     SyntaxPred
 )
 
@@ -99,10 +99,10 @@ class BERTEncoder(Module):
             config.dropout, config.norm_eps
         )
 
-    def forward(self, input, mask=None):
+    def forward(self, input, pad_mask=None):
         input = input.transpose(0, 1)  # torch expects seq x batch x emb
         for layer in self.layers:
-            input = layer(input, src_key_padding_mask=mask)
+            input = layer(input, src_key_padding_mask=pad_mask)
         return input.transpose(0, 1)  # restore
 
 
@@ -147,6 +147,14 @@ class BERTMLM(Module):
 ######
 
 
+class BERTNERHead(NERHead):
+    pass
+
+
+class BERTMorphHead(MorphHead):
+    pass
+
+
 class BERTTag(Module):
     def __init__(self, emb, encoder, head):
         super(BERTTag, self).__init__()
@@ -154,14 +162,18 @@ class BERTTag(Module):
         self.encoder = encoder
         self.head = head
 
-    def forward(self, input, mask=None):
+    def forward(self, input, pad_mask=None):
         x = self.emb(input)
-        x = self.encoder(x, mask)
+        x = self.encoder(x, pad_mask)
         return self.head(x)
 
 
-BERTNER = BERTTag
-BERTMorph = BERTTag
+class BERTNER(BERTTag):
+    pass
+
+
+class BERTMorph(BERTTag):
+    pass
 
 
 #######
@@ -169,6 +181,14 @@ BERTMorph = BERTTag
 #   SYNTAX
 #
 #######
+
+
+class BERTSyntaxHead(SyntaxHead):
+    pass
+
+
+class BERTSyntaxRel(SyntaxRel):
+    pass
 
 
 class BERTSyntax(Module):

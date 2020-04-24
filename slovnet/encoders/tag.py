@@ -7,7 +7,7 @@ from slovnet.shape import word_shape
 from slovnet.batch import Batch
 
 from .buffer import ShuffleBuffer
-from .common import WordShapeInferEncoder as TagInferEncoder
+from .common import WordShapeInferEncoder
 
 
 class TagTrainInput(Record):
@@ -51,3 +51,7 @@ class TagTrainEncoder:
         chunks = chop(seqs, self.batch_size)
         for chunk in chunks:
             yield self.batch(chunk)
+
+
+class TagInferEncoder(WordShapeInferEncoder):
+    pass

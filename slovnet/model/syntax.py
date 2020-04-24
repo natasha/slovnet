@@ -7,8 +7,8 @@ from slovnet.record import Record
 from slovnet.mask import fill_masked
 
 from .base import Module
-from .cnn import CNNEncoder as SyntaxEncoder
-from .emb import WordShapeEmbedding as SyntaxEmbedding
+from .cnn import CNNEncoder
+from .emb import WordShapeEmbedding
 
 
 class FF(Module):
@@ -149,6 +149,14 @@ class SyntaxRel(Module):
 
 class SyntaxPred(Record):
     __attributes__ = ['head_id', 'rel_id']
+
+
+class SyntaxEmbedding(WordShapeEmbedding):
+    pass
+
+
+class SyntaxEncoder(CNNEncoder):
+    pass
 
 
 class Syntax(Module):

@@ -3,8 +3,8 @@ from torch import nn
 
 from .base import Module
 from .crf import CRF
-from .emb import WordShapeEmbedding as TagEmbedding
-from .cnn import CNNEncoder as TagEncoder
+from .emb import WordShapeEmbedding
+from .cnn import CNNEncoder
 
 
 class NERHead(Module):
@@ -35,6 +35,14 @@ class MorphHead(Module):
         return self.proj(input)
 
 
+class TagEmbedding(WordShapeEmbedding):
+    pass
+
+
+class TagEncoder(CNNEncoder):
+    pass
+
+
 class Tag(Module):
     def __init__(self, emb, encoder, head):
         super(Tag, self).__init__()
@@ -42,11 +50,15 @@ class Tag(Module):
         self.encoder = encoder
         self.head = head
 
-    def forward(self, word_id, shape_id, mask=None):
+    def forward(self, word_id, shape_id, pad_mask=None):
         x = self.emb(word_id, shape_id)
-        x = self.encoder(x, mask)
+        x = self.encoder(x, pad_mask)
         return self.head(x)
 
 
-NER = Tag
-Morph = Tag
+class NER(Tag):
+    pass
+
+
+class Morph(Tag):
+    pass

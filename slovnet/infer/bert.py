@@ -13,8 +13,8 @@ from slovnet.markup import (
 )
 
 from .base import Infer
-from .tag import TagDecoder as BERTTagDecoder
-from .syntax import SyntaxDecoder as BERTSyntaxDecoder
+from .tag import TagDecoder
+from .syntax import SyntaxDecoder
 
 
 ##########
@@ -89,6 +89,21 @@ def join_items(items):
         tokens = flatten(_.tokens for _ in group)
         pred = flatten(_.pred for _ in group)
         yield BERTInferItem(id, tokens, pred)
+
+
+#######
+#
+#  DECODE
+#
+#######
+
+
+class BERTTagDecoder(TagDecoder):
+    pass
+
+
+class BERTSyntaxDecoder(SyntaxDecoder):
+    pass
 
 
 #######
