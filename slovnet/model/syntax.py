@@ -74,14 +74,12 @@ class SyntaxHead(Module):
         # loops, nonprojective
         # ~10% sents
 
-        x = append_root_mask(mask)
-        x = matmul_mask(x)
-        x = strip_root(x)
-        pred = fill_masked(pred, ~x, pred.min())
+        mask = append_root_mask(mask)
+        mask = matmul_mask(mask)
+        mask = strip_root(mask)
 
-        pred = pred.argmax(-1)
-        pred = fill_masked(pred, ~mask, -1)
-        return pred
+        pred = fill_masked(pred, ~mask, pred.min())
+        return pred.argmax(-1)
 
     def forward(self, input):
         input = append_root(input, self.root)
@@ -129,12 +127,11 @@ class SyntaxRel(Module):
         nn.init.xavier_uniform_(self.kernel)
 
     def decode(self, pred, mask):
-        x = mask.unsqueeze(-1)  # batch x seq x 1
-        x = x.expand_as(pred)
-        pred = fill_masked(pred, ~x, pred.min())
+        mask = mask.unsqueeze(-1)  # batch x seq x 1
+        mask = mask.expand_as(pred)
 
-        pred = pred.argmax(-1)
-        return fill_masked(pred, ~mask, -1)
+        pred = fill_masked(pred, ~mask, pred.min())
+        return pred.argmax(-1)
 
     def forward(self, input, head_id):
         head = self.head(gather_head(input, self.root, head_id))
