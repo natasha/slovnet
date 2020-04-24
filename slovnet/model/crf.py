@@ -2,6 +2,8 @@
 import torch
 from torch import nn
 
+from slovnet.mask import mask_like
+
 from .base import Module
 
 
@@ -22,7 +24,7 @@ class CRF(Module):
 
     def forward(self, emissions, tags, mask=None):
         if mask is None:
-            mask = torch.ones_like(tags).bool()
+            mask = mask_like(tags)
 
         emissions = emissions.transpose(1, 0)  # seq x batch x tags
         tags = tags.transpose(1, 0)  # seq x batch
@@ -60,7 +62,11 @@ class CRF(Module):
     def decode(self, emissions, mask=None):
         batch_size, seq_len, tags_num = emissions.shape
         if mask is None:
-            mask = torch.ones((batch_size, seq_len)).bool().to(emissions.device)
+            mask = torch.ones(
+                (batch_size, seq_len),
+                dtype=torch.bool,
+                device=emissions.device
+            )
 
         emissions = emissions.transpose(1, 0)
         mask = mask.transpose(1, 0)
