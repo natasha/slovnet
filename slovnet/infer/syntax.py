@@ -1,5 +1,6 @@
 
 from slovnet.markup import SyntaxMarkup
+from slovnet.mask import split_masked
 
 from .base import Infer
 
@@ -21,14 +22,21 @@ class SyntaxInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             input = input.to(self.model.device)
+            mask = ~input.pad_mask
+
             pred = self.model(
                 input.word_id, input.shape_id,
-                pad_mask=~input.mask,
-                target_mask=input.mask
+                pad_mask=input.pad_mask,
+                target_mask=mask
             )
-            head_id = self.model.head.decode(pred.head_id)
-            rel_id = self.model.rel.decode(pred.rel_id)
-            yield from zip(head_id, rel_id)
+
+            head_id = self.model.head.decode(pred.head_id, mask)
+            head_ids = split_masked(head_id, mask)
+
+            rel_id = self.model.rel.decode(pred.rel_id, mask)
+            rel_ids = split_masked(rel_id, mask)
+
+            yield from zip(head_ids, rel_ids)
 
     def __call__(self, items):
         inputs = self.encoder(items)
@@ -36,6 +44,6 @@ class SyntaxInfer(Infer):
         preds = self.decoder(preds)
 
         for item, pred in zip(items, preds):
-            ids, head_ids, rels = item.pred
+            ids, head_ids, rels = pred
             tuples = zip(ids, item, head_ids, rels)
             yield SyntaxMarkup.from_tuples(tuples)
