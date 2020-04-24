@@ -261,15 +261,17 @@ def tag_f1(preds, targets, type):
 
 
 def decode_tags(seqs, tags_vocab):
-    for seq in seqs:
-        for id in seq:
-            yield tags_vocab.decode(id)
+    return [
+        tags_vocab.decode(id)
+        for seq in seqs
+        for id in seq
+    ]
 
 
 def score_ner_batch(batch, tags_vocab):
     score = NERBatchScore(batch.loss)
-    preds = list(decode_tags(batch.pred, tags_vocab))
-    targets = list(decode_tags(batch.target, tags_vocab))
+    preds = decode_tags(batch.pred, tags_vocab)
+    targets = decode_tags(batch.target, tags_vocab)
     for type in tags_vocab.types:
         score.types[type] = tag_f1(preds, targets, type)
     return score
