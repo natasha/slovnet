@@ -60,11 +60,19 @@ def test_ner(ner):
 
     markup = next(ner([text]))
 
-    pred = [
-        markup.text[_.start:_.stop]
-        for _ in markup.spans
+    pred = []
+    for span in markup.spans:
+        chunk = markup.text[span.start:span.stop]
+        pred.append([span.type, chunk])
+
+    assert pred == [
+        ['PER', 'Денис Пушилин'],
+        ['ORG', 'Донецкая республика'],
+        ['LOC', 'ДНР'],
+        ['PER', 'Леонид Пасечник'],
+        ['ORG', 'Мир Луганщине'],
+        ['LOC', 'ЛНР']
     ]
-    assert pred == ['Денис Пушилин', 'Донецкая республика', 'ДНР', 'Леонид Пасечник', 'Мир Луганщине', 'ЛНР']
 
 
 def test_morph(morph):
@@ -72,8 +80,24 @@ def test_morph(morph):
 
     markup = next(morph([words]))
 
-    pred = [_.pos for _ in markup.tokens]
-    assert pred == ['ADP', 'PRON', 'VERB', 'ADP', 'NOUN', 'PUNCT', 'VERB', 'ADP', 'ADJ', 'NOUN', 'PROPN', 'PUNCT']
+    pred = [
+        [_.text, _.tag]
+        for _ in markup.tokens
+    ]
+    assert pred == [
+        ['Об', 'ADP'],
+        ['этом', 'PRON|Animacy=Inan|Case=Loc|Gender=Neut|Number=Sing'],
+        ['говорится', 'VERB|Aspect=Imp|Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin|Voice=Pass'],
+        ['в', 'ADP'],
+        ['документе', 'NOUN|Animacy=Inan|Case=Loc|Gender=Masc|Number=Sing'],
+        [',', 'PUNCT'],
+        ['опубликованном', 'VERB|Aspect=Perf|Case=Loc|Gender=Masc|Number=Sing|Tense=Past|VerbForm=Part|Voice=Pass'],
+        ['в', 'ADP'],
+        ['официальном', 'ADJ|Case=Loc|Degree=Pos|Gender=Masc|Number=Sing'],
+        ['журнале', 'NOUN|Animacy=Inan|Case=Loc|Gender=Masc|Number=Sing'],
+        ['Евросоюза', 'PROPN|Animacy=Inan|Case=Gen|Gender=Masc|Number=Sing'],
+        ['.', 'PUNCT']
+    ]
 
 
 def test_syntax(syntax):
