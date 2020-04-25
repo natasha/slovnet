@@ -31,7 +31,17 @@ SlovNet is a Python library for deep-learning based NLP modeling for Russian lan
 </td>
 <td>27MB</td>
 <td>
-  Russian morphology optimized for news articles.
+  Russian morphology tagger optimized for news articles.
+</td>
+</tr>
+
+<tr>
+<td>
+  <a href="https://storage.yandexcloud.net/natasha-slovnet/07_syntax/pack/slovnet_syntax_news_v1.tar">slovnet_syntax_news_v1.tar</a>
+</td>
+<td>27MB</td>
+<td>
+  Russian syntax parser optimized for news articles.
 </td>
 </tr>
 
@@ -154,6 +164,73 @@ Morphology annotator processes tokenized text. To split the input into sentencie
                  там ADV|Degree=Pos
             выборами NOUN|Animacy=Inan|Case=Ins|Gender=Masc|Number=Plur
                    . PUNCT
+
+```
+
+### Syntax
+
+Syntax parser processes sentencies split into tokens. Use <a href="https://github.com/natasha/razdel">Razdel</a> for segmentation.
+
+```python
+>>> from ipymarkup import show_dep_ascii_markup as show_markup
+>>> from razdel import sentenize, tokenize
+>>> from slovnet import Syntax
+
+>>> chunk = []
+>>> for sent in sentenize(text):
+>>>     tokens = [_.text for _ in tokenize(sent.text)]
+>>>     chunk.append(tokens)
+>>> chunk[:1]
+[['Европейский', 'союз', 'добавил', 'в', 'санкционный', 'список', 'девять', 'политических', 'деятелей', 'из', 'самопровозглашенных', 'республик', 'Донбасса', '—', 'Донецкой', 'народной', 'республики', '(', 'ДНР', ')', 'и', 'Луганской', 'народной', 'республики', '(', 'ЛНР', ')', '—', 'в', 'связи', 'с', 'прошедшими', 'там', 'выборами', '.']]
+
+>>> morph = Syntax('slovnet_syntax_news_v1.tar')
+
+>>> markup = next(morph(chunk))
+
+# Convert CoNLL-style format to source, target indices
+>>> words, deps = [], []
+>>> for token in markup.tokens:
+>>>     words.append(token.text)
+>>>     source = int(token.head_id) - 1
+>>>     target = int(token.id) - 1
+>>>     if source > 0 and source != target:  # skip root, loops
+>>>         deps.append([source, target, token.rel])
+>>> show_markup(words, deps)
+              ┌► Европейский         amod
+            ┌►└─ союз                nsubj
+┌───────┌─┌─└─── добавил             
+│       │ │ ┌──► в                   case
+│       │ │ │ ┌► санкционный         amod
+│       │ └►└─└─ список              obl
+│       │   ┌──► девять              nummod:gov
+│       │   │ ┌► политических        amod
+│ ┌─────└►┌─└─└─ деятелей            obj
+│ │       │ ┌──► из                  case
+│ │       │ │ ┌► самопровозглашенных amod
+│ │       └►└─└─ республик           nmod
+│ │         └──► Донбасса            nmod
+│ │ ┌──────────► —                   punct
+│ │ │       ┌──► Донецкой            amod
+│ │ │       │ ┌► народной            amod
+│ │ │ ┌─┌─┌─└─└─ республики          
+│ │ │ │ │ │   ┌► (                   punct
+│ │ │ │ │ └►┌─└─ ДНР                 parataxis
+│ │ │ │ │   └──► )                   punct
+│ │ │ │ │ ┌────► и                   cc
+│ │ │ │ │ │ ┌──► Луганской           amod
+│ │ │ │ │ │ │ ┌► народной            amod
+│ │ └─│ └►└─└─└─ республики          conj
+│ │   │       ┌► (                   punct
+│ │   └────►┌─└─ ЛНР                 parataxis
+│ │         └──► )                   punct
+│ │     ┌──────► —                   punct
+│ │     │ ┌►┌─┌─ в                   case
+│ │     │ │ │ └► связи               fixed
+│ │     │ │ └──► с                   fixed
+│ │     │ │ ┌►┌─ прошедшими          acl
+│ │     │ │ │ └► там                 advmod
+│ └────►└─└─└─── выборами            nmod
+└──────────────► .                   punct
 
 ```
 
@@ -423,7 +500,7 @@ Datasets from <a href="https://github.com/natasha/corus#load_gramru">GramEval202
 * <a href="https://github.com/IlyaGusev/rnnmorph">`rnnmorph`</a> — first place on morphoRuEval-2017.
 * <a href="https://github.com/chomechome/maru">`maru`</a>
 * `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe</a> with model trained on SynTagRus.
-* `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained to @buriy</a>.
+* `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
 
 For every column top 3 results are highlighted. `slovnet` was trained only on news dataset:
 
@@ -594,6 +671,158 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
   </tbody>
 </table>
 <!--- morph2 --->
+
+### Syntax
+
+* `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe</a> + Russian SynTagRus model.
+* `spacy` — <a href="https://spacy.io/">spaCy</a> + <a href="https://github.com/buriy/spacy-ru">Russian models by @buriy</a>.
+* `deeppavlov_bert` — BERT + biaffine head, see <a href="http://docs.deeppavlov.ai/en/master/features/models/syntaxparser.html">Deeppavlov docs</a>.
+
+<!--- syntax1 --->
+<table border="0" class="dataframe">
+  <thead>
+    <tr>
+      <th></th>
+      <th colspan="2" halign="left">news</th>
+      <th colspan="2" halign="left">wiki</th>
+      <th colspan="2" halign="left">fiction</th>
+      <th colspan="2" halign="left">social</th>
+      <th colspan="2" halign="left">poetry</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>uas</th>
+      <th>las</th>
+      <th>uas</th>
+      <th>las</th>
+      <th>uas</th>
+      <th>las</th>
+      <th>uas</th>
+      <th>las</th>
+      <th>uas</th>
+      <th>las</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>udpipe</th>
+      <td>0.873</td>
+      <td>0.823</td>
+      <td>0.622</td>
+      <td>0.531</td>
+      <td><b>0.910</b></td>
+      <td><b>0.876</b></td>
+      <td>0.700</td>
+      <td>0.624</td>
+      <td>0.625</td>
+      <td>0.534</td>
+    </tr>
+    <tr>
+      <th>spacy</th>
+      <td>0.876</td>
+      <td>0.818</td>
+      <td>0.770</td>
+      <td>0.665</td>
+      <td>0.880</td>
+      <td>0.833</td>
+      <td><b>0.757</b></td>
+      <td><b>0.666</b></td>
+      <td><b>0.657</b></td>
+      <td><b>0.544</b></td>
+    </tr>
+    <tr>
+      <th>deeppavlov_bert</th>
+      <td><b>0.962</b></td>
+      <td><b>0.910</b></td>
+      <td><b>0.882</b></td>
+      <td><b>0.786</b></td>
+      <td><b>0.963</b></td>
+      <td><b>0.929</b></td>
+      <td><b>0.844</b></td>
+      <td><b>0.761</b></td>
+      <td><b>0.784</b></td>
+      <td><b>0.691</b></td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td><b>0.965</b></td>
+      <td><b>0.936</b></td>
+      <td><b>0.891</b></td>
+      <td><b>0.828</b></td>
+      <td><b>0.958</b></td>
+      <td><b>0.940</b></td>
+      <td><b>0.846</b></td>
+      <td><b>0.782</b></td>
+      <td><b>0.776</b></td>
+      <td><b>0.706</b></td>
+    </tr>
+    <tr>
+      <th>slovnet</th>
+      <td><b>0.907</b></td>
+      <td><b>0.880</b></td>
+      <td><b>0.775</b></td>
+      <td><b>0.718</b></td>
+      <td>0.806</td>
+      <td>0.776</td>
+      <td>0.726</td>
+      <td>0.656</td>
+      <td>0.542</td>
+      <td>0.469</td>
+    </tr>
+  </tbody>
+</table>
+<!--- syntax1 --->
+
+<!--- syntax2 --->
+<table border="0" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>init, s</th>
+      <th>disk, mb</th>
+      <th>ram, mb</th>
+      <th>speed, it/s</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>udpipe</th>
+      <td><b>6.9</b></td>
+      <td><b>45</b></td>
+      <td><b>242</b></td>
+      <td>56.2</td>
+    </tr>
+    <tr>
+      <th>spacy</th>
+      <td>10.9</td>
+      <td><b>89</b></td>
+      <td><b>579</b></td>
+      <td>31.6</td>
+    </tr>
+    <tr>
+      <th>deeppavlov_bert</th>
+      <td>34.0</td>
+      <td>1427</td>
+      <td>8704</td>
+      <td><b>75.0 (gpu)</b></td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td><b>5.0</b></td>
+      <td>504</td>
+      <td>3427</td>
+      <td><b>200.0 (gpu)</b></td>
+    </tr>
+    <tr>
+      <th>slovnet</th>
+      <td><b>1.0</b></td>
+      <td><b>27</b></td>
+      <td><b>125</b></td>
+      <td><b>450.0</b></td>
+    </tr>
+  </tbody>
+</table>
+<!--- syntax2 --->
 
 ## Support
 
