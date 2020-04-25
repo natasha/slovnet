@@ -1,2 +1,2 @@
 
-from .api import NER, Morph  # noqa
+from .api import NER, Morph, Syntax  # noqa

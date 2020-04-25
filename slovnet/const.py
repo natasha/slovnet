@@ -31,6 +31,7 @@ MASK = '<mask>'
 WORD = 'word'
 SHAPE = 'shape'
 TAG = 'tag'
+REL = 'rel'
 
 #####
 #  BIO

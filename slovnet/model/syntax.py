@@ -96,7 +96,7 @@ def gather_head(input, root, index):
     input = append_root(input, root)  # batch x seq + 1 x emb
 
     # for root select root
-    zero = torch.zeros(batch_size, 1).long().to(input.device)
+    zero = torch.zeros(batch_size, 1, dtype=torch.long, device=input.device)
     index = torch.cat((zero, index), dim=-1)  # batch x seq + 1 x emb
 
     # prep for gather
@@ -164,14 +164,13 @@ class Syntax(Module):
         self.head = head
         self.rel = rel
 
-    def forward(self, word_id, shape_id, pad_mask,
-                target_mask, target_head_id=None):
+    def forward(self, word_id, shape_id, pad_mask, target_head_id=None):
         x = self.emb(word_id, shape_id)
         x = self.encoder(x, pad_mask)
 
         head_id = self.head(x)
         if target_head_id is None:
-            target_head_id = self.head.decode(head_id, target_mask)
+            target_head_id = self.head.decode(head_id, ~pad_mask)
 
         return SyntaxPred(
             head_id=head_id,

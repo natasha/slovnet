@@ -104,6 +104,36 @@ class ExecVisitor(Visitor):
             self.visit(item.head)
         )
 
+    def visit_FF(self, item):
+        return exec.FF(
+            self.visit(item.proj),
+            self.visit(item.relu)
+        )
+
+    def visit_SyntaxHead(self, item):
+        return exec.SyntaxHead(
+            self.visit(item.head),
+            self.visit(item.tail),
+            self.visit(item.root),
+            self.visit(item.kernel)
+        )
+
+    def visit_SyntaxRel(self, item):
+        return exec.SyntaxRel(
+            self.visit(item.head),
+            self.visit(item.tail),
+            self.visit(item.root),
+            self.visit(item.kernel)
+        )
+
+    def visit_Syntax(self, item):
+        return exec.Syntax(
+            self.visit(item.emb),
+            self.visit(item.encoder),
+            self.visit(item.head),
+            self.visit(item.rel)
+        )
+
     def visit_CRF(self, item):
         return exec.CRF(
             self.visit(item.transitions)

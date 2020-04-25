@@ -29,7 +29,7 @@ from slovnet.board import (
 from slovnet.const import (
     TRAIN, TEST,
     CUDA0, PAD,
-    WORD, SHAPE, TAG
+    WORD, SHAPE, REL
 )
 from slovnet.token import tokenize
 from slovnet.shape import SHAPES
@@ -63,6 +63,7 @@ from slovnet.exec.pack import (
     Meta,
     DumpPack
 )
+from slovnet import api
 
 
 DATA_DIR = 'data'

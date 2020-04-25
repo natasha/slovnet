@@ -22,21 +22,17 @@ class SyntaxInfer(Infer):
     def process(self, inputs):
         for input in inputs:
             input = input.to(self.model.device)
+
+            pred = self.model(input.word_id, input.shape_id, input.pad_mask)
             mask = ~input.pad_mask
 
-            pred = self.model(
-                input.word_id, input.shape_id,
-                pad_mask=input.pad_mask,
-                target_mask=mask
-            )
-
             head_id = self.model.head.decode(pred.head_id, mask)
-            head_ids = split_masked(head_id, mask)
+            head_id = split_masked(head_id, mask)
 
             rel_id = self.model.rel.decode(pred.rel_id, mask)
-            rel_ids = split_masked(rel_id, mask)
+            rel_id = split_masked(rel_id, mask)
 
-            yield from zip(head_ids, rel_ids)
+            yield from zip(head_id, rel_id)
 
     def __call__(self, items):
         inputs = self.encoder(items)

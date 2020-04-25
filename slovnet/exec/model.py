@@ -4,6 +4,8 @@ import numpy as np
 from slovnet.record import Record, parse_annotation
 from slovnet.visitor import Visitor
 
+from .mask import fill_masked
+
 
 class Weight(Record):
     __attributes__ = ['shape', 'dtype', 'array']
@@ -62,7 +64,7 @@ class Conv1d(Module):
         input = np.pad(
             input,
             # batch no pad, in no pad, pad seq
-            [(0, 0), (0, 0), (self.padding, self.padding)],
+            ((0, 0), (0, 0), (self.padding, self.padding)),
             mode='constant', constant_values=0
         )
         input = np.ascontiguousarray(input)
@@ -75,10 +77,10 @@ class Conv1d(Module):
 
         # populate conv windows
         windows = np.ndarray(
-            [batch_size, windows_count, in_dim, kernel_size],
+            (batch_size, windows_count, in_dim, kernel_size),
             dtype=input.dtype,
             buffer=input.data,
-            strides=[batch_stride, unit_stride, in_stride, seq_stride]
+            strides=(batch_stride, unit_stride, in_stride, seq_stride)
         )
 
         # conv
@@ -223,7 +225,7 @@ class WordShapeEmbedding(Module):
     def __call__(self, word_id, shape_id):
         word = self.word(word_id)
         shape = self.shape(shape_id)
-        return np.concatenate([word, shape], axis=-1)
+        return np.concatenate((word, shape), axis=-1)
 
 
 ######
@@ -299,9 +301,9 @@ class MorphHead(Module):
 class Tag(Module):
     __attributes__ = ['emb', 'encoder', 'head']
 
-    def __call__(self, word_id, shape_id, mask):
+    def __call__(self, word_id, shape_id, pad_mask):
         x = self.emb(word_id, shape_id)
-        x = self.encoder(x, mask)
+        x = self.encoder(x, pad_mask)
         return self.head(x)
 
 
@@ -319,6 +321,148 @@ class Morph(Tag):
         'encoder': CNNEncoder,
         'head': MorphHead
     }
+
+
+########
+#
+#  SYNTAX
+#
+######
+
+
+class FF(Module):
+    __attributes__ = ['proj', 'relu']
+    __annotations__ = {
+        'proj': Linear,
+        'relu': ReLU
+    }
+
+    def __call__(self, input):
+        x = self.proj(input)
+        return self.relu(x)
+
+
+def append_root(input, root):
+    batch_size, _, emb_dim = input.shape
+    root = np.repeat(root, batch_size, axis=0)
+    root = root.reshape(batch_size, 1, emb_dim)
+    return np.concatenate((root, input), axis=1)
+
+
+def strip_root(input):
+    return input[:, 1:, :]
+
+
+def append_root_mask(mask):
+    return np.pad(
+        mask,
+        [(0, 0), (1, 0)],  # no pad for batch, pad left seq
+        mode='constant', constant_values=True
+    )
+
+
+def matmul_mask(mask):
+    mask = np.expand_dims(mask, axis=-2)
+    return np.matmul(mask.swapaxes(-2, -1), mask)
+
+
+class SyntaxHead(Module):
+    __attributes__ = ['head', 'tail', 'root', 'kernel']
+    __annotations__ = {
+        'head': FF,
+        'tail': FF,
+        'root': Weight,
+        'kernel': Weight
+    }
+
+    def decode(self, pred, mask):
+        mask = append_root_mask(mask)
+        mask = matmul_mask(mask)
+        mask = strip_root(mask)
+
+        pred = fill_masked(pred, ~mask, pred.min())
+        return pred.argmax(-1)
+
+    def __call__(self, input):
+        input = append_root(input, self.root.array)
+        head = self.head(input)
+        tail = self.tail(input)
+
+        x = np.matmul(head, self.kernel.array)
+        x = np.matmul(x, tail.swapaxes(-2, -1))
+        return strip_root(x)
+
+
+def gather_head(input, root, index):
+    batch_size, seq_len, emb_dim = input.shape
+    input = append_root(input, root)
+
+    zero = np.zeros((batch_size, 1), dtype=np.long)
+    index = np.concatenate((zero, index), axis=-1)
+
+    # flatten input, absolute indexing in index
+    input = input.reshape(-1, emb_dim)  # batch * seq x dim
+    offset = np.arange(batch_size) * seq_len
+    index = offset[np.newaxis].T + index
+    input = input[index]
+
+    return strip_root(input)
+
+
+class SyntaxRel(Module):
+    __attributes__ = ['head', 'tail', 'root', 'kernel']
+    __annotations__ = {
+        'head': FF,
+        'tail': FF,
+        'root': Weight,
+        'kernel': Weight
+    }
+
+    def decode(self, pred, mask):
+        _, _, rel_dim = pred.shape
+        mask = np.expand_dims(mask, axis=-1)
+        mask = np.repeat(mask, rel_dim, axis=-1)
+
+        pred = fill_masked(pred, ~mask, pred.min())
+        return pred.argmax(-1)
+
+    def __call__(self, input, head_id):
+        head = self.head(gather_head(input, self.root.array, head_id))
+        tail = self.tail(input)
+
+        batch_size, seq_len, _ = input.shape
+        hidden_dim, dim = self.kernel.shape
+        rel_dim = dim // hidden_dim
+
+        x = np.matmul(head, self.kernel.array)  # batch x seq x hidden * rel
+        x = x.reshape(batch_size, seq_len, rel_dim, hidden_dim)
+        x = np.matmul(x, tail.reshape(batch_size, seq_len, hidden_dim, 1))
+        return x.reshape(batch_size, seq_len, rel_dim)
+
+
+class SyntaxPred(Record):
+    __attributes__ = ['head_id', 'rel_id']
+
+
+class Syntax(Module):
+    __attributes__ = ['emb', 'encoder', 'head', 'rel']
+    __annotations__ = {
+        'emb': WordShapeEmbedding,
+        'encoder': CNNEncoder,
+        'head': SyntaxHead,
+        'rel': SyntaxRel
+    }
+
+    def __call__(self, word_id, shape_id, pad_mask):
+        x = self.emb(word_id, shape_id)
+        x = self.encoder(x, pad_mask)
+
+        head_id = self.head(x)
+        rel_id = self.rel(
+            x,
+            self.head.decode(head_id, ~pad_mask)
+        )
+        return SyntaxPred(head_id, rel_id)
 
 
 #######
