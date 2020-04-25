@@ -344,7 +344,7 @@ class FF(Module):
 
 def append_root(input, root):
     batch_size, _, emb_dim = input.shape
-    root = np.repeat(root, batch_size, axis=0)
+    root = np.tile(root, batch_size)
     root = root.reshape(batch_size, 1, emb_dim)
     return np.concatenate((root, input), axis=1)
 
@@ -400,9 +400,9 @@ def gather_head(input, root, index):
     zero = np.zeros((batch_size, 1), dtype=np.long)
     index = np.concatenate((zero, index), axis=-1)
 
-    # flatten input, absolute indexing in index
+    # flatten input, absolute indexing
     input = input.reshape(-1, emb_dim)  # batch * seq x dim
-    offset = np.arange(batch_size) * seq_len
+    offset = np.arange(batch_size) * (seq_len + 1)
     index = offset[np.newaxis].T + index
     input = input[index]
 
