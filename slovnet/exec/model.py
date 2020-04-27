@@ -458,10 +458,8 @@ class Syntax(Module):
         x = self.encoder(x, pad_mask)
 
         head_id = self.head(x)
-        rel_id = self.rel(
-            x,
-            self.head.decode(head_id, ~pad_mask)
-        )
+        target_head_id = self.head.decode(head_id, ~pad_mask)
+        rel_id = self.rel(x, target_head_id)
         return SyntaxPred(head_id, rel_id)
 
 

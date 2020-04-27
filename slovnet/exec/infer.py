@@ -24,9 +24,6 @@ class Infer(Record):
 class TagDecoder(Record):
     __attributes__ = ['tags_vocab']
 
-    def __init__(self, tags_vocab):
-        self.tags_vocab = tags_vocab
-
     def __call__(self, preds):
         for pred in preds:
             yield [self.tags_vocab.decode(_) for _ in pred]
