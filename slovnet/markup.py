@@ -181,10 +181,13 @@ def syntax_markup_deps(tokens):
     for token in tokens:
         id = int(token.id)
         head_id = int(token.head_id)
+        # skip root=0, skip loop
+        # ipymarkup crashes
+        if head_id == 0 or head_id == id:
+            continue
+
         rel = token.rel
         id = id - 1
-        if head_id == 0:  # skip root=0
-            continue
         head_id = head_id - 1
         yield head_id, id, rel
 
