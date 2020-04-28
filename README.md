@@ -17,9 +17,9 @@ SlovNet is a Python library for deep-learning based NLP modeling for Russian lan
 
 <tr>
 <td>
-  <a href="https://storage.yandexcloud.net/natasha-slovnet/05_ner/pack/slovnet_ner_news_v1.tar">slovnet_ner_news_v1.tar</a>
+  <a href="https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_ner_news_v1.tar">slovnet_ner_news_v1.tar</a>
 </td>
-<td>27MB</td>
+<td>2MB</td>
 <td>
   Russian NER, standart PER, LOC, ORG annotation, trained on news articles.
 </td>
@@ -27,9 +27,9 @@ SlovNet is a Python library for deep-learning based NLP modeling for Russian lan
 
 <tr>
 <td>
-  <a href="https://storage.yandexcloud.net/natasha-slovnet/06_morph/pack/slovnet_morph_news_v1.tar">slovnet_morph_news_v1.tar</a>
+  <a href="https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_morph_news_v1.tar">slovnet_morph_news_v1.tar</a>
 </td>
-<td>27MB</td>
+<td>2MB</td>
 <td>
   Russian morphology tagger optimized for news articles.
 </td>
@@ -37,9 +37,9 @@ SlovNet is a Python library for deep-learning based NLP modeling for Russian lan
 
 <tr>
 <td>
-  <a href="https://storage.yandexcloud.net/natasha-slovnet/07_syntax/pack/slovnet_syntax_news_v1.tar">slovnet_syntax_news_v1.tar</a>
+  <a href="https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_syntax_news_v1.tar">slovnet_syntax_news_v1.tar</a>
 </td>
-<td>27MB</td>
+<td>3MB</td>
 <td>
   Russian syntax parser optimized for news articles.
 </td>
@@ -57,22 +57,24 @@ $ pip install slovnet
 
 ## Usage
 
-Download model weights and vocabs package, use links from <a href="#downloads">downloads section</a>. Optionally install <a href="https://github.com/natasha/ipymarkup">Ipymarkup</a> to visualize NER markup.
+Download model weights and vocabs package, use links from <a href="#downloads">downloads section</a> and <a href="https://github.com/natasha/navec#downloads">Navec download section</a>. Optionally install <a href="https://github.com/natasha/ipymarkup">Ipymarkup</a> to visualize NER markup.
 
 Slovnet annotators have list of items as input and same size iterator over markups as output. Internally items are processed in batches of size `batch_size`. Default size is 8, larger batch — more RAM, better CPU utilization.
 
 ### NER
 
-
 ```python
+>>> from navec import Navec
 >>> from slovnet import NER
 >>> from ipymarkup import show_span_ascii_markup as show_markup
 
 >>> text = 'Европейский союз добавил в санкционный список девять политических деятелей из самопровозглашенных республик Донбасса — Донецкой народной республики (ДНР) и Луганской народной республики (ЛНР) — в связи с прошедшими там выборами. Об этом говорится в документе, опубликованном в официальном журнале Евросоюза. В новом списке фигурирует Леонид Пасечник, который по итогам выборов стал главой ЛНР. Помимо него там присутствуют Владимир Бидевка и Денис Мирошниченко, председатели законодательных органов ДНР и ЛНР, а также Ольга Позднякова и Елена Кравченко, председатели ЦИК обеих республик. Выборы прошли в непризнанных республиках Донбасса 11 ноября. На них удержали лидерство действующие руководители и партии — Денис Пушилин и «Донецкая республика» в ДНР и Леонид Пасечник с движением «Мир Луганщине» в ЛНР. Президент Франции Эмманюэль Макрон и канцлер ФРГ Ангела Меркель после встречи с украинским лидером Петром Порошенко осудили проведение выборов, заявив, что они нелегитимны и «подрывают территориальную целостность и суверенитет Украины». Позже к осуждению присоединились США с обещаниями новых санкций для России.'
 
->>> ner = NER('slovnet_ner_news_v1.tar', batch_size=4)
+>>> navec = Navec.load('navec_news_v1_1B_250K_300d_100q.tar')
+>>> ner = NER.load('slovnet_ner_news_v1.tar')
+>>> ner.navec(navec)
 
->>> markup = next(ner([text]))
+>>> markup = ner(text)
 >>> show_markup(markup.text, markup.spans)
 Европейский союз добавил в санкционный список девять политических 
 LOC─────────────                                                  
@@ -115,6 +117,7 @@ Morphology annotator processes tokenized text. To split the input into sentencie
 
 ```python
 >>> from razdel import sentenize, tokenize
+>>> from navec import Navec
 >>> from slovnet import Morph
 
 >>> chunk = []
@@ -124,9 +127,11 @@ Morphology annotator processes tokenized text. To split the input into sentencie
 >>> chunk[:1]
 [['Европейский', 'союз', 'добавил', 'в', 'санкционный', 'список', 'девять', 'политических', 'деятелей', 'из', 'самопровозглашенных', 'республик', 'Донбасса', '—', 'Донецкой', 'народной', 'республики', '(', 'ДНР', ')', 'и', 'Луганской', 'народной', 'республики', '(', 'ЛНР', ')', '—', 'в', 'связи', 'с', 'прошедшими', 'там', 'выборами', '.']]
 
->>> morph = Morph('slovnet_morph_news_v1.tar')
+>>> navec = Navec.load('navec_news_v1_1B_250K_300d_100q.tar')
+>>> morph = Morph.load('slovnet_morph_news_v1.tar', batch_size=4)
+>>> morph.navec(navec)
 
->>> markup = next(morph(chunk))
+>>> markup = next(morph.map(chunk))
 >>> for token in markup.tokens:
 >>>     print(f'{token.text:>20} {token.tag}')
          Европейский ADJ|Case=Nom|Degree=Pos|Gender=Masc|Number=Sing
@@ -174,6 +179,7 @@ Syntax parser processes sentencies split into tokens. Use <a href="https://githu
 ```python
 >>> from ipymarkup import show_dep_ascii_markup as show_markup
 >>> from razdel import sentenize, tokenize
+>>> from navec import Navec
 >>> from slovnet import Syntax
 
 >>> chunk = []
@@ -183,9 +189,11 @@ Syntax parser processes sentencies split into tokens. Use <a href="https://githu
 >>> chunk[:1]
 [['Европейский', 'союз', 'добавил', 'в', 'санкционный', 'список', 'девять', 'политических', 'деятелей', 'из', 'самопровозглашенных', 'республик', 'Донбасса', '—', 'Донецкой', 'народной', 'республики', '(', 'ДНР', ')', 'и', 'Луганской', 'народной', 'республики', '(', 'ЛНР', ')', '—', 'в', 'связи', 'с', 'прошедшими', 'там', 'выборами', '.']]
 
->>> morph = Syntax('slovnet_syntax_news_v1.tar')
+>>> navec = Navec.load('navec_news_v1_1B_250K_300d_100q.tar')
+>>> syntax = Syntax.load('slovnet_syntax_news_v1.tar')
+>>> syntax.navec(navec)
 
->>> markup = next(morph(chunk))
+>>> markup = next(syntax.map(chunk))
 
 # Convert CoNLL-style format to source, target indices
 >>> words, deps = [], []

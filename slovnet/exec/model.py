@@ -10,20 +10,39 @@ from .mask import fill_masked
 class Weight(Record):
     __attributes__ = ['shape', 'dtype', 'array']
 
+    def empty(self):
+        return self.replace(array=None)
+
+    @property
+    def is_empty(self):
+        return self.array is None
+
+    @property
+    def is_id(self):
+        return type(self.array) is int
+
 
 class Module(Record):
-    def strip(self):
-        visitor = StripVisitor()
+    def separate_arrays(self):
+        visitor = SeparateArraysVisitor()
         scheme = visitor(self)
         return visitor.arrays, scheme
 
-    def impl(self, arrays):
-        visitor = ImplVisitor(arrays)
+    def inject_arrays(self, arrays):
+        visitor = InjectArraysVisitor(arrays)
+        return visitor(self)
+
+    def strip_navec(self):
+        visitor = StripNavecVisitor()
+        return visitor(self)
+
+    def inject_navec(self, navec):
+        visitor = InjectNavecVisitor(navec)
         return visitor(self)
 
     @property
     def weights(self):
-        visitor = WeightVisitor()
+        visitor = WeightsVisitor()
         visitor(self)
         return visitor.weights
 
@@ -489,27 +508,57 @@ class ModuleVisitor(Visitor):
         return type(item)(*args)
 
 
-class StripVisitor(ModuleVisitor):
+class SeparateArraysVisitor(ModuleVisitor):
     def __init__(self):
         self.arrays = {}
 
     def visit_Weight(self, item):
+        if item.is_empty:
+            return item
+
         id = len(self.arrays)
         self.arrays[id] = item.array
-        item.array = id
-        return item
+        return item.replace(array=id)
 
 
-class ImplVisitor(ModuleVisitor):
+class InjectArraysVisitor(ModuleVisitor):
     def __init__(self, arrays):
         self.arrays = arrays
 
     def visit_Weight(self, item):
-        item.array = self.arrays[item.array]
-        return item
+        if not item.is_id:
+            return item
+
+        return item.replace(
+            array=self.arrays[item.array]
+        )
 
 
-class WeightVisitor(ModuleVisitor):
+class StripNavecVisitor(ModuleVisitor):
+    def visit_NavecEmbedding(self, item):
+        return item.replace(
+            indexes=item.indexes.empty(),
+            codes=item.codes.empty()
+        )
+
+
+class InjectNavecVisitor(ModuleVisitor):
+    def __init__(self, navec):
+        self.navec = navec
+
+    def visit_NavecEmbedding(self, item):
+        id = self.navec.meta.id
+        if item.id != id:
+            raise ValueError('Expected id=%r, got %r' % (item.id, id))
+
+        pq = self.navec.pq
+        return item.replace(
+            indexes=item.indexes.replace(array=pq.indexes),
+            codes=item.codes.replace(array=pq.codes)
+        )
+
+
+class WeightsVisitor(ModuleVisitor):
     def __init__(self):
         self.weights = []
 

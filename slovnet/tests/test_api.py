@@ -1,19 +1,23 @@
 
 import pytest
 
-from os.path import join, dirname, exists
+from os.path import join, dirname, basename, exists
 from os import makedirs
 from urllib.request import urlopen
 from shutil import copyfileobj
 
+from navec import Navec
 from slovnet import NER, Morph, Syntax
 
 
-DATA_DIR = join(dirname(__file__), '../../data/models')
+DATA_DIR = join(dirname(__file__), '../../data/test')
 
 
-def download(url, path):
-    dir = dirname(path)
+def download(url, dir=DATA_DIR):
+    path = join(dir, basename(url))
+    if exists(path):
+        return path
+
     if not exists(dir):
         makedirs(dir)
 
@@ -21,44 +25,37 @@ def download(url, path):
         with open(path, 'wb') as target:
             copyfileobj(source, target)
 
-
-@pytest.fixture(scope='module')
-def ner():
-    url = 'https://storage.yandexcloud.net/natasha-slovnet/05_ner/pack/slovnet_ner_news_v1.tar'
-    path = join(DATA_DIR, 'slovnet_ner_news_v1.tar')
-
-    if not exists(path):
-        download(url, path)
-
-    return NER(path)
+    return path
 
 
 @pytest.fixture(scope='module')
-def morph():
-    url = 'https://storage.yandexcloud.net/natasha-slovnet/06_morph/pack/slovnet_morph_news_v1.tar'
-    path = join(DATA_DIR, 'slovnet_morph_news_v1.tar')
-
-    if not exists(path):
-        download(url, path)
-
-    return Morph(path)
+def navec():
+    path = download('https://storage.yandexcloud.net/natasha-navec/packs/navec_news_v1_1B_250K_300d_100q.tar')
+    return Navec.load(path)
 
 
 @pytest.fixture(scope='module')
-def syntax():
-    url = 'https://storage.yandexcloud.net/natasha-slovnet/07_syntax/pack/slovnet_syntax_news_v1.tar'
-    path = join(DATA_DIR, 'slovnet_syntax_news_v1.tar')
+def ner(navec):
+    path = download('https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_ner_news_v1.tar')
+    return NER.load(path).navec(navec)
 
-    if not exists(path):
-        download(url, path)
 
-    return Syntax(path)
+@pytest.fixture(scope='module')
+def morph(navec):
+    path = download('https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_morph_news_v1.tar')
+    return Morph.load(path).navec(navec)
+
+
+@pytest.fixture(scope='module')
+def syntax(navec):
+    path = download('https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_syntax_news_v1.tar')
+    return Syntax.load(path).navec(navec)
 
 
 def test_ner(ner):
     text = 'На них удержали лидерство действующие руководители и партии — Денис Пушилин и «Донецкая республика» в ДНР и Леонид Пасечник с движением «Мир Луганщине» в ЛНР.'
 
-    markup = next(ner([text]))
+    markup = ner(text)
 
     pred = []
     for span in markup.spans:
@@ -78,7 +75,7 @@ def test_ner(ner):
 def test_morph(morph):
     words = ['Об', 'этом', 'говорится', 'в', 'документе', ',', 'опубликованном', 'в', 'официальном', 'журнале', 'Евросоюза', '.']
 
-    markup = next(morph([words]))
+    markup = morph(words)
 
     pred = [
         [_.text, _.tag]
@@ -103,7 +100,7 @@ def test_morph(morph):
 def test_syntax(syntax):
     words = ['Опубликованы', 'новые', 'данные', 'по', 'заражению', 'коронавирусом', 'в', 'Москве']
 
-    markup = next(syntax([words]))
+    markup = syntax(words)
 
     ids = {_.id: _ for _ in markup.tokens}
     pred = []

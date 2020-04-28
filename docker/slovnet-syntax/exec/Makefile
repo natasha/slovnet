@@ -12,7 +12,7 @@ push:
 
 run:
 	docker run -it --rm \
-		-p 8081:8080 \
+		-p 8080:8080 \
 		-e BATCH_SIZE=4 \
 		$(IMAGE)
 

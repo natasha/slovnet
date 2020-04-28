@@ -10,10 +10,12 @@ log = logging.info
 
 from aiohttp import web
 
+from navec import Navec
 from slovnet import Morph
 
 
-PACK = getenv('PACK', 'slovnet_morph_news_v1.tar')
+NAVEC = getenv('NAVEC', 'navec.tar')
+PACK = getenv('PACK', 'pack.tar')
 BATCH_SIZE = int(getenv('BATCH_SIZE', 8))
 
 HOST = getenv('HOST', '0.0.0.0')
@@ -22,15 +24,19 @@ MB = 1024 * 1024
 MAX_SIZE = int(getenv('MAX_SIZE', 100 * MB))
 
 
+log('Load navec: %r' % NAVEC)
+navec = Navec.load(NAVEC)
+
 log('Load pack: %r' % PACK)
 log('Batch size: %r' % BATCH_SIZE)
-morph = Morph(PACK)
+morph = Morph.load(PACK)
+morph.navec(navec)
 
 
 async def handle(request):
     chunk = await request.json()
     log('Post chunk size: %r' % len(chunk))
-    markups = list(morph(chunk))
+    markups = list(morph.map(chunk))
 
     tags = sum(len(_.tags) for _ in markups)
     log('Infer tags: %r', tags)

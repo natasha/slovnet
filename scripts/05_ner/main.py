@@ -74,7 +74,6 @@ DATA_DIR = 'data'
 MODEL_DIR = 'model'
 NAVEC_DIR = 'navec'
 RAW_DIR = join(DATA_DIR, 'raw')
-PACK_DIR = 'pack'
 S3_DIR = '05_ner'
 
 RAW_NERUS = join(RAW_DIR, 'nerus_lenta.conllu.gz')
@@ -83,7 +82,7 @@ NERUS_TOTAL = 739346
 NERUS = join(DATA_DIR, 'nerus.jl.gz')
 S3_NERUS = join(S3_DIR, NERUS)
 
-NAVEC_URL = 'https://github.com/natasha/navec/releases/download/v0.0.0/navec_news_v1_1B_250K_300d_100q.tar'
+NAVEC_URL = 'https://storage.yandexcloud.net/natasha-navec/packs/navec_news_v1_1B_250K_300d_100q.tar'
 NAVEC = join(NAVEC_DIR, 'navec_news_v1_1B_250K_300d_100q.tar')
 
 MODEL_SHAPE = join(MODEL_DIR, 'shape.pt')
@@ -95,10 +94,10 @@ S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
 S3_MODEL_NER = join(S3_DIR, MODEL_NER)
 
 ID = 'slovnet_ner_news_v1'
-PACK = join(PACK_DIR, ID + '.tar')
-S3_PACK = join(S3_DIR, PACK)
+PACK = ID + '.tar'
+S3_PACK = join('packs', PACK)
 
-BOARD_NAME = getenv('board_name', '05_ner_10000')
+BOARD_NAME = getenv('board_name', '05_ner')
 RUNS_DIR = 'runs'
 
 TRAIN_BOARD = '01_train'

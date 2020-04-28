@@ -27,7 +27,7 @@ class Meta(Record):
 
     def check_protocol(self):
         if self.protocol != PROTOCOL:
-            raise ValueError('Expected protocol=%d, got %d' % (PROTOCOL, self.protocol))
+            raise ValueError('Expected protocol=%r, got %r' % (PROTOCOL, self.protocol))
 
 
 #######
@@ -101,7 +101,11 @@ class Pack(Tar):
         return self.load_record(MODEL, Model)
 
     def load_arrays(self, weights):
-        for shape, dtype, id in weights:
+        for weight in weights:
+            if not weight.is_id:
+                continue
+
+            shape, dtype, id = weight
             name = array_name(id)
             bytes = self.read(name)
             yield id, bytes_array(bytes, shape, dtype)

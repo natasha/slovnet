@@ -115,8 +115,14 @@ class Record(object):
 
     def to(self, device):
         cls = type(self)
-        args = [
-            getattr(self, _).to(device)
-            for _ in self.__attributes__
-        ]
+        args = (_.to(device) for _ in self)
         return cls(*args)
+
+    def copy(self):
+        return type(self)(*self)
+
+    def replace(self, **kwargs):
+        other = self.copy()
+        for key, value in kwargs.items():
+            setattr(other, key, value)
+        return other

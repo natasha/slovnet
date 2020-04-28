@@ -1,5 +1,7 @@
 
+from .record import Record
 from .const import WORD, SHAPE, TAG, REL
+from .chop import chop
 
 from .exec.pack import Pack
 from .exec.model import (
@@ -21,67 +23,91 @@ from .exec.infer import (
 )
 
 
-def NER(path, batch_size=8):
-    with Pack(path) as pack:
-        meta = pack.load_meta()
-        meta.check_protocol()
+class API(Record):
+    __attributes__ = ['infer', 'batch_size']
 
-        model = pack.load_model(NERModel)
-        arrays = dict(pack.load_arrays(model.weights))
+    def navec(self, navec):
+        self.infer.model = self.infer.model.inject_navec(navec)
+        return self
 
-        words_vocab = pack.load_vocab(WORD)
-        shapes_vocab = pack.load_vocab(SHAPE)
-        tags_vocab = pack.load_vocab(TAG)
+    def map(self, items):
+        for chunk in chop(items, self.batch_size):
+            yield from self.infer(chunk)
 
-    model = model.impl(arrays)
-    encoder = TagEncoder(
-        words_vocab, shapes_vocab,
-        batch_size
-    )
-    decoder = TagDecoder(tags_vocab)
-
-    return NERInfer(model, encoder, decoder)
+    def __call__(self, item):
+        return next(self.map([item]))
 
 
-def Morph(path, batch_size=8):
-    with Pack(path) as pack:
-        meta = pack.load_meta()
-        meta.check_protocol()
+class NER(API):
+    @classmethod
+    def load(cls, path, batch_size=8):
+        with Pack(path) as pack:
+            meta = pack.load_meta()
+            meta.check_protocol()
 
-        model = pack.load_model(MorphModel)
-        arrays = dict(pack.load_arrays(model.weights))
+            model = pack.load_model(NERModel)
+            arrays = dict(pack.load_arrays(model.weights))
 
-        words_vocab = pack.load_vocab(WORD)
-        shapes_vocab = pack.load_vocab(SHAPE)
-        tags_vocab = pack.load_vocab(TAG)
+            words_vocab = pack.load_vocab(WORD)
+            shapes_vocab = pack.load_vocab(SHAPE)
+            tags_vocab = pack.load_vocab(TAG)
 
-    model = model.impl(arrays)
-    encoder = TagEncoder(
-        words_vocab, shapes_vocab,
-        batch_size
-    )
-    decoder = TagDecoder(tags_vocab)
+        model = model.inject_arrays(arrays)
+        encoder = TagEncoder(
+            words_vocab, shapes_vocab,
+            batch_size
+        )
+        decoder = TagDecoder(tags_vocab)
+        infer = NERInfer(model, encoder, decoder)
 
-    return MorphInfer(model, encoder, decoder)
+        return cls(infer, batch_size)
 
 
-def Syntax(path, batch_size=8):
-    with Pack(path) as pack:
-        meta = pack.load_meta()
-        meta.check_protocol()
+class Morph(API):
+    @classmethod
+    def load(cls, path, batch_size=8):
+        with Pack(path) as pack:
+            meta = pack.load_meta()
+            meta.check_protocol()
 
-        model = pack.load_model(SyntaxModel)
-        arrays = dict(pack.load_arrays(model.weights))
+            model = pack.load_model(MorphModel)
+            arrays = dict(pack.load_arrays(model.weights))
 
-        words_vocab = pack.load_vocab(WORD)
-        shapes_vocab = pack.load_vocab(SHAPE)
-        rels_vocab = pack.load_vocab(REL)
+            words_vocab = pack.load_vocab(WORD)
+            shapes_vocab = pack.load_vocab(SHAPE)
+            tags_vocab = pack.load_vocab(TAG)
 
-    model = model.impl(arrays)
-    encoder = SyntaxEncoder(
-        words_vocab, shapes_vocab,
-        batch_size
-    )
-    decoder = SyntaxDecoder(rels_vocab)
+        model = model.inject_arrays(arrays)
+        encoder = TagEncoder(
+            words_vocab, shapes_vocab,
+            batch_size
+        )
+        decoder = TagDecoder(tags_vocab)
+        infer = MorphInfer(model, encoder, decoder)
 
-    return SyntaxInfer(model, encoder, decoder)
+        return cls(infer, batch_size)
+
+
+class Syntax(API):
+    @classmethod
+    def load(cls, path, batch_size=8):
+        with Pack(path) as pack:
+            meta = pack.load_meta()
+            meta.check_protocol()
+
+            model = pack.load_model(SyntaxModel)
+            arrays = dict(pack.load_arrays(model.weights))
+
+            words_vocab = pack.load_vocab(WORD)
+            shapes_vocab = pack.load_vocab(SHAPE)
+            rels_vocab = pack.load_vocab(REL)
+
+        model = model.inject_arrays(arrays)
+        encoder = SyntaxEncoder(
+            words_vocab, shapes_vocab,
+            batch_size
+        )
+        decoder = SyntaxDecoder(rels_vocab)
+        infer = SyntaxInfer(model, encoder, decoder)
+
+        return cls(infer, batch_size)
