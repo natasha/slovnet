@@ -839,6 +839,22 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
 
 ## Development
 
+Tests:
+
+```bash
+make test
+```
+
+Package:
+
+```bash
+make version
+git push
+git push --tags
+
+make clean package publish
+```
+
 Rent GPU:
 
 ```bash
