@@ -3,7 +3,10 @@
 
 ![CI](https://github.com/natasha/slovnet/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/natasha/slovnet/branch/master/graph/badge.svg)](https://codecov.io/gh/natasha/slovnet)
 
-SlovNet is a Python library for deep-learning based NLP modeling for Russian language. Library is integrated with other <a href="https://github.com/natasha/">Natasha</a> projects: <a href="https://github.com/natasha/nerus">Nerus</a> — large automatically annotated corpus, <a href="https://github.com/natasha/razdel">Razdel</a> — sentence segmenter, tokenizer and <a href="https://github.com/natasha/navec">Navec</a> — compact Russian embeddings. SlovNet provides high quality practical models for Russian NER and morphology. NER is 1-2% worse than current BERT SOTA by DeepPavlov but 60 times smaller in size (~30 MB) and works fast on CPU (~25 news articles/sec). Morphology tagger has comparable accuracy on news dataset with large SOTA BERT models, takes 50 times less space (~30 MB), works faster on CPU (~500 sentences/sec). See <a href="#evaluation">evaluation section</a> for more.
+SlovNet is a Python library for deep-learning based NLP modeling for Russian language. Library is integrated with other <a href="https://github.com/natasha/">Natasha</a> projects: <a href="https://github.com/natasha/nerus">Nerus</a> — large automatically annotated corpus, <a href="https://github.com/natasha/razdel">Razdel</a> — sentence segmenter, tokenizer and <a href="https://github.com/natasha/navec">Navec</a> — compact Russian embeddings. SlovNet provides high quality practical models for Russian NER, morphology and syntax. See <a href="#evaluation">evaluation section</a> for more:
+
+* NER is 1-2% worse than current BERT SOTA by DeepPavlov but 60 times smaller in size (~30 MB) and works fast on CPU (~25 news articles/sec).
+* Morphology tagger and syntax parser have comparable accuracy on news dataset with large SOTA BERT models, take 50 times less space (~30 MB), work faster on CPU (~500 sentences/sec). 
 
 ## Downloads
 
@@ -244,20 +247,21 @@ Syntax parser processes sentencies split into tokens. Use <a href="https://githu
 
 ## Evaluation
 
-In addition to quality metrics we measure speed and models size, parameters that are important in practise:
+In addition to quality metrics we measure speed and models size, parameters that are important in production:
 
 * `init` — time between system launch and first response. It is convenient for testing and devops to have model that starts quickly.
-* `disk` — file size of artefacts one needs to download before using the system: model weights, embeddings, binaries, vocabs. It is inconvenient to deploy large models in production.
+* `disk` — file size of artefacts one needs to download before using the system: model weights, embeddings, binaries, vocabs. It is convenient to deploy compact models in production.
 * `ram` — average CPU/GPU RAM usage.
-* `speed` — number of input items processed per second: news article texts, tokenized sentencies.
+* `speed` — number of input items processed per second: news articles, tokenized sentencies.
 
 ### NER
 
 4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus">Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>. `slovnet` is compared to:
 
-* `deeppavlov` — biLSTM + CRF by DeepPavlov, see <a href="https://arxiv.org/pdf/1709.09686.pdf">their 2017 paper</a> for more.
+* `deeppavlov` — BiLSTM-CRF by DeepPavlov, see <a href="https://arxiv.org/pdf/1709.09686.pdf">their 2017 paper</a> for more.
 * `deeppavlov_bert` — BERT based NER, current SOTA for Russian language, see <a href="https://www.youtube.com/watch?v=eKTA8i8s-zs">video presentation</a> describing the approach.
 * <a href="http://pullenti.ru/">`pullenti`</a> — first place on factRuEval-2016, super sophisticated ruled based system.
+* `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
 * <a href="https://texterra.ispras.ru">`texterra`</a> — multifunctional NLP solution by <a href="https://www.ispras.ru/">ISP RAS</a>, NER is one of the features.
 * <a href="https://github.com/yandex/tomita-parser/">`tomita`</a> — GLR-parser by Yandex, only grammars for `PER` are publicly available.
 * <a href="https://github.com/mit-nlp/MITIE">`mitie`</a> — engine developed at MIT + <a href="http://lang.org.ua/en/models/">third party model for Russian language</a>.
@@ -291,6 +295,20 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
   </thead>
   <tbody>
     <tr>
+      <th>slovnet</th>
+      <td><b>0.959</b></td>
+      <td><b>0.915</b></td>
+      <td><b>0.825</b></td>
+      <td>0.977</td>
+      <td><b>0.899</b></td>
+      <td>0.984</td>
+      <td>0.973</td>
+      <td>0.951</td>
+      <td><b>0.944</b></td>
+      <td><b>0.834</b></td>
+      <td><b>0.718</b></td>
+    </tr>
+    <tr>
       <th>slovnet_bert</th>
       <td><b>0.973</b></td>
       <td><b>0.928</b></td>
@@ -303,20 +321,6 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td><b>0.960</b></td>
       <td><b>0.838</b></td>
       <td><b>0.733</b></td>
-    </tr>
-    <tr>
-      <th>slovnet</th>
-      <td><b>0.959</b></td>
-      <td><b>0.915</b></td>
-      <td><b>0.825</b></td>
-      <td><b>0.977</b></td>
-      <td><b>0.899</b></td>
-      <td><b>0.984</b></td>
-      <td><b>0.973</b></td>
-      <td><b>0.951</b></td>
-      <td><b>0.944</b></td>
-      <td><b>0.834</b></td>
-      <td><b>0.718</b></td>
     </tr>
     <tr>
       <th>deeppavlov</th>
@@ -361,6 +365,20 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>0.566</td>
     </tr>
     <tr>
+      <th>spacy</th>
+      <td>0.955</td>
+      <td>0.914</td>
+      <td>0.803</td>
+      <td><b>0.980</b></td>
+      <td>0.894</td>
+      <td><b>0.990</b></td>
+      <td><b>0.973</b></td>
+      <td><b>0.951</b></td>
+      <td>0.938</td>
+      <td>0.828</td>
+      <td>0.703</td>
+    </tr>
+    <tr>
       <th>texterra</th>
       <td>0.900</td>
       <td>0.800</td>
@@ -387,20 +405,6 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>0.881</td>
       <td></td>
       <td></td>
-    </tr>
-    <tr>
-      <th>natasha</th>
-      <td>0.867</td>
-      <td>0.753</td>
-      <td>0.297</td>
-      <td>0.873</td>
-      <td>0.347</td>
-      <td>0.852</td>
-      <td>0.709</td>
-      <td>0.394</td>
-      <td>0.836</td>
-      <td>0.755</td>
-      <td>0.350</td>
     </tr>
     <tr>
       <th>mitie</th>
@@ -433,18 +437,18 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
   </thead>
   <tbody>
     <tr>
-      <th>slovnet_bert</th>
-      <td>5.0</td>
-      <td>473</td>
-      <td>9500</td>
-      <td><b>40.0 (gpu)</b></td>
-    </tr>
-    <tr>
       <th>slovnet</th>
       <td><b>1.0</b></td>
       <td><b>27</b></td>
       <td><b>205</b></td>
       <td>25.3</td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td>5.0</td>
+      <td>473</td>
+      <td>9500</td>
+      <td><b>40.0 (gpu)</b></td>
     </tr>
     <tr>
       <th>deeppavlov</th>
@@ -462,10 +466,17 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
     </tr>
     <tr>
       <th>pullenti</th>
-      <td>2.9</td>
+      <td><b>2.9</b></td>
       <td><b>16</b></td>
-      <td>253</td>
+      <td><b>253</b></td>
       <td>6.0</td>
+    </tr>
+    <tr>
+      <th>spacy</th>
+      <td>8.0</td>
+      <td>89</td>
+      <td>625</td>
+      <td>8.0</td>
     </tr>
     <tr>
       <th>texterra</th>
@@ -477,16 +488,9 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
     <tr>
       <th>tomita</th>
       <td><b>2.0</b></td>
-      <td>64</td>
+      <td><b>64</b></td>
       <td><b>63</b></td>
       <td><b>29.8</b></td>
-    </tr>
-    <tr>
-      <th>natasha</th>
-      <td><b>2.0</b></td>
-      <td><b>1</b></td>
-      <td><b>160</b></td>
-      <td>8.8</td>
     </tr>
     <tr>
       <th>mitie</th>
@@ -501,12 +505,12 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 
 ### Morphology
 
-Datasets from <a href="https://github.com/natasha/corus#load_gramru">GramEval2020</a> are used for evaluation. `slovnet` is compated to a number of existing morphology taggers:
+<a href="https://github.com/natasha/corus#load_gramru">Datasets from GramEval2020</a> are used for evaluation. `slovnet` is compated to a number of existing morphology taggers:
 
-* `deeppavlov` and `deeppavlov_bert` — Char biLSTM and BERT based models, see <a href="http://docs.deeppavlov.ai/en/master/features/models/morphotagger.html">Deeppavlov docs</a>.
-* <a href="https://github.com/Koziev/rupostagger">`rupostagger`</a>
-* <a href="https://github.com/IlyaGusev/rnnmorph">`rnnmorph`</a> — first place on morphoRuEval-2017.
-* <a href="https://github.com/chomechome/maru">`maru`</a>
+* `deeppavlov` and `deeppavlov_bert` — CharBiLSTM and BERT based models, see <a href="http://docs.deeppavlov.ai/en/master/features/models/morphotagger.html">Deeppavlov docs</a>.
+* <a href="https://github.com/Koziev/rupostagger">`rupostagger`</a> — CRF tagger, part of <a href="http://www.solarix.ru/">Solarix project</a>.
+* <a href="https://github.com/IlyaGusev/rnnmorph">`rnnmorph`</a> — first place solution on morphoRuEval-2017, see <a href="https://habr.com/ru/post/339954/">post on Habr</a>.
+* <a href="https://github.com/chomechome/maru">`maru`</a> — CharFF-WordBiLST-CRF.
 * `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe</a> with model trained on SynTagRus.
 * `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
 
@@ -526,44 +530,20 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
   </thead>
   <tbody>
     <tr>
-      <th>rupostagger</th>
-      <td>0.673</td>
-      <td>0.645</td>
-      <td>0.661</td>
-      <td>0.641</td>
-      <td>0.636</td>
+      <th>slovnet</th>
+      <td><b>0.961</b></td>
+      <td>0.815</td>
+      <td>0.905</td>
+      <td>0.807</td>
+      <td>0.664</td>
     </tr>
     <tr>
-      <th>rnnmorph</th>
-      <td>0.896</td>
-      <td>0.812</td>
-      <td>0.890</td>
-      <td>0.860</td>
-      <td>0.838</td>
-    </tr>
-    <tr>
-      <th>maru</th>
-      <td>0.894</td>
-      <td>0.808</td>
-      <td>0.887</td>
-      <td>0.861</td>
-      <td>0.840</td>
-    </tr>
-    <tr>
-      <th>udpipe</th>
-      <td>0.918</td>
-      <td>0.811</td>
-      <td><b>0.957</b></td>
-      <td><b>0.870</b></td>
-      <td>0.776</td>
-    </tr>
-    <tr>
-      <th>spacy</th>
-      <td>0.919</td>
-      <td>0.812</td>
-      <td>0.938</td>
-      <td>0.836</td>
-      <td>0.729</td>
+      <th>slovnet_bert</th>
+      <td><b>0.982</b></td>
+      <td><b>0.884</b></td>
+      <td><b>0.990</b></td>
+      <td><b>0.890</b></td>
+      <td><b>0.856</b></td>
     </tr>
     <tr>
       <th>deeppavlov</th>
@@ -582,20 +562,44 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td><b>0.865</b></td>
     </tr>
     <tr>
-      <th>slovnet</th>
-      <td><b>0.961</b></td>
-      <td>0.815</td>
-      <td>0.905</td>
-      <td>0.807</td>
-      <td>0.664</td>
+      <th>udpipe</th>
+      <td>0.918</td>
+      <td>0.811</td>
+      <td><b>0.957</b></td>
+      <td><b>0.870</b></td>
+      <td>0.776</td>
     </tr>
     <tr>
-      <th>slovnet_bert</th>
-      <td><b>0.982</b></td>
-      <td><b>0.884</b></td>
-      <td><b>0.990</b></td>
-      <td><b>0.890</b></td>
-      <td><b>0.856</b></td>
+      <th>spacy</th>
+      <td>0.919</td>
+      <td>0.812</td>
+      <td>0.938</td>
+      <td>0.836</td>
+      <td>0.729</td>
+    </tr>
+    <tr>
+      <th>rnnmorph</th>
+      <td>0.896</td>
+      <td>0.812</td>
+      <td>0.890</td>
+      <td>0.860</td>
+      <td>0.838</td>
+    </tr>
+    <tr>
+      <th>maru</th>
+      <td>0.894</td>
+      <td>0.808</td>
+      <td>0.887</td>
+      <td>0.861</td>
+      <td>0.840</td>
+    </tr>
+    <tr>
+      <th>rupostagger</th>
+      <td>0.673</td>
+      <td>0.645</td>
+      <td>0.661</td>
+      <td>0.641</td>
+      <td>0.636</td>
     </tr>
   </tbody>
 </table>
@@ -614,39 +618,18 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
   </thead>
   <tbody>
     <tr>
-      <th>rupostagger</th>
-      <td><b>4.8</b></td>
-      <td><b>3</b></td>
-      <td><b>118</b></td>
-      <td>48.0</td>
+      <th>slovnet</th>
+      <td><b>1.0</b></td>
+      <td><b>27</b></td>
+      <td><b>115</b></td>
+      <td><b>532.0</b></td>
     </tr>
     <tr>
-      <th>rnnmorph</th>
-      <td>8.7</td>
-      <td><b>10</b></td>
-      <td>289</td>
-      <td>16.6</td>
-    </tr>
-    <tr>
-      <th>maru</th>
-      <td>15.8</td>
-      <td>44</td>
-      <td>370</td>
-      <td>36.4</td>
-    </tr>
-    <tr>
-      <th>udpipe</th>
-      <td>6.9</td>
-      <td>45</td>
-      <td><b>242</b></td>
-      <td>56.2</td>
-    </tr>
-    <tr>
-      <th>spacy</th>
-      <td>10.9</td>
-      <td>89</td>
-      <td>579</td>
-      <td>30.6</td>
+      <th>slovnet_bert</th>
+      <td>5.0</td>
+      <td>475</td>
+      <td>8087</td>
+      <td><b>285.0 (gpu)</b></td>
     </tr>
     <tr>
       <th>deeppavlov</th>
@@ -663,18 +646,39 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td>85.0 (gpu)</td>
     </tr>
     <tr>
-      <th>slovnet</th>
-      <td><b>1.0</b></td>
-      <td><b>27</b></td>
-      <td><b>115</b></td>
-      <td><b>532.0</b></td>
+      <th>udpipe</th>
+      <td>6.9</td>
+      <td>45</td>
+      <td><b>242</b></td>
+      <td>56.2</td>
     </tr>
     <tr>
-      <th>slovnet_bert</th>
-      <td>5.0</td>
-      <td>475</td>
-      <td>8087</td>
-      <td><b>285.0 (gpu)</b></td>
+      <th>spacy</th>
+      <td>10.9</td>
+      <td>89</td>
+      <td>579</td>
+      <td>30.6</td>
+    </tr>
+    <tr>
+      <th>rnnmorph</th>
+      <td>8.7</td>
+      <td><b>10</b></td>
+      <td>289</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <th>maru</th>
+      <td>15.8</td>
+      <td>44</td>
+      <td>370</td>
+      <td>36.4</td>
+    </tr>
+    <tr>
+      <th>rupostagger</th>
+      <td><b>4.8</b></td>
+      <td><b>3</b></td>
+      <td><b>118</b></td>
+      <td>48.0</td>
     </tr>
   </tbody>
 </table>
@@ -713,6 +717,45 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
   </thead>
   <tbody>
     <tr>
+      <th>slovnet</th>
+      <td><b>0.907</b></td>
+      <td><b>0.880</b></td>
+      <td><b>0.775</b></td>
+      <td><b>0.718</b></td>
+      <td>0.806</td>
+      <td>0.776</td>
+      <td>0.726</td>
+      <td>0.656</td>
+      <td>0.542</td>
+      <td>0.469</td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td><b>0.965</b></td>
+      <td><b>0.936</b></td>
+      <td><b>0.891</b></td>
+      <td><b>0.828</b></td>
+      <td><b>0.958</b></td>
+      <td><b>0.940</b></td>
+      <td><b>0.846</b></td>
+      <td><b>0.782</b></td>
+      <td><b>0.776</b></td>
+      <td><b>0.706</b></td>
+    </tr>
+    <tr>
+      <th>deeppavlov_bert</th>
+      <td><b>0.962</b></td>
+      <td><b>0.910</b></td>
+      <td><b>0.882</b></td>
+      <td><b>0.786</b></td>
+      <td><b>0.963</b></td>
+      <td><b>0.929</b></td>
+      <td><b>0.844</b></td>
+      <td><b>0.761</b></td>
+      <td><b>0.784</b></td>
+      <td><b>0.691</b></td>
+    </tr>
+    <tr>
       <th>udpipe</th>
       <td>0.873</td>
       <td>0.823</td>
@@ -738,45 +781,6 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td><b>0.657</b></td>
       <td><b>0.544</b></td>
     </tr>
-    <tr>
-      <th>deeppavlov_bert</th>
-      <td><b>0.962</b></td>
-      <td><b>0.910</b></td>
-      <td><b>0.882</b></td>
-      <td><b>0.786</b></td>
-      <td><b>0.963</b></td>
-      <td><b>0.929</b></td>
-      <td><b>0.844</b></td>
-      <td><b>0.761</b></td>
-      <td><b>0.784</b></td>
-      <td><b>0.691</b></td>
-    </tr>
-    <tr>
-      <th>slovnet_bert</th>
-      <td><b>0.965</b></td>
-      <td><b>0.936</b></td>
-      <td><b>0.891</b></td>
-      <td><b>0.828</b></td>
-      <td><b>0.958</b></td>
-      <td><b>0.940</b></td>
-      <td><b>0.846</b></td>
-      <td><b>0.782</b></td>
-      <td><b>0.776</b></td>
-      <td><b>0.706</b></td>
-    </tr>
-    <tr>
-      <th>slovnet</th>
-      <td><b>0.907</b></td>
-      <td><b>0.880</b></td>
-      <td><b>0.775</b></td>
-      <td><b>0.718</b></td>
-      <td>0.806</td>
-      <td>0.776</td>
-      <td>0.726</td>
-      <td>0.656</td>
-      <td>0.542</td>
-      <td>0.469</td>
-    </tr>
   </tbody>
 </table>
 <!--- syntax1 --->
@@ -794,6 +798,27 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
   </thead>
   <tbody>
     <tr>
+      <th>slovnet</th>
+      <td><b>1.0</b></td>
+      <td><b>27</b></td>
+      <td><b>125</b></td>
+      <td><b>450.0</b></td>
+    </tr>
+    <tr>
+      <th>slovnet_bert</th>
+      <td><b>5.0</b></td>
+      <td>504</td>
+      <td>3427</td>
+      <td><b>200.0 (gpu)</b></td>
+    </tr>
+    <tr>
+      <th>deeppavlov_bert</th>
+      <td>34.0</td>
+      <td>1427</td>
+      <td>8704</td>
+      <td><b>75.0 (gpu)</b></td>
+    </tr>
+    <tr>
       <th>udpipe</th>
       <td><b>6.9</b></td>
       <td><b>45</b></td>
@@ -806,27 +831,6 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td><b>89</b></td>
       <td><b>579</b></td>
       <td>31.6</td>
-    </tr>
-    <tr>
-      <th>deeppavlov_bert</th>
-      <td>34.0</td>
-      <td>1427</td>
-      <td>8704</td>
-      <td><b>75.0 (gpu)</b></td>
-    </tr>
-    <tr>
-      <th>slovnet_bert</th>
-      <td><b>5.0</b></td>
-      <td>504</td>
-      <td>3427</td>
-      <td><b>200.0 (gpu)</b></td>
-    </tr>
-    <tr>
-      <th>slovnet</th>
-      <td><b>1.0</b></td>
-      <td><b>27</b></td>
-      <td><b>125</b></td>
-      <td><b>450.0</b></td>
     </tr>
   </tbody>
 </table>
@@ -871,8 +875,7 @@ yc compute instance create \
   --platform-id gpu-standard-v1 \
   --preemptible
 
-yc compute instance list
-yc compute instance delete fhmj2ftcm32qgqt4igjf
+yc compute instance delete --name gpu
 
 ```
 
