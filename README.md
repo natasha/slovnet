@@ -62,7 +62,7 @@ $ pip install slovnet
 
 Download model weights and vocabs package, use links from <a href="#downloads">downloads section</a> and <a href="https://github.com/natasha/navec#downloads">Navec download section</a>. Optionally install <a href="https://github.com/natasha/ipymarkup">Ipymarkup</a> to visualize NER markup.
 
-Slovnet annotators have list of items as input and same size iterator over markups as output. Internally items are processed in batches of size `batch_size`. Default size is 8, larger batch — more RAM, better CPU utilization.
+Slovnet annotator `map` method has list of items as input and same size iterator over markups as output. Internally items are processed in batches of size `batch_size`. Default size is 8, larger batch — more RAM, better CPU utilization. `__call__` method just calls `map` with a list of 1 item.
 
 ### NER
 
