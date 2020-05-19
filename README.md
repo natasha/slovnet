@@ -505,7 +505,15 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 
 ### Morphology
 
-<a href="https://github.com/natasha/corus#load_gramru">Datasets from GramEval2020</a> are used for evaluation. `slovnet` is compated to a number of existing morphology taggers:
+<a href="https://github.com/natasha/corus#load_gramru">Datasets from GramEval2020</a> are used for evaluation:
+
+* `news` — sample from Lenta.ru.
+* `wiki` — UD GSD.
+* `fiction` — SynTagRus + JZ.
+* `social` — social subset of Taiga.
+* `poetry` — poetry subset of Taiga.
+
+`slovnet` is compated to a number of existing morphology taggers:
 
 * `deeppavlov` and `deeppavlov_bert` — CharBiLSTM and BERT based models, see <a href="http://docs.deeppavlov.ai/en/master/features/models/morphotagger.html">Deeppavlov docs</a>.
 * <a href="https://github.com/Koziev/rupostagger">`rupostagger`</a> — CRF tagger, part of <a href="http://www.solarix.ru/">Solarix project</a>.
