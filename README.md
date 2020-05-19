@@ -510,8 +510,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 * `news` — sample from Lenta.ru.
 * `wiki` — UD GSD.
 * `fiction` — SynTagRus + JZ.
-* `social` — social subset of Taiga.
-* `poetry` — poetry subset of Taiga.
+* `social`, `poetry` — social, poetry subset of Taiga.
 
 `slovnet` is compated to a number of existing morphology taggers:
 
