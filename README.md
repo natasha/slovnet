@@ -263,7 +263,7 @@ In addition to quality metrics we measure speed and models size, parameters that
 * <a href="http://pullenti.ru/">`pullenti`</a> — first place on factRuEval-2016, super sophisticated ruled based system.
 * `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
 * <a href="https://texterra.ispras.ru">`texterra`</a> — multifunctional NLP solution by <a href="https://www.ispras.ru/">ISP RAS</a>, NER is one of the features.
-* <a href="https://github.com/yandex/tomita-parser/">`tomita`</a> — GLR-parser by Yandex, only grammars for `PER` are publicly available.
+* <a href="https://github.com/yandex/tomita-parser/">`tomita`</a> — GLR-parser by Yandex, only implementation for `PER` is publicly available.
 * <a href="https://github.com/mit-nlp/MITIE">`mitie`</a> — engine developed at MIT + <a href="http://lang.org.ua/en/models/">third party model for Russian language</a>.
 
 For every column top 3 results are highlighted. In each case `slovnet` and `deeppavlov_bert` are 5-10% better then other systems:
@@ -424,6 +424,8 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 </table>
 <!--- ner1 --->
 
+`it/s` — news articles per second, 1 article ≈ 1KB.
+
 <!--- ner2 --->
 <table border="0" class="dataframe">
   <thead>
@@ -518,7 +520,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 * <a href="https://github.com/Koziev/rupostagger">`rupostagger`</a> — CRF tagger, part of <a href="http://www.solarix.ru/">Solarix project</a>.
 * <a href="https://github.com/IlyaGusev/rnnmorph">`rnnmorph`</a> — first place solution on morphoRuEval-2017, see <a href="https://habr.com/ru/post/339954/">post on Habr</a>.
 * <a href="https://github.com/chomechome/maru">`maru`</a> — CharFF-WordBiLST-CRF.
-* `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe</a> with model trained on SynTagRus.
+* `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe 1.2</a> with model trained on SynTagRus.
 * `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
 
 For every column top 3 results are highlighted. `slovnet` was trained only on news dataset:
@@ -612,6 +614,8 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
 </table>
 <!--- morph1 --->
 
+`it/s` — sentences per second.
+
 <!--- morph2 --->
 <table border="0" class="dataframe">
   <thead>
@@ -693,7 +697,7 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
 
 ### Syntax
 
-* `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe</a> + Russian SynTagRus model.
+* `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe 1.2</a> + Russian SynTagRus model.
 * `spacy` — <a href="https://spacy.io/">spaCy</a> + <a href="https://github.com/buriy/spacy-ru">Russian models by @buriy</a>.
 * `deeppavlov_bert` — BERT + biaffine head, see <a href="http://docs.deeppavlov.ai/en/master/features/models/syntaxparser.html">Deeppavlov docs</a>.
 
@@ -791,6 +795,8 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
   </tbody>
 </table>
 <!--- syntax1 --->
+
+`it/s` — sentences per second.
 
 <!--- syntax2 --->
 <table border="0" class="dataframe">
