@@ -120,7 +120,7 @@ class BERTNERInfer(Infer):
             pred = self.model(input.word_id, input.pad_mask)
             pred = pad_masked(pred, input.word_mask)
             mask = pad_masked(input.word_mask, input.word_mask)
-            yield from self.model.ner.crf.decode(pred, mask)
+            yield from self.model.head.crf.decode(pred, mask)
 
     def __call__(self, chunk):
         items = text_items(chunk, self.encoder.words_vocab)
@@ -146,7 +146,7 @@ class BERTMorphInfer(Infer):
         for input in inputs:
             input = input.to(self.model.device)
             pred = self.model(input.word_id, input.pad_mask)
-            pred = self.model.morph.decode(pred)
+            pred = self.model.head.decode(pred)
             yield from split_masked(pred, input.word_mask)
 
     def __call__(self, chunk):

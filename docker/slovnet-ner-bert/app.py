@@ -26,7 +26,7 @@ from slovnet.model.bert import (
     BERTNER
 )
 from slovnet.encoders.bert import BERTInferEncoder
-from slovnet.infer.bert import BERTNERInfer, BERTTagsDecoder
+from slovnet.infer.bert import BERTNERInfer, BERTTagDecoder
 
 
 WORDS_VOCAB = getenv('WORDS_VOCAB', 'vocab.txt')
@@ -70,7 +70,7 @@ encoder = BERTInferEncoder(
     words_vocab,
     seq_len=SEQ_LEN, batch_size=BATCH_SIZE
 )
-decoder = BERTTagsDecoder(tags_vocab)
+decoder = BERTTagDecoder(tags_vocab)
 infer = BERTNERInfer(model, encoder, decoder)
 
 
