@@ -78,7 +78,7 @@ def word_shape(word):
     if type in (RU, EN):
         return format_shape(type, word_outline(word))
     elif type == PUNCT:
-        if word not in PUNCTS:
+        if len(word) > 1 or word not in PUNCTS:
             # ..., ?!, ****
             word = OTHER
         return format_shape(PUNCT, word)

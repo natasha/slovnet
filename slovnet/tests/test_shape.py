@@ -36,6 +36,10 @@ TESTS = [
         'Прибыл на I@',
         [s(RU, Xx), s(RU, xx), s(EN, X), s(PUNCT, '@')]
     ],
+    [
+        'и -‐',
+        [s(RU, x), s(PUNCT, OTHER)]
+    ]
 ]
 
 
