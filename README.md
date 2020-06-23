@@ -260,6 +260,7 @@ In addition to quality metrics we measure speed and models size, parameters that
 
 * `deeppavlov` — BiLSTM-CRF by DeepPavlov, see <a href="https://arxiv.org/pdf/1709.09686.pdf">their 2017 paper</a> for more.
 * `deeppavlov_bert` — BERT based NER, current SOTA for Russian language, see <a href="https://www.youtube.com/watch?v=eKTA8i8s-zs">video presentation</a> describing the approach.
+* <a href="https://github.com/deepmipt/Slavic-BERT-NER">`deeppavlov_slavic`</a> — see <a href="https://www.aclweb.org/anthology/W19-3712/">the paper</a>.
 * <a href="http://pullenti.ru/">`pullenti`</a> — first place on factRuEval-2016, super sophisticated ruled based system.
 * `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
 * <a href="https://stanfordnlp.github.io/stanza/">`stanza`</a> — tool by Stanford released in 2020, CharLSTM+WordLSTM-CRF, see <a href="https://arxiv.org/pdf/2003.07082.pdf">their paper</a>.
@@ -305,7 +306,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>0.984</td>
       <td>0.973</td>
       <td>0.951</td>
-      <td><b>0.944</b></td>
+      <td>0.944</td>
       <td>0.834</td>
       <td>0.718</td>
     </tr>
@@ -320,7 +321,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td><b>0.989</b></td>
       <td><b>0.976</b></td>
       <td><b>0.960</b></td>
-      <td><b>0.838</b></td>
+      <td>0.838</td>
       <td><b>0.733</b></td>
     </tr>
     <tr>
@@ -350,6 +351,20 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td><b>0.954</b></td>
       <td><b>0.840</b></td>
       <td><b>0.741</b></td>
+    </tr>
+    <tr>
+      <th>deeppavlov_slavic</th>
+      <td>0.956</td>
+      <td>0.884</td>
+      <td>0.714</td>
+      <td>0.976</td>
+      <td>0.776</td>
+      <td>0.984</td>
+      <td>0.817</td>
+      <td>0.761</td>
+      <td><b>0.965</b></td>
+      <td><b>0.925</b></td>
+      <td><b>0.831</b></td>
     </tr>
     <tr>
       <th>pullenti</th>
@@ -391,7 +406,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>0.734</td>
       <td>0.938</td>
       <td><b>0.838</b></td>
-      <td><b>0.724</b></td>
+      <td>0.724</td>
     </tr>
     <tr>
       <th>texterra</th>
@@ -480,6 +495,13 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>2048</td>
       <td>6144</td>
       <td>13.1 (gpu)</td>
+    </tr>
+    <tr>
+      <th>deeppavlov_slavic</th>
+      <td>35.0</td>
+      <td>2048</td>
+      <td>4096</td>
+      <td>8.0 (gpu)</td>
     </tr>
     <tr>
       <th>pullenti</th>
