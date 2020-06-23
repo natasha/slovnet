@@ -262,6 +262,7 @@ In addition to quality metrics we measure speed and models size, parameters that
 * `deeppavlov_bert` — BERT based NER, current SOTA for Russian language, see <a href="https://www.youtube.com/watch?v=eKTA8i8s-zs">video presentation</a> describing the approach.
 * <a href="http://pullenti.ru/">`pullenti`</a> — first place on factRuEval-2016, super sophisticated ruled based system.
 * `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
+* <a href="https://stanfordnlp.github.io/stanza/">`stanza`</a> — tool by Stanford released in 2020, CharLSTM+WordLSTM-CRF, see <a href="https://arxiv.org/pdf/2003.07082.pdf">their paper</a>.
 * <a href="https://texterra.ispras.ru">`texterra`</a> — multifunctional NLP solution by <a href="https://www.ispras.ru/">ISP RAS</a>, NER is one of the features.
 * <a href="https://github.com/yandex/tomita-parser/">`tomita`</a> — GLR-parser by Yandex, only implementation for `PER` is publicly available.
 * <a href="https://github.com/mit-nlp/MITIE">`mitie`</a> — engine developed at MIT + <a href="http://lang.org.ua/en/models/">third party model for Russian language</a>.
@@ -305,8 +306,8 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>0.973</td>
       <td>0.951</td>
       <td><b>0.944</b></td>
-      <td><b>0.834</b></td>
-      <td><b>0.718</b></td>
+      <td>0.834</td>
+      <td>0.718</td>
     </tr>
     <tr>
       <th>slovnet_bert</th>
@@ -377,6 +378,20 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>0.938</td>
       <td>0.828</td>
       <td>0.703</td>
+    </tr>
+    <tr>
+      <th>stanza</th>
+      <td>0.943</td>
+      <td>0.865</td>
+      <td>0.687</td>
+      <td>0.953</td>
+      <td>0.827</td>
+      <td>0.923</td>
+      <td>0.753</td>
+      <td>0.734</td>
+      <td>0.938</td>
+      <td><b>0.838</b></td>
+      <td><b>0.724</b></td>
     </tr>
     <tr>
       <th>texterra</th>
@@ -481,6 +496,13 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
       <td>8.0</td>
     </tr>
     <tr>
+      <th>stanza</th>
+      <td>3.0</td>
+      <td>591</td>
+      <td>11264</td>
+      <td>3.0 (gpu)</td>
+    </tr>
+    <tr>
       <th>texterra</th>
       <td>47.6</td>
       <td>193</td>
@@ -522,6 +544,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 * <a href="https://github.com/chomechome/maru">`maru`</a> — CharFF-WordBiLST-CRF.
 * `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe 1.2</a> with model trained on SynTagRus.
 * `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
+* <a href="https://stanfordnlp.github.io/stanza/">`stanza`</a> — see <a href="https://arxiv.org/pdf/2003.07082.pdf">their paper</a>.
 
 For every column top 3 results are highlighted. `slovnet` was trained only on news dataset:
 
@@ -575,7 +598,7 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td>0.918</td>
       <td>0.811</td>
       <td><b>0.957</b></td>
-      <td><b>0.870</b></td>
+      <td>0.870</td>
       <td>0.776</td>
     </tr>
     <tr>
@@ -585,6 +608,14 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td>0.938</td>
       <td>0.836</td>
       <td>0.729</td>
+    </tr>
+    <tr>
+      <th>stanza</th>
+      <td>0.934</td>
+      <td>0.840</td>
+      <td>0.940</td>
+      <td><b>0.873</b></td>
+      <td>0.825</td>
     </tr>
     <tr>
       <th>rnnmorph</th>
@@ -647,7 +678,7 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td><b>4.0</b></td>
       <td>32</td>
       <td>10240</td>
-      <td><b>90.0 (gpu)</b></td>
+      <td>90.0 (gpu)</td>
     </tr>
     <tr>
       <th>deeppavlov_bert</th>
@@ -665,10 +696,17 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
     </tr>
     <tr>
       <th>spacy</th>
-      <td>10.9</td>
+      <td>8.0</td>
       <td>89</td>
       <td>579</td>
-      <td>30.6</td>
+      <td>50.0</td>
+    </tr>
+    <tr>
+      <th>stanza</th>
+      <td><b>2.0</b></td>
+      <td>591</td>
+      <td>393</td>
+      <td><b>92.0</b></td>
     </tr>
     <tr>
       <th>rnnmorph</th>
@@ -686,7 +724,7 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
     </tr>
     <tr>
       <th>rupostagger</th>
-      <td><b>4.8</b></td>
+      <td>4.8</td>
       <td><b>3</b></td>
       <td><b>118</b></td>
       <td>48.0</td>
@@ -700,6 +738,7 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
 * `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe 1.2</a> + Russian SynTagRus model.
 * `spacy` — <a href="https://spacy.io/">spaCy</a> + <a href="https://github.com/buriy/spacy-ru">Russian models by @buriy</a>.
 * `deeppavlov_bert` — BERT + biaffine head, see <a href="http://docs.deeppavlov.ai/en/master/features/models/syntaxparser.html">Deeppavlov docs</a>.
+* <a href="https://stanfordnlp.github.io/stanza/">`stanza`</a> — see <a href="https://arxiv.org/pdf/2003.07082.pdf">their paper</a>.
 
 <!--- syntax1 --->
 <table border="0" class="dataframe">
@@ -729,10 +768,10 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
   <tbody>
     <tr>
       <th>slovnet</th>
-      <td><b>0.907</b></td>
-      <td><b>0.880</b></td>
-      <td><b>0.775</b></td>
-      <td><b>0.718</b></td>
+      <td>0.907</td>
+      <td>0.880</td>
+      <td>0.775</td>
+      <td>0.718</td>
       <td>0.806</td>
       <td>0.776</td>
       <td>0.726</td>
@@ -772,8 +811,8 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td>0.823</td>
       <td>0.622</td>
       <td>0.531</td>
-      <td><b>0.910</b></td>
-      <td><b>0.876</b></td>
+      <td>0.910</td>
+      <td>0.876</td>
       <td>0.700</td>
       <td>0.624</td>
       <td>0.625</td>
@@ -787,10 +826,23 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
       <td>0.665</td>
       <td>0.880</td>
       <td>0.833</td>
-      <td><b>0.757</b></td>
-      <td><b>0.666</b></td>
-      <td><b>0.657</b></td>
-      <td><b>0.544</b></td>
+      <td>0.757</td>
+      <td>0.666</td>
+      <td>0.657</td>
+      <td>0.544</td>
+    </tr>
+    <tr>
+      <th>stanza</th>
+      <td><b>0.940</b></td>
+      <td><b>0.886</b></td>
+      <td><b>0.827</b></td>
+      <td><b>0.723</b></td>
+      <td><b>0.936</b></td>
+      <td><b>0.895</b></td>
+      <td><b>0.802</b></td>
+      <td><b>0.714</b></td>
+      <td><b>0.713</b></td>
+      <td><b>0.613</b></td>
     </tr>
   </tbody>
 </table>
@@ -833,17 +885,24 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
     </tr>
     <tr>
       <th>udpipe</th>
-      <td><b>6.9</b></td>
+      <td>6.9</td>
       <td><b>45</b></td>
       <td><b>242</b></td>
       <td>56.2</td>
     </tr>
     <tr>
       <th>spacy</th>
-      <td>10.9</td>
+      <td>9.0</td>
       <td><b>89</b></td>
       <td><b>579</b></td>
-      <td>31.6</td>
+      <td>41.0</td>
+    </tr>
+    <tr>
+      <th>stanza</th>
+      <td><b>3.0</b></td>
+      <td>591</td>
+      <td>890</td>
+      <td>12.0</td>
     </tr>
   </tbody>
 </table>
