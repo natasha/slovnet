@@ -934,6 +934,7 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
 
 - Chat — https://telegram.me/natural_language_processing
 - Issues — https://github.com/natasha/slovnet/issues
+- Commercial support — https://lab.alexkuk.ru
 
 ## Development
 
