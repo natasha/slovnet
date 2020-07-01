@@ -256,17 +256,7 @@ In addition to quality metrics we measure speed and models size, parameters that
 
 ### NER
 
-4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus">Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>. `slovnet` is compared to:
-
-* `deeppavlov` — BiLSTM-CRF by DeepPavlov, see <a href="https://arxiv.org/pdf/1709.09686.pdf">their 2017 paper</a> for more.
-* `deeppavlov_bert` — BERT based NER, current SOTA for Russian language, see <a href="https://www.youtube.com/watch?v=eKTA8i8s-zs">video presentation</a> describing the approach.
-* <a href="https://github.com/deepmipt/Slavic-BERT-NER">`deeppavlov_slavic`</a> — see <a href="https://www.aclweb.org/anthology/W19-3712/">the paper</a>.
-* <a href="http://pullenti.ru/">`pullenti`</a> — first place on factRuEval-2016, super sophisticated ruled based system.
-* `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
-* <a href="https://stanfordnlp.github.io/stanza/">`stanza`</a> — tool by Stanford released in 2020, CharLSTM+WordLSTM-CRF, see <a href="https://arxiv.org/pdf/2003.07082.pdf">their paper</a>.
-* <a href="https://texterra.ispras.ru">`texterra`</a> — multifunctional NLP solution by <a href="https://www.ispras.ru/">ISP RAS</a>, NER is one of the features.
-* <a href="https://github.com/yandex/tomita-parser/">`tomita`</a> — GLR-parser by Yandex, only implementation for `PER` is publicly available.
-* <a href="https://github.com/mit-nlp/MITIE">`mitie`</a> — engine developed at MIT + <a href="http://lang.org.ua/en/models/">third party model for Russian language</a>.
+4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus"><code>Corus</a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code><code>factru</code></code></code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code><code>gareev</code></code></code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code><code>ne5</code></code></code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code><code>bsnlp</code></code></code></a>. `slovnet` is compared to: <a href="https://github.com/natasha/naeval#deeppavlov_ner"><code>deeppavlov</code></a>, <a href="https://github.com/natasha/naeval#deeppavlov_bert_ner"><code>deeppavlov_bert</code></a>, <a href="https://github.com/natasha/naeval#deeppavlov_slavic_bert_ner"><code>deeppavlov_slavic</code></a>, <a href="https://github.com/natasha/naeval#pullenti"><code>pullenti</code></a>, <a href="https://github.com/natasha/naeval#spacy"><code>spacy</code></a>, <a href="https://github.com/natasha/naeval#stanza"><code>stanza</code></a>, <a href="https://github.com/natasha/naeval#texterra"><code>texterra</code></a>, <a href="https://github.com/natasha/naeval#tomita"><code>tomita</code></a>, <a href="https://github.com/natasha/naeval#mitie"><code>mitie</code></a>, see <a href="https://github.com/natasha/naeval#models">Naeval</a> registry.
 
 For every column top 3 results are highlighted. In each case `slovnet` and `deeppavlov_bert` are 5-10% better then other systems:
 
