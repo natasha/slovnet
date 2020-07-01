@@ -256,7 +256,7 @@ In addition to quality metrics we measure speed and models size, parameters that
 
 ### NER
 
-4 datasets are used for evaluation, see <a href="https://github.com/natasha/corus"><code>Corus</code></a> registry for more info: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>. `slovnet` is compared to: <a href="https://github.com/natasha/naeval#deeppavlov_ner"><code>deeppavlov</code></a>, <a href="https://github.com/natasha/naeval#deeppavlov_bert_ner"><code>deeppavlov_bert</code></a>, <a href="https://github.com/natasha/naeval#deeppavlov_slavic_bert_ner"><code>deeppavlov_slavic</code></a>, <a href="https://github.com/natasha/naeval#pullenti"><code>pullenti</code></a>, <a href="https://github.com/natasha/naeval#spacy"><code>spacy</code></a>, <a href="https://github.com/natasha/naeval#stanza"><code>stanza</code></a>, <a href="https://github.com/natasha/naeval#texterra"><code>texterra</code></a>, <a href="https://github.com/natasha/naeval#tomita"><code>tomita</code></a>, <a href="https://github.com/natasha/naeval#mitie"><code>mitie</code></a>, see <a href="https://github.com/natasha/naeval#models">Naeval</a> registry.
+4 datasets are used for evaluation: <a href="https://github.com/natasha/corus#load_factru"><code>factru</code></a>, <a href="https://github.com/natasha/corus#load_gareev"><code>gareev</code></a>, <a href="https://github.com/natasha/corus#load_ne5"><code>ne5</code></a> and <a href="https://github.com/natasha/corus#load_bsnlp"><code>bsnlp</code></a>. Slovnet is compared to: <a href="https://github.com/natasha/naeval#deeppavlov_ner"><code>deeppavlov</code></a>, <a href="https://github.com/natasha/naeval#deeppavlov_bert_ner"><code>deeppavlov_bert</code></a>, <a href="https://github.com/natasha/naeval#deeppavlov_slavic_bert_ner"><code>deeppavlov_slavic</code></a>, <a href="https://github.com/natasha/naeval#pullenti"><code>pullenti</code></a>, <a href="https://github.com/natasha/naeval#spacy"><code>spacy</code></a>, <a href="https://github.com/natasha/naeval#stanza"><code>stanza</code></a>, <a href="https://github.com/natasha/naeval#texterra"><code>texterra</code></a>, <a href="https://github.com/natasha/naeval#tomita"><code>tomita</code></a>, <a href="https://github.com/natasha/naeval#mitie"><code>mitie</code></a>.
 
 For every column top 3 results are highlighted. In each case `slovnet` and `deeppavlov_bert` are 5-10% better then other systems:
 
@@ -548,15 +548,7 @@ For every column top 3 results are highlighted. In each case `slovnet` and `deep
 * `fiction` — SynTagRus + JZ.
 * `social`, `poetry` — social, poetry subset of Taiga.
 
-`slovnet` is compated to a number of existing morphology taggers:
-
-* `deeppavlov` and `deeppavlov_bert` — CharBiLSTM and BERT based models, see <a href="http://docs.deeppavlov.ai/en/master/features/models/morphotagger.html">Deeppavlov docs</a>.
-* <a href="https://github.com/Koziev/rupostagger">`rupostagger`</a> — CRF tagger, part of <a href="http://www.solarix.ru/">Solarix project</a>.
-* <a href="https://github.com/IlyaGusev/rnnmorph">`rnnmorph`</a> — first place solution on morphoRuEval-2017, see <a href="https://habr.com/ru/post/339954/">post on Habr</a>.
-* <a href="https://github.com/chomechome/maru">`maru`</a> — CharFF-WordBiLST-CRF.
-* `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe 1.2</a> with model trained on SynTagRus.
-* `spacy` — <a href="https://spacy.io/">spaCy</a> with <a href="https://github.com/buriy/spacy-ru">Russian models trained by @buriy</a>.
-* <a href="https://stanfordnlp.github.io/stanza/">`stanza`</a> — see <a href="https://arxiv.org/pdf/2003.07082.pdf">their paper</a>.
+Slovnet is compated to a number of existing morphology taggers: <a href="https://github.com/natasha/naeval#deeppavlov_morph"><code>deeppavlov</code></a>, <a href="https://github.com/natasha/naeval#deeppavlov_bert_morph"><code>deeppavlov_bert</code></a>, <a href="https://github.com/natasha/naeval#rupostagger"><code>rupostagger</code></a>, <a href="https://github.com/natasha/naeval#rnnmorph"><code>rnnmorph</code></a>, <a href="https://github.com/natasha/naeval#mary"><code>maru</code></a>, <a href="https://github.com/natasha/naeval#udpipe"><code>udpipe</code></a>, <a href="https://github.com/natasha/naeval#spacy"><code>spacy</code></a>, <a href="https://github.com/natasha/naeval#stanza"><code>stanza</code></a>.
 
 For every column top 3 results are highlighted. `slovnet` was trained only on news dataset:
 
@@ -747,10 +739,7 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
 
 ### Syntax
 
-* `udpipe` — <a href="http://ufal.mff.cuni.cz/udpipe">UDPipe 1.2</a> + Russian SynTagRus model.
-* `spacy` — <a href="https://spacy.io/">spaCy</a> + <a href="https://github.com/buriy/spacy-ru">Russian models by @buriy</a>.
-* `deeppavlov_bert` — BERT + biaffine head, see <a href="http://docs.deeppavlov.ai/en/master/features/models/syntaxparser.html">Deeppavlov docs</a>.
-* <a href="https://stanfordnlp.github.io/stanza/">`stanza`</a> — see <a href="https://arxiv.org/pdf/2003.07082.pdf">their paper</a>.
+Slovnet is compated to several existing syntax parsers: <a href="https://github.com/natasha/naeval#udpipe"><code>udpipe</code></a>, <a href="https://github.com/natasha/naeval#spacy"><code>spacy</code></a>, <a href="https://github.com/natasha/naeval#deeppavlov_bert_syntax"><code>deeppavlov</code></a>, <a href="https://github.com/natasha/naeval#stanza"><code>stanza</code></a>.
 
 <!--- syntax1 --->
 <table border="0" class="dataframe">
