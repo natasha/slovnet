@@ -8,6 +8,8 @@ SlovNet is a Python library for deep-learning based NLP modeling for Russian lan
 * NER is 1-2% worse than current BERT SOTA by DeepPavlov but 60 times smaller in size (~30 MB) and works fast on CPU (~25 news articles/sec).
 * Morphology tagger and syntax parser have comparable accuracy on news dataset with large SOTA BERT models, take 50 times less space (~30 MB), work faster on CPU (~500 sentences/sec). 
 
+There is an <a href="https://natasha.github.io/ner">article explaining in details who NER model works</a> (in Russian).
+
 ## Downloads
 
 <table>
