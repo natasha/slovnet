@@ -12,7 +12,7 @@ with open('requirements/main.txt') as file:
 
 setup(
     name='slovnet',
-    version='0.4.0',
+    version='0.5.0',
 
     description='Deep-learning based NLP modeling for Russian language',
     long_description=description,
