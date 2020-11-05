@@ -33,6 +33,12 @@ ner.navec(navec)
 
 
 async def handle(request):
+      """
+      Handles the request.
+
+      Args:
+          request: (todo): write your description
+      """
     chunk = await request.json()
     log('Post chunk size: %r' % len(chunk))
     markups = list(ner.map(chunk))

@@ -45,6 +45,12 @@ TESTS = [
 
 @pytest.mark.parametrize('test', TESTS)
 def test_shape(test):
+    """
+    Tokenize a text.
+
+    Args:
+        test: (todo): write your description
+    """
     text, etalon = test
     tokens = tokenize(text)
     guess = [word_shape(_.text) for _ in tokens]

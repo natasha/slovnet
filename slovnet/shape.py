@@ -32,16 +32,34 @@ Xx_Xx = 'Xx-Xx'
 
 
 def is_title(word):
+    """
+    Returns true if word is a title.
+
+    Args:
+        word: (str): write your description
+    """
     return len(word) > 1 and word[0].isupper() and word[1:].islower()
 
 
 def is_dash_title(word):
+    """
+    Returns true if the given word is a valid title.
+
+    Args:
+        word: (str): write your description
+    """
     if '-' in word:
         left, right = word.split('-', 1)
         return is_title(left) and is_title(right)
 
 
 def word_outline(word):
+    """
+    Return the outline of a word.
+
+    Args:
+        word: (str): write your description
+    """
     if len(word) == 1:
         if word.isupper():
             return X
@@ -61,6 +79,12 @@ def word_outline(word):
 
 
 def word_type(word):
+    """
+    Determine type of a word.
+
+    Args:
+        word: (str): write your description
+    """
     # СИЗО-6 -> RU
     # 2011-2020 -> NUM
     match = TYPE.match(word)
@@ -70,10 +94,23 @@ def word_type(word):
 
 
 def format_shape(type, value):
+    """
+    Format a shape for a type.
+
+    Args:
+        type: (str): write your description
+        value: (todo): write your description
+    """
     return '%s_%s' % (type, value)
 
 
 def word_shape(word):
+    """
+    Returns a shape string.
+
+    Args:
+        word: (str): write your description
+    """
     type = word_type(word)
     if type in (RU, EN):
         return format_shape(type, word_outline(word))

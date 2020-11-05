@@ -27,20 +27,49 @@ class API(Record):
     __attributes__ = ['infer', 'batch_size']
 
     def navec(self, navec):
+        """
+        Infer a nave model.
+
+        Args:
+            self: (todo): write your description
+            navec: (array): write your description
+        """
         self.infer.model = self.infer.model.inject_navec(navec)
         return self
 
     def map(self, items):
+        """
+        Map an iterator.
+
+        Args:
+            self: (todo): write your description
+            items: (array): write your description
+        """
         for chunk in chop(items, self.batch_size):
             yield from self.infer(chunk)
 
     def __call__(self, item):
+        """
+        Call the first item and return the result.
+
+        Args:
+            self: (todo): write your description
+            item: (todo): write your description
+        """
         return next(self.map([item]))
 
 
 class NER(API):
     @classmethod
     def load(cls, path, batch_size=8):
+        """
+        Loads a model from a dataset.
+
+        Args:
+            cls: (todo): write your description
+            path: (str): write your description
+            batch_size: (int): write your description
+        """
         with Pack(path) as pack:
             meta = pack.load_meta()
             meta.check_protocol()
@@ -66,6 +95,14 @@ class NER(API):
 class Morph(API):
     @classmethod
     def load(cls, path, batch_size=8):
+        """
+        Loads a model from a text file.
+
+        Args:
+            cls: (todo): write your description
+            path: (str): write your description
+            batch_size: (int): write your description
+        """
         with Pack(path) as pack:
             meta = pack.load_meta()
             meta.check_protocol()
@@ -91,6 +128,14 @@ class Morph(API):
 class Syntax(API):
     @classmethod
     def load(cls, path, batch_size=8):
+        """
+        Load a model from a dataset.
+
+        Args:
+            cls: (todo): write your description
+            path: (str): write your description
+            batch_size: (int): write your description
+        """
         with Pack(path) as pack:
             meta = pack.load_meta()
             meta.check_protocol()

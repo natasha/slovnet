@@ -1,6 +1,13 @@
 
 
 def format_conll_tag(pos, feats):
+    """
+    Format pos tag.
+
+    Args:
+        pos: (int): write your description
+        feats: (todo): write your description
+    """
     if not feats:
         return pos
 
@@ -12,6 +19,12 @@ def format_conll_tag(pos, feats):
 
 
 def parse_conll_tag(tag):
+    """
+    Parse a single tag from the given tag.
+
+    Args:
+        tag: (str): write your description
+    """
     if '|' not in tag:
         return tag, {}
 

@@ -76,6 +76,12 @@ infer = BERTMorphInfer(model, encoder, decoder)
 
 
 async def handle(request):
+      """
+      Handles a request.
+
+      Args:
+          request: (todo): write your description
+      """
     chunk = await request.json()
     log('Post chunk size: %r' % len(chunk))
     markups = list(infer(chunk))

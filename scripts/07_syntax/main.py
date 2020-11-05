@@ -122,6 +122,12 @@ LAYER_DIMS = [
 
 
 def adapt_markup(record):
+    """
+    Adapts a markuptext string for the given record.
+
+    Args:
+        record: (todo): write your description
+    """
     return SyntaxMarkup([
         SyntaxToken(_.id, _.text, _.head_id, _.rel)
         for _ in record.tokens
@@ -129,6 +135,14 @@ def adapt_markup(record):
 
 
 def process_batch(model, criterion, batch):
+    """
+    Process a single batch.
+
+    Args:
+        model: (todo): write your description
+        criterion: (todo): write your description
+        batch: (todo): write your description
+    """
     input, target = batch
 
     pred = model(

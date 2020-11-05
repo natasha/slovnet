@@ -90,16 +90,39 @@ DEVICE = CUDA0
 
 
 def every(step, period):
+    """
+    Return a step.
+
+    Args:
+        step: (int): write your description
+        period: (str): write your description
+    """
     return step > 0 and step % period == 0
 
 
 def process_batch(model, criterion, batch):
+    """
+    Process a single batch.
+
+    Args:
+        model: (todo): write your description
+        criterion: (todo): write your description
+        batch: (todo): write your description
+    """
     pred = model(batch.input)
     loss = criterion(pred, batch.target.value, batch.target.mask)
     return batch.processed(loss, pred)
 
 
 def infer_batches(model, criterion, batches):
+    """
+    Infer batches of batches.
+
+    Args:
+        model: (todo): write your description
+        criterion: (str): write your description
+        batches: (todo): write your description
+    """
     training = model.training
     model.eval()
     with torch.no_grad():

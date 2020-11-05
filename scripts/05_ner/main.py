@@ -122,6 +122,12 @@ LAYER_DIMS = [
 
 
 def adapt_markup(record):
+    """
+    Adapts the marker record.
+
+    Args:
+        record: (todo): write your description
+    """
     return SpanMarkup(
         record.text,
         [Span(_.start, _.stop, _.type) for _ in record.spans]
@@ -129,6 +135,14 @@ def adapt_markup(record):
 
 
 def process_batch(model, criterion, batch):
+    """
+    Parameters ---------- model.
+
+    Args:
+        model: (todo): write your description
+        criterion: (todo): write your description
+        batch: (todo): write your description
+    """
     input, target = batch
 
     pred = model(input.word_id, input.shape_id)

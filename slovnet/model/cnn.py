@@ -6,6 +6,15 @@ from .base import Module
 
 class CNNEncoderLayer(Module):
     def __init__(self, in_dim, out_dim, kernel_size):
+        """
+        Initialize a convolution layer.
+
+        Args:
+            self: (todo): write your description
+            in_dim: (int): write your description
+            out_dim: (int): write your description
+            kernel_size: (int): write your description
+        """
         super(CNNEncoderLayer, self).__init__()
 
         padding = (kernel_size - 1) // 2
@@ -17,12 +26,27 @@ class CNNEncoderLayer(Module):
         self.norm = nn.BatchNorm1d(out_dim)
 
     def __call__(self, input):
+        """
+        Implement operator.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         x = self.conv(input)
         x = self.relu(x)
         return self.norm(x)
 
 
 def gen_cnn_encoder_layers(input_dim, layer_dims, kernel_size):
+    """
+    Generate encoder_encoder.
+
+    Args:
+        input_dim: (str): write your description
+        layer_dims: (todo): write your description
+        kernel_size: (int): write your description
+    """
     dims = [input_dim] + layer_dims
     for index in range(1, len(dims)):
         in_dim = dims[index - 1]
@@ -32,6 +56,15 @@ def gen_cnn_encoder_layers(input_dim, layer_dims, kernel_size):
 
 class CNNEncoder(Module):
     def __init__(self, input_dim, layer_dims, kernel_size):
+        """
+        Initialize the kernel.
+
+        Args:
+            self: (todo): write your description
+            input_dim: (int): write your description
+            layer_dims: (int): write your description
+            kernel_size: (int): write your description
+        """
         super(CNNEncoder, self).__init__()
 
         layers = gen_cnn_encoder_layers(input_dim, layer_dims, kernel_size)
@@ -39,6 +72,14 @@ class CNNEncoder(Module):
         self.dim = layer_dims[-1]
 
     def forward(self, input, mask=None):  # batch x seq x emb
+        """
+        Forward computation.
+
+        Args:
+            self: (todo): write your description
+            input: (todo): write your description
+            mask: (todo): write your description
+        """
         input = input.transpose(2, 1)  # batch x emb x seq
 
         if mask is not None:

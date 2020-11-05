@@ -25,21 +25,48 @@ class TagDecoder(Record):
     __attributes__ = ['tags_vocab']
 
     def __call__(self, preds):
+        """
+        Yields all preds.
+
+        Args:
+            self: (todo): write your description
+            preds: (array): write your description
+        """
         for pred in preds:
             yield [self.tags_vocab.decode(_) for _ in pred]
 
 
 def text_words(text):
+    """
+    Returns a list of words.
+
+    Args:
+        text: (str): write your description
+    """
     return [_.text for _ in tokenize(text)]
 
 
 class NERInfer(Infer):
     def process(self, inputs):
+        """
+        : param inputs.
+
+        Args:
+            self: (todo): write your description
+            inputs: (todo): write your description
+        """
         for input in inputs:
             pred = self.model(input.word_id, input.shape_id, input.pad_mask)
             yield from self.model.head.crf.decode(pred, ~input.pad_mask)
 
     def __call__(self, texts):
+        """
+        Yields tokens.
+
+        Args:
+            self: (todo): write your description
+            texts: (str): write your description
+        """
         items = [text_words(_) for _ in texts]
         inputs = self.encoder(items)
         preds = self.process(inputs)
@@ -53,12 +80,26 @@ class NERInfer(Infer):
 
 class MorphInfer(Infer):
     def process(self, inputs):
+        """
+        Process a list of the model.
+
+        Args:
+            self: (todo): write your description
+            inputs: (todo): write your description
+        """
         for input in inputs:
             pred = self.model(input.word_id, input.shape_id, input.pad_mask)
             pred = self.model.head.decode(pred)
             yield from split_masked(pred, ~input.pad_mask)
 
     def __call__(self, items):
+        """
+        Iterate on items.
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         inputs = self.encoder(items)
         preds = self.process(inputs)
         preds = self.decoder(preds)
@@ -79,6 +120,13 @@ class SyntaxDecoder(Record):
     __attributes__ = ['rels_vocab']
 
     def __call__(self, preds):
+        """
+        Return a sequence of documents.
+
+        Args:
+            self: (todo): write your description
+            preds: (array): write your description
+        """
         for pred in preds:
             head_ids, rel_ids = pred
             ids = [str(_ + 1) for _ in range(len(head_ids))]
@@ -89,6 +137,13 @@ class SyntaxDecoder(Record):
 
 class SyntaxInfer(Infer):
     def process(self, inputs):
+        """
+        Processes : py : meth : type inputs.
+
+        Args:
+            self: (todo): write your description
+            inputs: (todo): write your description
+        """
         for input in inputs:
             pred = self.model(input.word_id, input.shape_id, input.pad_mask)
             mask = ~input.pad_mask
@@ -102,6 +157,13 @@ class SyntaxInfer(Infer):
             yield from zip(head_id, rel_id)
 
     def __call__(self, items):
+        """
+        Call the items in parallel ).
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         inputs = self.encoder(items)
         preds = self.process(inputs)
         preds = self.decoder(preds)

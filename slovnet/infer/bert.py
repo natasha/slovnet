@@ -32,21 +32,50 @@ class BERTInferItem(Record):
     __attributes__ = ['id', 'tokens', 'pred']
 
     def __init__(self, id, tokens, pred=None):
+        """
+        Initialize a new token.
+
+        Args:
+            self: (todo): write your description
+            id: (str): write your description
+            tokens: (int): write your description
+            pred: (todo): write your description
+        """
         self.id = id
         self.tokens = tokens
         self.pred = pred
 
     @property
     def words(self):
+        """
+        Returns a list of words.
+
+        Args:
+            self: (todo): write your description
+        """
         return [_.text for _ in self.tokens]
 
 
 def substoken(text, vocab):
+    """
+    Substoken a subs. substoken.
+
+    Args:
+        text: (str): write your description
+        vocab: (todo): write your description
+    """
     subs = bert_subs(text, vocab)
     return SubsToken(text, subs)
 
 
 def text_items(texts, vocab):
+    """
+    Generate : param texts from text.
+
+    Args:
+        texts: (str): write your description
+        vocab: (todo): write your description
+    """
     for id, text in enumerate(texts):
         tokens = [
             substoken(_.text, vocab)
@@ -56,6 +85,13 @@ def text_items(texts, vocab):
 
 
 def word_items(items, vocab):
+    """
+    Yields a list.
+
+    Args:
+        items: (todo): write your description
+        vocab: (str): write your description
+    """
     for id, words in enumerate(items):
         tokens = [
             substoken(_, vocab)
@@ -65,6 +101,13 @@ def word_items(items, vocab):
 
 
 def segment_items(items, seq_len):
+    """
+    Yields chunks from seq_len.
+
+    Args:
+        items: (todo): write your description
+        seq_len: (int): write your description
+    """
     for item in items:
         chunks = chop_weighted(
             item.tokens,
@@ -76,6 +119,12 @@ def segment_items(items, seq_len):
 
 
 def flatten(seqs):
+    """
+    Flatten a sequence of sequences.
+
+    Args:
+        seqs: (todo): write your description
+    """
     return [
         item
         for seq in seqs
@@ -84,6 +133,12 @@ def flatten(seqs):
 
 
 def join_items(items):
+    """
+    Join items in items.
+
+    Args:
+        items: (todo): write your description
+    """
     for id, group in groupby(items, key=lambda _: _.id):
         group = list(group)
         tokens = flatten(_.tokens for _ in group)
@@ -115,6 +170,13 @@ class BERTSyntaxDecoder(SyntaxDecoder):
 
 class BERTNERInfer(Infer):
     def process(self, inputs):
+        """
+        Process the given inputs.
+
+        Args:
+            self: (todo): write your description
+            inputs: (todo): write your description
+        """
         for input in inputs:
             input = input.to(self.model.device)
             pred = self.model(input.word_id, input.pad_mask)
@@ -123,6 +185,13 @@ class BERTNERInfer(Infer):
             yield from self.model.head.crf.decode(pred, mask)
 
     def __call__(self, chunk):
+        """
+        Yields - based on - batch.
+
+        Args:
+            self: (todo): write your description
+            chunk: (array): write your description
+        """
         items = text_items(chunk, self.encoder.words_vocab)
         # consider <cls>, <sep> spec tokens
         items = list(segment_items(items, self.encoder.seq_len - 2))
@@ -143,6 +212,13 @@ class BERTNERInfer(Infer):
 
 class BERTMorphInfer(Infer):
     def process(self, inputs):
+        """
+        Process the model.
+
+        Args:
+            self: (todo): write your description
+            inputs: (todo): write your description
+        """
         for input in inputs:
             input = input.to(self.model.device)
             pred = self.model(input.word_id, input.pad_mask)
@@ -150,6 +226,13 @@ class BERTMorphInfer(Infer):
             yield from split_masked(pred, input.word_mask)
 
     def __call__(self, chunk):
+        """
+        Generator that yields a batch.
+
+        Args:
+            self: (todo): write your description
+            chunk: (array): write your description
+        """
         items = word_items(chunk, self.encoder.words_vocab)
         items = list(segment_items(items, self.encoder.seq_len - 2))
         inputs = self.encoder(items)
@@ -167,6 +250,13 @@ class BERTMorphInfer(Infer):
 
 class BERTSyntaxInfer(Infer):
     def process(self, inputs):
+        """
+        Processes a list of the inputs.
+
+        Args:
+            self: (todo): write your description
+            inputs: (todo): write your description
+        """
         for input in inputs:
             input = input.to(self.model.device)
             pred = self.model(input.word_id, input.word_mask, input.pad_mask)
@@ -175,6 +265,13 @@ class BERTSyntaxInfer(Infer):
             yield from zip(head_id, rel_id)
 
     def __call__(self, chunk):
+        """
+        Parameters ---------- chunk : a batch of words.
+
+        Args:
+            self: (todo): write your description
+            chunk: (array): write your description
+        """
         items = list(word_items(chunk, self.encoder.words_vocab))
         inputs = self.encoder(items)
         preds = self.process(inputs)

@@ -33,6 +33,12 @@ syntax.navec(navec)
 
 
 async def handle(request):
+      """
+      Handle a request.
+
+      Args:
+          request: (todo): write your description
+      """
     chunk = await request.json()
     log('Post chunk size: %r' % len(chunk))
     markups = list(syntax.map(chunk))

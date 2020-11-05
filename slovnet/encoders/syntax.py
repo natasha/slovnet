@@ -29,6 +29,17 @@ class SyntaxTarget(Record):
 class SyntaxTrainEncoder:
     def __init__(self, words_vocab, shapes_vocab, rels_vocab,
                  batch_size=8, sort_size=1):
+        """
+        Initialize vocab.
+
+        Args:
+            self: (todo): write your description
+            words_vocab: (todo): write your description
+            shapes_vocab: (todo): write your description
+            rels_vocab: (todo): write your description
+            batch_size: (int): write your description
+            sort_size: (int): write your description
+        """
         self.words_vocab = words_vocab
         self.shapes_vocab = shapes_vocab
         self.rels_vocab = rels_vocab
@@ -37,6 +48,13 @@ class SyntaxTrainEncoder:
         self.sort = SortBuffer(sort_size, key=lambda _: len(_.tokens))
 
     def item(self, markup):
+        """
+        Return a list of tokens for the given set of tokens.
+
+        Args:
+            self: (todo): write your description
+            markup: (str): write your description
+        """
         word_ids, shape_ids, head_ids, rel_ids = [], [], [], []
         ids = {ROOT_ID: 0}
 
@@ -59,6 +77,13 @@ class SyntaxTrainEncoder:
         return SyntaxTrainItem(word_ids, shape_ids, head_ids, rel_ids)
 
     def batch(self, chunk):
+        """
+        Parameters ---------- chunk : int chunks.
+
+        Args:
+            self: (todo): write your description
+            chunk: (todo): write your description
+        """
         word_id, shape_id, head_id, rel_id = [], [], [], []
         for item in chunk:
             word_id.append(torch.tensor(item.word_ids, dtype=torch.long))
@@ -79,6 +104,13 @@ class SyntaxTrainEncoder:
         return Batch(input, target)
 
     def __call__(self, markups):
+        """
+        Iterate over all the given marker.
+
+        Args:
+            self: (todo): write your description
+            markups: (array): write your description
+        """
         markups = self.sort(markups)
         items = (self.item(_) for _ in markups)
         chunks = chop(items, self.batch_size)

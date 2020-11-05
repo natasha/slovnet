@@ -118,6 +118,14 @@ EPOCHS = int(getenv('epochs', 2))
 
 
 def process_batch(model, criterion, batch):
+    """
+    Process a single batch.
+
+    Args:
+        model: (todo): write your description
+        criterion: (todo): write your description
+        batch: (todo): write your description
+    """
     input, target = batch
 
     pred = model(

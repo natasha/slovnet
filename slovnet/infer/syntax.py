@@ -7,9 +7,23 @@ from .base import Infer
 
 class SyntaxDecoder:
     def __init__(self, rels_vocab):
+        """
+        Initialize vocab.
+
+        Args:
+            self: (todo): write your description
+            rels_vocab: (todo): write your description
+        """
         self.rels_vocab = rels_vocab
 
     def __call__(self, preds):
+        """
+        Return a sequence of documents.
+
+        Args:
+            self: (todo): write your description
+            preds: (array): write your description
+        """
         for pred in preds:
             head_ids, rel_ids = pred
             ids = [str(_ + 1) for _ in range(len(head_ids))]
@@ -20,6 +34,13 @@ class SyntaxDecoder:
 
 class SyntaxInfer(Infer):
     def process(self, inputs):
+        """
+        Processes a list of the model.
+
+        Args:
+            self: (todo): write your description
+            inputs: (todo): write your description
+        """
         for input in inputs:
             input = input.to(self.model.device)
 
@@ -35,6 +56,13 @@ class SyntaxInfer(Infer):
             yield from zip(head_id, rel_id)
 
     def __call__(self, items):
+        """
+        Call the items in parallel ).
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         inputs = self.encoder(items)
         preds = self.process(inputs)
         preds = self.decoder(preds)

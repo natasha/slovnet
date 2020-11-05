@@ -22,6 +22,17 @@ class BERTMLMTrainEncoder:
     def __init__(self, vocab,
                  seq_len=512, batch_size=8, shuffle_size=1,
                  mask_prob=0.15):
+        """
+        Initialize the iterator.
+
+        Args:
+            self: (todo): write your description
+            vocab: (todo): write your description
+            seq_len: (int): write your description
+            batch_size: (int): write your description
+            shuffle_size: (int): write your description
+            mask_prob: (todo): write your description
+        """
         self.vocab = vocab
         self.seq_len = seq_len
         self.batch_size = batch_size
@@ -31,16 +42,37 @@ class BERTMLMTrainEncoder:
         self.mask_prob = mask_prob
 
     def items(self, texts):
+        """
+        Iterate over all subs of texts.
+
+        Args:
+            self: (todo): write your description
+            texts: (str): write your description
+        """
         for text in texts:
             subs = bert_subs(text, self.vocab)
             for sub in subs:
                 yield self.vocab.encode(sub)
 
     def seqs(self, items):
+        """
+        Generate sequences from a sequence.
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         for chunk in chop_drop(items, self.seq_len - 2):
             yield [self.vocab.cls_id] + chunk + [self.vocab.sep_id]
 
     def mask(self, input):
+        """
+        Mask the mask for the given input.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         prob = torch.full(input.shape, self.mask_prob)
 
         spec = (input == self.vocab.cls_id) | (input == self.vocab.sep_id)
@@ -49,6 +81,13 @@ class BERTMLMTrainEncoder:
         return torch.bernoulli(prob).bool()
 
     def batch(self, chunk):
+        """
+        Returns a batch of examples.
+
+        Args:
+            self: (todo): write your description
+            chunk: (todo): write your description
+        """
         input = torch.tensor(chunk).long()
         target = input.clone()
 
@@ -58,6 +97,13 @@ class BERTMLMTrainEncoder:
         return Batch(input, Masked(target, mask))
 
     def __call__(self, texts):
+        """
+        Yields a sequences.
+
+        Args:
+            self: (todo): write your description
+            texts: (str): write your description
+        """
         items = self.items(texts)
         seqs = self.seqs(items)
         seqs = self.shuffle(seqs)
@@ -76,6 +122,17 @@ class BERTMLMTrainEncoder:
 class BERTNERTrainEncoder:
     def __init__(self, words_vocab, tags_vocab,
                  seq_len=512, batch_size=8, shuffle_size=1):
+        """
+        Initialize the vocab.
+
+        Args:
+            self: (todo): write your description
+            words_vocab: (todo): write your description
+            tags_vocab: (todo): write your description
+            seq_len: (int): write your description
+            batch_size: (int): write your description
+            shuffle_size: (int): write your description
+        """
         self.words_vocab = words_vocab
         self.tags_vocab = tags_vocab
 
@@ -85,6 +142,13 @@ class BERTNERTrainEncoder:
         self.shuffle = ShuffleBuffer(shuffle_size)
 
     def items(self, markups):
+        """
+        Iterate over all the tokens.
+
+        Args:
+            self: (todo): write your description
+            markups: (todo): write your description
+        """
         for markup in markups:
             for token in markup.tokens:
                 subs = bert_subs(token.text, self.words_vocab)
@@ -97,12 +161,26 @@ class BERTNERTrainEncoder:
                     )
 
     def seqs(self, items):
+        """
+        Yields sentences.
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         cls = (self.words_vocab.cls_id, self.tags_vocab.pad_id, False)
         sep = (self.words_vocab.sep_id, self.tags_vocab.pad_id, False)
         for chunk in chop_drop(items, self.seq_len - 2):
             yield [cls] + chunk + [sep]
 
     def batch(self, chunk):
+        """
+        Parameters ---------- chunk : int the chunk to a batch.
+
+        Args:
+            self: (todo): write your description
+            chunk: (todo): write your description
+        """
         chunk = torch.tensor(chunk)  # batch x seq x (word, mask, tag)
         word_id, tag_id, mask = chunk.unbind(-1)
         word_id, tag_id, mask = word_id.long(), tag_id.long(), mask.bool()
@@ -116,6 +194,13 @@ class BERTNERTrainEncoder:
         return Batch(input, target)
 
     def __call__(self, markups):
+        """
+        Yields all the given marker.
+
+        Args:
+            self: (todo): write your description
+            markups: (array): write your description
+        """
         items = self.items(markups)
         seqs = self.seqs(items)
         seqs = self.shuffle(seqs)
@@ -134,6 +219,17 @@ class BERTNERTrainEncoder:
 class BERTMorphTrainEncoder:
     def __init__(self, words_vocab, tags_vocab,
                  seq_len=512, batch_size=8, shuffle_size=1):
+        """
+        Initialize the vocab.
+
+        Args:
+            self: (todo): write your description
+            words_vocab: (todo): write your description
+            tags_vocab: (todo): write your description
+            seq_len: (int): write your description
+            batch_size: (int): write your description
+            shuffle_size: (int): write your description
+        """
         self.words_vocab = words_vocab
         self.tags_vocab = tags_vocab
 
@@ -143,6 +239,13 @@ class BERTMorphTrainEncoder:
         self.shuffle = ShuffleBuffer(shuffle_size)
 
     def items(self, markups):
+        """
+        Iterate over all the tokens.
+
+        Args:
+            self: (todo): write your description
+            markups: (todo): write your description
+        """
         for markup in markups:
             for token in markup.tokens:
                 subs = bert_subs(token.text, self.words_vocab)
@@ -155,12 +258,26 @@ class BERTMorphTrainEncoder:
                     )
 
     def seqs(self, items):
+        """
+        Yields sentences.
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         cls = (self.words_vocab.cls_id, self.tags_vocab.pad_id, False)
         sep = (self.words_vocab.sep_id, self.tags_vocab.pad_id, False)
         for chunk in chop_drop(items, self.seq_len - 2):
             yield [cls] + chunk + [sep]
 
     def batch(self, chunk):
+        """
+        Parameters ---------- chunk : int the chunk to a batch.
+
+        Args:
+            self: (todo): write your description
+            chunk: (todo): write your description
+        """
         chunk = torch.tensor(chunk)  # batch x seq x (word, mask, tag)
         word_id, tag_id, mask = chunk.unbind(-1)
         word_id, tag_id, mask = word_id.long(), tag_id.long(), mask.bool()
@@ -174,6 +291,13 @@ class BERTMorphTrainEncoder:
         return Batch(input, target)
 
     def __call__(self, markups):
+        """
+        Yields all the given marker.
+
+        Args:
+            self: (todo): write your description
+            markups: (array): write your description
+        """
         items = self.items(markups)
         seqs = self.seqs(items)
         seqs = self.shuffle(seqs)
@@ -196,6 +320,12 @@ class BERTSyntaxTrainItem(Record):
     __attributes__ = ['word_ids', 'mask', 'head_ids', 'rel_ids']
 
     def __len__(self):
+        """
+        Returns the number of the number.
+
+        Args:
+            self: (todo): write your description
+        """
         return len(self.rel_ids)
 
 
@@ -211,6 +341,17 @@ class BERTSyntaxTrainEncoder:
     def __init__(self, words_vocab, rels_vocab,
                  seq_len=512, batch_size=8,
                  sort_size=1):
+        """
+        Initialize vocab.
+
+        Args:
+            self: (todo): write your description
+            words_vocab: (todo): write your description
+            rels_vocab: (todo): write your description
+            seq_len: (int): write your description
+            batch_size: (int): write your description
+            sort_size: (int): write your description
+        """
         self.words_vocab = words_vocab
         self.rels_vocab = rels_vocab
 
@@ -220,6 +361,13 @@ class BERTSyntaxTrainEncoder:
         self.sort = SortBuffer(sort_size, key=lambda _: len(_.tokens))
 
     def item(self, markup):
+        """
+        Generate a list of tokens for a set of tokens.
+
+        Args:
+            self: (todo): write your description
+            markup: (str): write your description
+        """
         word_ids, mask, head_ids, rel_ids = [], [], [], []
         ids = {ROOT_ID: 0}
 
@@ -242,6 +390,13 @@ class BERTSyntaxTrainEncoder:
         return BERTSyntaxTrainItem(word_ids, mask, head_ids, rel_ids)
 
     def batch(self, items):
+        """
+        Parameters ---------- batch_id - batch of sentences - batch - batch.
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         word_id, mask, head_id, rel_id = [], [], [], []
         for item in items:
             word_id.append(torch.tensor(item.word_ids, dtype=torch.long))
@@ -262,6 +417,13 @@ class BERTSyntaxTrainEncoder:
         return Batch(input, target)
 
     def __call__(self, markups):
+        """
+        Iterate over a generator.
+
+        Args:
+            self: (todo): write your description
+            markups: (array): write your description
+        """
         markups = self.sort(markups)
         items = (self.item(_) for _ in markups)
         # 0.02% sents longer then 128, just drop them
@@ -285,12 +447,28 @@ class BERTInferInput(Record):
 class BERTInferEncoder:
     def __init__(self, words_vocab,
                  seq_len=128, batch_size=8):
+        """
+        Initializes the vocab.
+
+        Args:
+            self: (todo): write your description
+            words_vocab: (todo): write your description
+            seq_len: (int): write your description
+            batch_size: (int): write your description
+        """
         self.words_vocab = words_vocab
 
         self.seq_len = seq_len
         self.batch_size = batch_size
 
     def item(self, item):
+        """
+        Return a list of - tuples.
+
+        Args:
+            self: (todo): write your description
+            item: (todo): write your description
+        """
         word_ids, mask = [], []
         for token in item.tokens:
             for index, sub in enumerate(token.subs):
@@ -305,6 +483,13 @@ class BERTInferEncoder:
         )
 
     def input(self, items):
+        """
+        Create a list of - batch ids.
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         word_id, word_mask = [], []
         for word_ids, mask in items:
             word_id.append(torch.tensor(word_ids, dtype=torch.long))
@@ -315,6 +500,13 @@ class BERTInferEncoder:
         return BERTInferInput(word_id, word_mask, pad_mask)
 
     def __call__(self, items):
+        """
+        Yields a list of items.
+
+        Args:
+            self: (todo): write your description
+            items: (todo): write your description
+        """
         items = (self.item(_) for _ in items)
         chunks = chop(items, self.batch_size)
         for chunk in chunks:

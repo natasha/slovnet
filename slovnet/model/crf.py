@@ -11,18 +11,46 @@ class CRF(Module):
     # https://github.com/kmkurn/pytorch-crf/blob/master/torchcrf/__init__.py
 
     def __init__(self, tags_num):
+        """
+        Initialize the internal inputs.
+
+        Args:
+            self: (todo): write your description
+            tags_num: (int): write your description
+        """
         super(CRF, self).__init__()
         self.tags_num = tags_num
         self.transitions = nn.Parameter(torch.empty(tags_num, tags_num))
         self.reset_parameters()
 
     def reset_parameters(self):
+        """
+        Reset the parameters.
+
+        Args:
+            self: (todo): write your description
+        """
         nn.init.uniform_(self.transitions, -0.1, 0.1)
 
     def extra_repr(self):
+        """
+        Return a human - readable string.
+
+        Args:
+            self: (todo): write your description
+        """
         return 'tags_num=%d' % self.tags_num
 
     def forward(self, emissions, tags, mask=None):
+        """
+        Forward computation.
+
+        Args:
+            self: (todo): write your description
+            emissions: (todo): write your description
+            tags: (todo): write your description
+            mask: (todo): write your description
+        """
         if mask is None:
             mask = mask_like(tags)
 
@@ -37,6 +65,15 @@ class CRF(Module):
         return -torch.mean(log_likelihood)  # 1
 
     def score(self, emissions, tags, mask):
+        """
+        Return the score.
+
+        Args:
+            self: (todo): write your description
+            emissions: (todo): write your description
+            tags: (todo): write your description
+            mask: (todo): write your description
+        """
         seq_len, batch_size = tags.shape
         batch_range = torch.arange(batch_size)
         score = emissions[0, batch_range, tags[0]]  # batch
@@ -48,6 +85,14 @@ class CRF(Module):
         return score
 
     def normalization(self, emissions, mask):
+        """
+        Computes the normalization.
+
+        Args:
+            self: (todo): write your description
+            emissions: (todo): write your description
+            mask: (array): write your description
+        """
         seq_len, batch_size, tags_num = emissions.shape
         score = emissions[0]
         for index in range(1, seq_len):
@@ -60,6 +105,14 @@ class CRF(Module):
         return torch.logsumexp(score, dim=-1)  # batch
 
     def decode(self, emissions, mask=None):
+        """
+        Decode a batch of examples.
+
+        Args:
+            self: (todo): write your description
+            emissions: (todo): write your description
+            mask: (todo): write your description
+        """
         batch_size, seq_len, tags_num = emissions.shape
         if mask is None:
             mask = torch.ones(

@@ -14,6 +14,14 @@ DATA_DIR = join(dirname(__file__), '../../data/test')
 
 
 def download(url, dir=DATA_DIR):
+    """
+    Download file from url.
+
+    Args:
+        url: (str): write your description
+        dir: (str): write your description
+        DATA_DIR: (str): write your description
+    """
     path = join(dir, basename(url))
     if exists(path):
         return path
@@ -30,29 +38,58 @@ def download(url, dir=DATA_DIR):
 
 @pytest.fixture(scope='module')
 def navec():
+    """
+    Download nave nave
+
+    Args:
+    """
     path = download('https://storage.yandexcloud.net/natasha-navec/packs/navec_news_v1_1B_250K_300d_100q.tar')
     return Navec.load(path)
 
 
 @pytest.fixture(scope='module')
 def ner(navec):
+    """
+    Loads the contents of a file.
+
+    Args:
+        navec: (todo): write your description
+    """
     path = download('https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_ner_news_v1.tar')
     return NER.load(path).navec(navec)
 
 
 @pytest.fixture(scope='module')
 def morph(navec):
+    """
+    Loads a nave.
+
+    Args:
+        navec: (int): write your description
+    """
     path = download('https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_morph_news_v1.tar')
     return Morph.load(path).navec(navec)
 
 
 @pytest.fixture(scope='module')
 def syntax(navec):
+    """
+    Downloads and load and returns a symbol object.
+
+    Args:
+        navec: (todo): write your description
+    """
     path = download('https://storage.yandexcloud.net/natasha-slovnet/packs/slovnet_syntax_news_v1.tar')
     return Syntax.load(path).navec(navec)
 
 
 def test_ner(ner):
+    """
+    Generate a list of the text.
+
+    Args:
+        ner: (todo): write your description
+    """
     text = 'На них удержали лидерство действующие руководители и партии — Денис Пушилин и «Донецкая республика» в ДНР и Леонид Пасечник с движением «Мир Луганщине» в ЛНР.'
 
     markup = ner(text)
@@ -73,6 +110,12 @@ def test_ner(ner):
 
 
 def test_morph(morph):
+    """
+    Test for markdown.
+
+    Args:
+        morph: (todo): write your description
+    """
     words = ['Об', 'этом', 'говорится', 'в', 'документе', ',', 'опубликованном', 'в', 'официальном', 'журнале', 'Евросоюза', '.']
 
     markup = morph(words)
@@ -98,6 +141,12 @@ def test_morph(morph):
 
 
 def test_syntax(syntax):
+    """
+    Create a list of syntax.
+
+    Args:
+        syntax: (todo): write your description
+    """
     words = ['Опубликованы', 'новые', 'данные', 'по', 'заражению', 'коронавирусом', 'в', 'Москве']
 
     markup = syntax(words)

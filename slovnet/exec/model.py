@@ -11,37 +11,87 @@ class Weight(Record):
     __attributes__ = ['shape', 'dtype', 'array']
 
     def empty(self):
+        """
+        Return an empty array with all empty values.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.replace(array=None)
 
     @property
     def is_empty(self):
+        """
+        Returns true if all empty array is empty.
+
+        Args:
+            self: (todo): write your description
+        """
         return self.array is None
 
     @property
     def is_id(self):
+        """
+        Return the id of the type : int.
+
+        Args:
+            self: (todo): write your description
+        """
         return type(self.array) is int
 
 
 class Module(Record):
     def separate_arrays(self):
+        """
+        Return a new arrays.
+
+        Args:
+            self: (todo): write your description
+        """
         visitor = SeparateArraysVisitor()
         scheme = visitor(self)
         return visitor.arrays, scheme
 
     def inject_arrays(self, arrays):
+        """
+        Inject arrays injects.
+
+        Args:
+            self: (todo): write your description
+            arrays: (array): write your description
+        """
         visitor = InjectArraysVisitor(arrays)
         return visitor(self)
 
     def strip_navec(self):
+        """
+        Strips the nave.
+
+        Args:
+            self: (todo): write your description
+        """
         visitor = StripNavecVisitor()
         return visitor(self)
 
     def inject_navec(self, navec):
+        """
+        Injects a nave.
+
+        Args:
+            self: (todo): write your description
+            navec: (str): write your description
+        """
         visitor = InjectNavecVisitor(navec)
         return visitor(self)
 
     @property
     def weights(self):
+        """
+        The weights of weights.
+
+        Args:
+            self: (todo): write your description
+        """
         visitor = WeightsVisitor()
         visitor(self)
         return visitor.weights
@@ -55,11 +105,26 @@ class Linear(Module):
     }
 
     def __init__(self, weight, bias):
+        """
+        Initialize weights.
+
+        Args:
+            self: (todo): write your description
+            weight: (int): write your description
+            bias: (float): write your description
+        """
         self.weight = weight
         self.bias = bias
         self.in_dim, self.out_dim = self.weight.shape
 
     def __call__(self, input):
+        """
+        Implement self ( self input ).
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         shape = input.shape
         input = input.reshape(-1, self.in_dim)
         output = np.matmul(input, self.weight.array) + self.bias.array
@@ -80,6 +145,13 @@ class Conv1d(Module):
     }
 
     def __call__(self, input):
+        """
+        Private function.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         input = np.pad(
             input,
             # batch no pad, in no pad, pad seq
@@ -114,6 +186,13 @@ class Conv1d(Module):
 
 class ReLU(Module):
     def __call__(self, input):
+        """
+        Calls self. call on self.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         return input.clip(0)
 
 
@@ -127,6 +206,13 @@ class BatchNorm1d(Module):
     }
 
     def __call__(self, input):
+        """
+        Return the mean value ).
+
+        Args:
+            self: (todo): write your description
+            input: (todo): write your description
+        """
         # input is N x C x L, do ops on C
         input = input.swapaxes(2, 1)
         output = (
@@ -152,6 +238,14 @@ class CRF(Module):
     }
 
     def decode(self, emissions, mask):
+        """
+        Decode a batch of sequences from a batch of sentences.
+
+        Args:
+            self: (todo): write your description
+            emissions: (todo): write your description
+            mask: (todo): write your description
+        """
         batch_size, seq_len, tags_num = emissions.shape
         emissions = emissions.swapaxes(1, 0)
         mask = mask.swapaxes(1, 0)
@@ -200,10 +294,24 @@ class Embedding(Module):
     }
 
     def __init__(self, weight):
+        """
+        Initialize weights.
+
+        Args:
+            self: (todo): write your description
+            weight: (int): write your description
+        """
         self.weight = weight
         _, self.dim = self.weight.shape
 
     def __call__(self, input):
+        """
+        Todo : py : meth : ndarray.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         shape = input.shape
         input = input.flatten()
         weight = self.weight.array[input]
@@ -218,6 +326,15 @@ class NavecEmbedding(Embedding):
     }
 
     def __init__(self, id, indexes, codes):
+        """
+        Initialize a qdims.
+
+        Args:
+            self: (todo): write your description
+            id: (str): write your description
+            indexes: (str): write your description
+            codes: (array): write your description
+        """
         self.id = id
         self.indexes = indexes
         self.codes = codes
@@ -227,6 +344,13 @@ class NavecEmbedding(Embedding):
         self.qdims = np.arange(qdim)
 
     def __call__(self, input):
+        """
+        Call the callable.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         shape = input.shape
         input = input.flatten()
         indexes = self.indexes.array[input]
@@ -242,6 +366,14 @@ class WordShapeEmbedding(Module):
     }
 
     def __call__(self, word_id, shape_id):
+        """
+        Returns the shape_id
+
+        Args:
+            self: (todo): write your description
+            word_id: (str): write your description
+            shape_id: (str): write your description
+        """
         word = self.word(word_id)
         shape = self.shape(shape_id)
         return np.concatenate((word, shape), axis=-1)
@@ -263,6 +395,13 @@ class CNNEncoderLayer(Module):
     }
 
     def __call__(self, input):
+        """
+        Implement operator.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         x = self.conv(input)
         x = self.relu(x)
         return self.norm(x)
@@ -275,6 +414,14 @@ class CNNEncoder(Module):
     }
 
     def __call__(self, input, mask):
+        """
+        Call the network.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+            mask: (array): write your description
+        """
         input = np.swapaxes(input, 2, 1)
         mask = np.expand_dims(mask, axis=1)
 
@@ -301,6 +448,13 @@ class NERHead(Module):
     }
 
     def __call__(self, input):
+        """
+        Calls the method.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         return self.proj(input)
 
 
@@ -311,9 +465,23 @@ class MorphHead(Module):
     }
 
     def __call__(self, input):
+        """
+        Calls the method.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         return self.proj(input)
 
     def decode(self, pred):
+        """
+        Decode the given predicate.
+
+        Args:
+            self: (todo): write your description
+            pred: (array): write your description
+        """
         return pred.argmax(-1)
 
 
@@ -321,6 +489,15 @@ class Tag(Module):
     __attributes__ = ['emb', 'encoder', 'head']
 
     def __call__(self, word_id, shape_id, pad_mask):
+        """
+        Parameters ---------- word_id : string.
+
+        Args:
+            self: (todo): write your description
+            word_id: (str): write your description
+            shape_id: (str): write your description
+            pad_mask: (array): write your description
+        """
         x = self.emb(word_id, shape_id)
         x = self.encoder(x, pad_mask)
         return self.head(x)
@@ -357,11 +534,25 @@ class FF(Module):
     }
 
     def __call__(self, input):
+        """
+        Implement self.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         x = self.proj(input)
         return self.relu(x)
 
 
 def append_root(input, root):
+    """
+    Append a root element.
+
+    Args:
+        input: (todo): write your description
+        root: (array): write your description
+    """
     batch_size, _, emb_dim = input.shape
     root = np.tile(root, batch_size)
     root = root.reshape(batch_size, 1, emb_dim)
@@ -369,10 +560,22 @@ def append_root(input, root):
 
 
 def strip_root(input):
+    """
+    Strips the root of a string.
+
+    Args:
+        input: (todo): write your description
+    """
     return input[:, 1:, :]
 
 
 def append_root_mask(mask):
+    """
+    Append a mask.
+
+    Args:
+        mask: (array): write your description
+    """
     return np.pad(
         mask,
         [(0, 0), (1, 0)],  # no pad for batch, pad left seq
@@ -381,6 +584,12 @@ def append_root_mask(mask):
 
 
 def matmul_mask(mask):
+    """
+    Swmulax mask.
+
+    Args:
+        mask: (array): write your description
+    """
     mask = np.expand_dims(mask, axis=-2)
     return np.matmul(mask.swapaxes(-2, -1), mask)
 
@@ -395,6 +604,14 @@ class SyntaxHead(Module):
     }
 
     def decode(self, pred, mask):
+        """
+        Decode a mask.
+
+        Args:
+            self: (todo): write your description
+            pred: (todo): write your description
+            mask: (array): write your description
+        """
         mask = append_root_mask(mask)
         mask = matmul_mask(mask)
         mask = strip_root(mask)
@@ -403,6 +620,13 @@ class SyntaxHead(Module):
         return pred.argmax(-1)
 
     def __call__(self, input):
+        """
+        Call the kernel matrix.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+        """
         input = append_root(input, self.root.array)
         head = self.head(input)
         tail = self.tail(input)
@@ -413,6 +637,14 @@ class SyntaxHead(Module):
 
 
 def gather_head(input, root, index):
+    """
+    Gather the first n elements in the array.
+
+    Args:
+        input: (array): write your description
+        root: (todo): write your description
+        index: (int): write your description
+    """
     batch_size, seq_len, emb_dim = input.shape
     input = append_root(input, root)
 
@@ -438,6 +670,14 @@ class SyntaxRel(Module):
     }
 
     def decode(self, pred, mask):
+        """
+        Decode the masked mask.
+
+        Args:
+            self: (todo): write your description
+            pred: (todo): write your description
+            mask: (array): write your description
+        """
         _, _, rel_dim = pred.shape
         mask = np.expand_dims(mask, axis=-1)
         mask = np.repeat(mask, rel_dim, axis=-1)
@@ -446,6 +686,14 @@ class SyntaxRel(Module):
         return pred.argmax(-1)
 
     def __call__(self, input, head_id):
+        """
+        Call a batch.
+
+        Args:
+            self: (todo): write your description
+            input: (array): write your description
+            head_id: (str): write your description
+        """
         head = self.head(gather_head(input, self.root.array, head_id))
         tail = self.tail(input)
 
@@ -473,6 +721,15 @@ class Syntax(Module):
     }
 
     def __call__(self, word_id, shape_id, pad_mask):
+        """
+        Parameters ---------- word_id : string.
+
+        Args:
+            self: (todo): write your description
+            word_id: (str): write your description
+            shape_id: (str): write your description
+            pad_mask: (array): write your description
+        """
         x = self.emb(word_id, shape_id)
         x = self.encoder(x, pad_mask)
 
@@ -491,9 +748,23 @@ class Syntax(Module):
 
 class ModuleVisitor(Visitor):
     def visit_Weight(self, item):
+        """
+        Determine if item.
+
+        Args:
+            self: (todo): write your description
+            item: (todo): write your description
+        """
         return item
 
     def visit_Module(self, item):
+        """
+        Handles an ast.
+
+        Args:
+            self: (todo): write your description
+            item: (todo): write your description
+        """
         args = []
         for key in item.__attributes__:
             value = getattr(item, key)
@@ -510,9 +781,22 @@ class ModuleVisitor(Visitor):
 
 class SeparateArraysVisitor(ModuleVisitor):
     def __init__(self):
+        """
+        Initialize the internal state.
+
+        Args:
+            self: (todo): write your description
+        """
         self.arrays = {}
 
     def visit_Weight(self, item):
+        """
+        Return an array corresponding to item.
+
+        Args:
+            self: (todo): write your description
+            item: (str): write your description
+        """
         if item.is_empty:
             return item
 
@@ -523,9 +807,23 @@ class SeparateArraysVisitor(ModuleVisitor):
 
 class InjectArraysVisitor(ModuleVisitor):
     def __init__(self, arrays):
+        """
+        Initialize arrays.
+
+        Args:
+            self: (todo): write your description
+            arrays: (array): write your description
+        """
         self.arrays = arrays
 
     def visit_Weight(self, item):
+        """
+        Convert an array as an array.
+
+        Args:
+            self: (todo): write your description
+            item: (str): write your description
+        """
         if not item.is_id:
             return item
 
@@ -536,6 +834,13 @@ class InjectArraysVisitor(ModuleVisitor):
 
 class StripNavecVisitor(ModuleVisitor):
     def visit_NavecEmbedding(self, item):
+        """
+        Return the nave of a nave.
+
+        Args:
+            self: (todo): write your description
+            item: (str): write your description
+        """
         return item.replace(
             indexes=item.indexes.empty(),
             codes=item.codes.empty()
@@ -544,9 +849,23 @@ class StripNavecVisitor(ModuleVisitor):
 
 class InjectNavecVisitor(ModuleVisitor):
     def __init__(self, navec):
+        """
+        Åīľ´æĸ°
+
+        Args:
+            self: (todo): write your description
+            navec: (todo): write your description
+        """
         self.navec = navec
 
     def visit_NavecEmbedding(self, item):
+        """
+        Create a naveingcEmbing item.
+
+        Args:
+            self: (todo): write your description
+            item: (str): write your description
+        """
         id = self.navec.meta.id
         if item.id != id:
             raise ValueError('Expected id=%r, got %r' % (item.id, id))
@@ -560,8 +879,21 @@ class InjectNavecVisitor(ModuleVisitor):
 
 class WeightsVisitor(ModuleVisitor):
     def __init__(self):
+        """
+        Initialize weights
+
+        Args:
+            self: (todo): write your description
+        """
         self.weights = []
 
     def visit_Weight(self, item):
+        """
+        Add a new item to the list.
+
+        Args:
+            self: (todo): write your description
+            item: (todo): write your description
+        """
         self.weights.append(item)
         return item

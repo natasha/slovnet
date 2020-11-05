@@ -120,6 +120,12 @@ LAYER_DIMS = [
 
 
 def adapt_markup(record):
+    """
+    Adapt the marker marker marker.
+
+    Args:
+        record: (todo): write your description
+    """
     return MorphMarkup([
         MorphToken(_.text, _.pos, _.feats)
         for _ in record.tokens
@@ -127,6 +133,14 @@ def adapt_markup(record):
 
 
 def process_batch(model, criterion, batch):
+    """
+    Process a single model.
+
+    Args:
+        model: (todo): write your description
+        criterion: (todo): write your description
+        batch: (todo): write your description
+    """
     input, target = batch
 
     pred = model(input.word_id, input.shape_id)

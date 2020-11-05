@@ -11,6 +11,12 @@ class Sent(Record):
 
 
 def split_lines(text):
+    """
+    Split text into lines.
+
+    Args:
+        text: (str): write your description
+    """
     for match in re.finditer(r'([^\r\n]+)', text):
         start = match.start()
         stop = match.end()
@@ -19,6 +25,12 @@ def split_lines(text):
 
 
 def sentenize(text):
+    """
+    Sentenize text.
+
+    Args:
+        text: (str): write your description
+    """
     for line in split_lines(text):
         for sent in sentenize_(line.text):
             if not sent.text:  # '\n\t\n' for example

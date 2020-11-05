@@ -4,6 +4,12 @@ from .const import B, I, O
 
 
 def parse_bio(tag):
+    """
+    Parse a bio tag.
+
+    Args:
+        tag: (str): write your description
+    """
     if '-' in tag:
         part, type = tag.split('-', 1)
     else:
@@ -13,6 +19,13 @@ def parse_bio(tag):
 
 
 def format_bio(part, type):
+    """
+    Format a bio. bio.
+
+    Args:
+        part: (int): write your description
+        type: (str): write your description
+    """
     if not type:
         return part
     return '%s-%s' % (part, type)
@@ -30,12 +43,26 @@ def format_bio(part, type):
 
 
 def append_ellipsis(items, ellipsis=None):
+    """
+    Yield all ellipsis.
+
+    Args:
+        items: (todo): write your description
+        ellipsis: (str): write your description
+    """
     for item in items:
         yield item
     yield ellipsis
 
 
 def spans_io(tokens, spans):
+    """
+    Yields spans from a list of spans.
+
+    Args:
+        tokens: (str): write your description
+        spans: (todo): write your description
+    """
     spans = append_ellipsis(spans)
     span = next(spans)
     for token in tokens:
@@ -51,6 +78,13 @@ def spans_io(tokens, spans):
 
 
 def io_spans(tokens, tags):
+    """
+    Yields a sequence of ) tuples.
+
+    Args:
+        tokens: (str): write your description
+        tags: (list): write your description
+    """
     previous = None
     start = None
     stop = None
@@ -83,6 +117,13 @@ def io_spans(tokens, tags):
 
 
 def spans_bio(tokens, spans):
+    """
+    Yields spans from a list of spans.
+
+    Args:
+        tokens: (str): write your description
+        spans: (todo): write your description
+    """
     spans = append_ellipsis(spans)
     span = next(spans)
     for token in tokens:
@@ -101,6 +142,13 @@ def spans_bio(tokens, spans):
 
 
 def bio_spans(tokens, tags):
+    """
+    Yields spans.
+
+    Args:
+        tokens: (str): write your description
+        tags: (array): write your description
+    """
     previous = None
     start = None
     stop = None
@@ -130,6 +178,12 @@ def bio_spans(tokens, tags):
 
 
 def bio_io(tags):
+    """
+    Iterate over bio. io tags ).
+
+    Args:
+        tags: (list): write your description
+    """
     for tag in tags:
         part, type = parse_bio(tag)
         if part == B:
@@ -145,6 +199,13 @@ def bio_io(tags):
 
 
 def select_type_tags(tags, selected):
+    """
+    Yield tags of tags.
+
+    Args:
+        tags: (str): write your description
+        selected: (bool): write your description
+    """
     for tag in tags:
         part, type = parse_bio(tag)
         if type != selected:

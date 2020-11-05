@@ -16,6 +16,22 @@ class S3(Record):
 
     def __init__(self, key_id=S3_KEY_ID, key=S3_KEY, bucket=S3_BUCKET,
                  endpoint=S3_ENDPOINT, region=S3_REGION):
+        """
+        Initialize the s3 bucket.
+
+        Args:
+            self: (todo): write your description
+            key_id: (str): write your description
+            S3_KEY_ID: (str): write your description
+            key: (str): write your description
+            S3_KEY: (str): write your description
+            bucket: (str): write your description
+            S3_BUCKET: (str): write your description
+            endpoint: (str): write your description
+            S3_ENDPOINT: (str): write your description
+            region: (str): write your description
+            S3_REGION: (str): write your description
+        """
         self.key_id = key_id
         self.key = key
         self.bucket = bucket
@@ -31,7 +47,23 @@ class S3(Record):
         )
 
     def upload(self, path, key):
+        """
+        Upload a file to an object.
+
+        Args:
+            self: (todo): write your description
+            path: (str): write your description
+            key: (str): write your description
+        """
         self.client.upload_file(path, self.bucket, key)
 
     def download(self, key, path):
+        """
+        Download a file from a file.
+
+        Args:
+            self: (todo): write your description
+            key: (str): write your description
+            path: (str): write your description
+        """
         self.client.download_file(self.bucket, key, path)

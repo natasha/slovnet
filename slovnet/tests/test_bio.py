@@ -91,6 +91,12 @@ CONVERT_TESTS = [
 
 @pytest.mark.parametrize('test', TESTS + IO_TESTS)
 def test_io(test):
+    """
+    Compute the test.
+
+    Args:
+        test: (todo): write your description
+    """
     tokens, tags = test
     spans = io_spans(tokens, tags)
     guess = spans_io(tokens, spans)
@@ -99,6 +105,12 @@ def test_io(test):
 
 @pytest.mark.parametrize('test', TESTS + BIO_TESTS)
 def test_bio(test):
+    """
+    Run a list of - bio tags.
+
+    Args:
+        test: (todo): write your description
+    """
     tokens, tags = test
     spans = bio_spans(tokens, tags)
     guess = spans_bio(tokens, spans)
@@ -106,12 +118,22 @@ def test_bio(test):
 
 
 def test_convert():
+    """
+    Convert i_convert.
+
+    Args:
+    """
     guess = bio_io([B_PER, I_PER, I_LOC])
     etalon = [I_PER, I_PER, I_LOC]
     assert etalon == list(guess)
 
 
 def test_select():
+    """
+    Test if the selector of a string of type tags.
+
+    Args:
+    """
     guess = select_type_tags([B_PER, I_LOC], PER)
     etalon = [B_PER, O]
     assert etalon == list(guess)

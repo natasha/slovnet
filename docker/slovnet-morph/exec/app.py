@@ -34,6 +34,12 @@ morph.navec(navec)
 
 
 async def handle(request):
+      """
+      Handles a list of tags.
+
+      Args:
+          request: (todo): write your description
+      """
     chunk = await request.json()
     log('Post chunk size: %r' % len(chunk))
     markups = list(morph.map(chunk))
