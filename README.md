@@ -244,6 +244,7 @@ Syntax parser processes sentencies split into tokens. Use <a href="https://githu
 └──────────────► .                   punct
 
 ```
+
 ## Documentation
 
 Materials are in Russian:
