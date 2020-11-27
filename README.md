@@ -3,7 +3,7 @@
 
 ![CI](https://github.com/natasha/slovnet/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/natasha/slovnet/branch/master/graph/badge.svg)](https://codecov.io/gh/natasha/slovnet)
 
-SlovNet is a Python library for deep-learning based NLP modeling for Russian language. Library is integrated with other <a href="https://github.com/natasha/">Natasha</a> projects: <a href="https://github.com/natasha/nerus">Nerus</a> — large automatically annotated corpus, <a href="https://github.com/natasha/razdel">Razdel</a> — sentence segmenter, tokenizer and <a href="https://github.com/natasha/navec">Navec</a> — compact Russian embeddings. SlovNet provides high quality practical models for Russian NER, morphology and syntax. See <a href="#evaluation">evaluation section</a> and <a href="https://natasha.github.io/ner">natasha.github.io article about NER model</a> for more info:
+SlovNet is a Python library for deep-learning based NLP modeling for Russian language. Library is integrated with other <a href="https://github.com/natasha/">Natasha</a> projects: <a href="https://github.com/natasha/nerus">Nerus</a> — large automatically annotated corpus, <a href="https://github.com/natasha/razdel">Razdel</a> — sentence segmenter, tokenizer and <a href="https://github.com/natasha/navec">Navec</a> — compact Russian embeddings. Slovnet provides high quality practical models for Russian NER, morphology and syntax, see <a href="#evaluation">evaluation section</a> for more:
 
 * NER is 1-2% worse than current BERT SOTA by DeepPavlov but 60 times smaller in size (~30 MB) and works fast on CPU (~25 news articles/sec).
 * Morphology tagger and syntax parser have comparable accuracy on news dataset with large SOTA BERT models, take 50 times less space (~30 MB), work faster on CPU (~500 sentences/sec). 
@@ -244,6 +244,12 @@ Syntax parser processes sentencies split into tokens. Use <a href="https://githu
 └──────────────► .                   punct
 
 ```
+## Documentation
+
+Materials are in Russian:
+
+* <a href="https://natasha.github.io/ner">Article about distillation and quantization in Slovnet</a> 
+* <a href="https://youtu.be/-7XT_U6hVvk?t=2034">Slovnet section of Datafest 2020 talk</a>
 
 ## Evaluation
 
