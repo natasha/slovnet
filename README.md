@@ -291,11 +291,11 @@ For every column top 3 results are highlighted:
       <td><b>0.959</b></td>
       <td><b>0.915</b></td>
       <td><b>0.825</b></td>
-      <td>0.977</td>
+      <td><b>0.977</b></td>
       <td><b>0.899</b></td>
-      <td>0.984</td>
-      <td>0.973</td>
-      <td>0.951</td>
+      <td><b>0.984</b></td>
+      <td><b>0.973</b></td>
+      <td><b>0.951</b></td>
       <td>0.944</td>
       <td>0.834</td>
       <td>0.718</td>
@@ -372,17 +372,17 @@ For every column top 3 results are highlighted:
     </tr>
     <tr>
       <th>spacy</th>
-      <td>0.955</td>
-      <td>0.914</td>
-      <td>0.803</td>
-      <td><b>0.980</b></td>
-      <td>0.894</td>
-      <td><b>0.990</b></td>
-      <td><b>0.973</b></td>
-      <td><b>0.951</b></td>
-      <td>0.938</td>
-      <td>0.828</td>
-      <td>0.703</td>
+      <td>0.916</td>
+      <td>0.869</td>
+      <td>0.775</td>
+      <td>0.971</td>
+      <td>0.878</td>
+      <td>0.970</td>
+      <td>0.933</td>
+      <td>0.918</td>
+      <td>0.926</td>
+      <td>0.816</td>
+      <td>0.697</td>
     </tr>
     <tr>
       <th>stanza</th>
@@ -503,7 +503,7 @@ For every column top 3 results are highlighted:
     <tr>
       <th>spacy</th>
       <td>8.0</td>
-      <td>89</td>
+      <td>140</td>
       <td>625</td>
       <td>8.0</td>
     </tr>
@@ -584,14 +584,14 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
     <tr>
       <th>deeppavlov</th>
       <td>0.940</td>
-      <td><b>0.841</b></td>
+      <td>0.841</td>
       <td>0.944</td>
       <td>0.870</td>
       <td><b>0.857</b></td>
     </tr>
     <tr>
       <th>deeppavlov_bert</th>
-      <td><b>0.951</b></td>
+      <td>0.951</td>
       <td><b>0.868</b></td>
       <td><b>0.964</b></td>
       <td><b>0.892</b></td>
@@ -607,16 +607,16 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
     </tr>
     <tr>
       <th>spacy</th>
-      <td>0.919</td>
-      <td>0.812</td>
-      <td>0.938</td>
-      <td>0.836</td>
-      <td>0.729</td>
+      <td><b>0.964</b></td>
+      <td><b>0.849</b></td>
+      <td>0.940</td>
+      <td>0.858</td>
+      <td>0.785</td>
     </tr>
     <tr>
       <th>stanza</th>
       <td>0.934</td>
-      <td>0.840</td>
+      <td>0.831</td>
       <td>0.940</td>
       <td><b>0.873</b></td>
       <td>0.825</td>
@@ -701,7 +701,7 @@ For every column top 3 results are highlighted. `slovnet` was trained only on ne
     <tr>
       <th>spacy</th>
       <td>8.0</td>
-      <td>89</td>
+      <td>140</td>
       <td>579</td>
       <td>50.0</td>
     </tr>
@@ -821,29 +821,29 @@ Slovnet is compated to several existing syntax parsers: <a href="https://github.
     </tr>
     <tr>
       <th>spacy</th>
-      <td>0.876</td>
-      <td>0.818</td>
-      <td>0.770</td>
-      <td>0.665</td>
-      <td>0.880</td>
-      <td>0.833</td>
-      <td>0.757</td>
-      <td>0.666</td>
-      <td>0.657</td>
-      <td>0.544</td>
+      <td><b>0.942</b></td>
+      <td><b>0.915</b></td>
+      <td><b>0.846</b></td>
+      <td><b>0.779</b></td>
+      <td>0.900</td>
+      <td>0.873</td>
+      <td>0.802</td>
+      <td><b>0.733</b></td>
+      <td>0.706</td>
+      <td><b>0.618</b></td>
     </tr>
     <tr>
       <th>stanza</th>
-      <td><b>0.940</b></td>
-      <td><b>0.886</b></td>
-      <td><b>0.827</b></td>
-      <td><b>0.723</b></td>
+      <td>0.940</td>
+      <td>0.886</td>
+      <td>0.815</td>
+      <td>0.716</td>
       <td><b>0.936</b></td>
       <td><b>0.895</b></td>
       <td><b>0.802</b></td>
-      <td><b>0.714</b></td>
+      <td>0.714</td>
       <td><b>0.713</b></td>
-      <td><b>0.613</b></td>
+      <td>0.613</td>
     </tr>
   </tbody>
 </table>
@@ -894,7 +894,7 @@ Slovnet is compated to several existing syntax parsers: <a href="https://github.
     <tr>
       <th>spacy</th>
       <td>9.0</td>
-      <td><b>89</b></td>
+      <td><b>140</b></td>
       <td><b>579</b></td>
       <td>41.0</td>
     </tr>
