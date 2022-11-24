@@ -10,7 +10,6 @@ from .const import (
     S3_REGION
 )
 
-
 class S3(Record):
     __attributes__ = ['key_id', 'key', 'bucket', 'endpoint', 'region']
 
