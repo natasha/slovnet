@@ -1,6 +1,14 @@
 
+import sys
 from os import getenv, environ
-from os.path import exists, join, expanduser
+from os.path import dirname, realpath, exists, join
+
+# Starting from Python 3.3, implicit relative references are allowed no more
+# explanation - https://codeolives.com/2020/01/10/python-reference-module-in-parent-directory/
+currentdir = dirname(realpath(__file__))
+rootdir = dirname(dirname(currentdir))
+sys.path.append(rootdir)
+
 from random import seed, sample, randint, uniform
 from subprocess import run
 
@@ -57,7 +65,6 @@ from slovnet.mask import (
     split_masked,
     pad_masked
 )
-
 
 DATA_DIR = 'data'
 MODEL_DIR = 'model'
