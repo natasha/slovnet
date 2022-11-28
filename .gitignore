@@ -11,3 +11,9 @@ build/
 dist/
 notes/
 data/
+scripts/02_bert_ner/bert/emb.pt
+scripts/02_bert_ner/bert/encoder.pt
+scripts/02_bert_ner/bert/vocab.txt
+scripts/02_bert_ner/model/encoder.pt
+scripts/02_bert_ner/model/ner.pt
+events.out.tfevents.*
