@@ -9,7 +9,6 @@ from tqdm.notebook import tqdm as log_progress
 import torch
 from torch import optim
 
-from apex import amp
 O2 = 'O2'
 
 from corus import (
