@@ -18,3 +18,4 @@ navec/
 rubert/
 events.out.tfevents.*
 slovnet_ner_news_v1.tar
+slovnet_ner_custom_tags.tar
