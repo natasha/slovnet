@@ -46,7 +46,7 @@ from slovnet.markup import (
     show_span_markup
 )
 from slovnet.vocab import BERTVocab, BIOTagsVocab
-from slovnet.encoders.bert import BERTNERTrainEncoder
+from slovnet.encoders.bert import BERTNERTrainEncoder, BERTInferEncoder
 from slovnet.score import (
     NERBatchScore,
     NERScoreMeter,
@@ -58,10 +58,12 @@ from slovnet.mask import (
     pad_masked
 )
 
+from slovnet.infer.bert import BERTNERInfer, BERTTagDecoder
 
 DATA_DIR = 'data'
 MODEL_DIR = 'model'
 BERT_DIR = 'bert'
+
 RAW_DIR = join(DATA_DIR, 'raw')
 
 CORUS_NE5 = join(RAW_DIR, 'Collection5')
@@ -107,6 +109,21 @@ BERT_LR = float(getenv('bert_lr', 0.000045))
 LR = float(getenv('lr', 0.0075))
 LR_GAMMA = float(getenv('lr_gamma', 0.45))
 EPOCHS = int(getenv('epochs', 5))
+
+SEQ_LEN = int(getenv('SEQ_LEN', 256))
+BATCH_SIZE = int(getenv('BATCH_SIZE', 64))
+
+#####################
+#
+#  CUSTOM TAGS TUNING
+#
+############### START
+
+CUSTOM_TUNING = False # Set this flag to true in order to use your custom dataset and tags
+CUSTOM_TEXTS = join(DATA_DIR, 'custom-dataset.jl.gz') # Put your own data into the data dir
+TAGS = ['CUSTOM-TAG'] if CUSTOM_TUNING else [PER, LOC, ORG] # List all your custom tags 
+
+################# END
 
 
 def process_batch(model, criterion, batch):

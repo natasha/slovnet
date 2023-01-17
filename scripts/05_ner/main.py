@@ -93,10 +93,6 @@ S3_MODEL_SHAPE = join(S3_DIR, MODEL_SHAPE)
 S3_MODEL_ENCODER = join(S3_DIR, MODEL_ENCODER)
 S3_MODEL_NER = join(S3_DIR, MODEL_NER)
 
-ID = 'slovnet_ner_news_v1'
-PACK = ID + '.tar'
-S3_PACK = join('packs', PACK)
-
 BOARD_NAME = getenv('board_name', '05_ner')
 RUNS_DIR = 'runs'
 
@@ -120,13 +116,27 @@ LAYER_DIMS = [
     for _ in reversed(range(LAYERS_NUM))
 ]
 
+#####################
+#
+#  CUSTOM TAGS TUNING
+#
+############### START
+
+CUSTOM_TUNING = True # Set this flag to true in order to use your custom dataset and tags
+CUSTOM_TEXTS = join(DATA_DIR, 'big-synthetic-dataset.jl.gz') # Put your own data into the data dir
+TAGS = ['CUSTOM-TAG'] if CUSTOM_TUNING else [PER, LOC, ORG] # List all your custom tags 
+ID = 'slovnet_ner_custom_tags' if CUSTOM_TUNING else 'slovnet_ner_news_v1'
+
+################# END
+
+PACK = ID + '.tar'
+S3_PACK = join('packs', PACK)
 
 def adapt_markup(record):
     return SpanMarkup(
         record.text,
         [Span(_.start, _.stop, _.type) for _ in record.spans]
     )
-
 
 def process_batch(model, criterion, batch):
     input, target = batch

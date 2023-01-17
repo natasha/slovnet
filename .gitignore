@@ -1,6 +1,7 @@
 .DS_Store
 .cache/
 .coverage
+.vscode
 coverage.xml
 *.egg-info/
 *.pyc
@@ -11,9 +12,10 @@ build/
 dist/
 notes/
 data/
-scripts/02_bert_ner/bert/emb.pt
-scripts/02_bert_ner/bert/encoder.pt
-scripts/02_bert_ner/bert/vocab.txt
-scripts/02_bert_ner/model/encoder.pt
-scripts/02_bert_ner/model/ner.pt
+bert/
+model/
+navec/
+rubert/
 events.out.tfevents.*
+slovnet_ner_news_v1.tar
+slovnet_ner_custom_tags.tar
