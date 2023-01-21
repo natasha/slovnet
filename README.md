@@ -1,7 +1,7 @@
 
 <img src="https://github.com/natasha/natasha-logos/blob/master/slovnet.svg">
 
-![CI](https://github.com/natasha/slovnet/workflows/CI/badge.svg) [![codecov](https://codecov.io/gh/natasha/slovnet/branch/master/graph/badge.svg)](https://codecov.io/gh/natasha/slovnet)
+![CI](https://github.com/natasha/slovnet/actions/workflows/test.yml/badge.svg)
 
 SlovNet is a Python library for deep-learning based NLP modeling for Russian language. Library is integrated with other <a href="https://github.com/natasha/">Natasha</a> projects: <a href="https://github.com/natasha/nerus">Nerus</a> — large automatically annotated corpus, <a href="https://github.com/natasha/razdel">Razdel</a> — sentence segmenter, tokenizer and <a href="https://github.com/natasha/navec">Navec</a> — compact Russian embeddings. Slovnet provides high quality practical models for Russian NER, morphology and syntax, see <a href="#evaluation">evaluation section</a> for more:
 
@@ -924,23 +924,23 @@ Slovnet is compated to several existing syntax parsers: <a href="https://github.
 
 ## Development
 
-Tests:
+Dev env
+
+```bash
+python -m venv ~/.venvs/natasha-slovnet
+source ~/.venvs/natasha-slovnet/bin/activate
+
+pip install -r requirements/dev.txt
+pip install -e .
+```
+
+Test
 
 ```bash
 make test
 ```
 
-Package:
-
-```bash
-make version
-git push
-git push --tags
-
-make clean package publish
-```
-
-Rent GPU:
+Rent GPU
 
 ```bash
 yc compute instance create \
@@ -960,7 +960,7 @@ yc compute instance delete --name gpu
 
 ```
 
-Setup instance:
+Setup instance
 
 ```
 sudo locale-gen ru_RU.UTF-8
@@ -998,7 +998,7 @@ rsync -u --exclude data -rv 'gpu:~/slovnet/*' .
 
 ```
 
-Intall dev:
+Intall dev
 
 ```bash
 pip3 install -r slovnet/requirements/dev.txt

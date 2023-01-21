@@ -1,0 +1,4 @@
+torch==1.4.0  # 1.5 compiled with 10.2?
+boto3
+tensorboard
+tqdm
