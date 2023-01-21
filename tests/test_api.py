@@ -10,7 +10,7 @@ from navec import Navec
 from slovnet import NER, Morph, Syntax
 
 
-DATA_DIR = join(dirname(__file__), '../../data/test')
+DATA_DIR = join(dirname(__file__), '../data/test')
 
 
 def download(url, dir=DATA_DIR):
