@@ -6,10 +6,6 @@ with open('README.md') as file:
     description = file.read()
 
 
-with open('requirements/main.txt') as file:
-    requirements = [_.strip() for _ in file]
-
-
 setup(
     name='slovnet',
     version='0.5.0',
@@ -30,6 +26,12 @@ setup(
     ],
     keywords='nlp, deeplearning, russian',
 
-    packages=find_packages(),
-    install_requires=requirements
+    packages=find_packages(
+        exclude=['tests']
+    ),
+    install_requires=[
+        'numpy',
+        'razdel',
+        'navec',
+    ]
 )
