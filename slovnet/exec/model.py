@@ -416,9 +416,8 @@ def gather_head(input, root, index):
     batch_size, seq_len, emb_dim = input.shape
     input = append_root(input, root)
 
-    zero = np.zeros((batch_size, 1), dtype=np.long)
+    zero = np.zeros((batch_size, 1), dtype=np.int_)
     index = np.concatenate((zero, index), axis=-1)
-
     # flatten input, absolute indexing
     input = input.reshape(-1, emb_dim)  # batch * seq x dim
     offset = np.arange(batch_size) * (seq_len + 1)
