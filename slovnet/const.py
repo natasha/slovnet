@@ -38,8 +38,8 @@ REL = 'rel'
 #########
 
 B = 'B'
-I = 'I'
-O = 'O'
+I = 'I'  # noqa E741
+O = 'O'  # noqa
 
 PER = 'PER'
 LOC = 'LOC'
