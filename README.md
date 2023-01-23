@@ -957,7 +957,6 @@ yc compute instance create \
   --preemptible
 
 yc compute instance delete --name gpu
-
 ```
 
 Setup instance
@@ -995,13 +994,11 @@ ssh -Nf gpu -L 8888:localhost:8888 -L 6006:localhost:6006
 scp ~/.slovnet.json gpu:~
 rsync --exclude data -rv . gpu:~/slovnet
 rsync -u --exclude data -rv 'gpu:~/slovnet/*' .
-
 ```
 
 Intall dev
 
 ```bash
-pip3 install -r slovnet/requirements/dev.txt
+pip3 install -r slovnet/requirements/dev.txt -r slovnet/requirements/gpu.txt
 pip3 install -e slovnet
-
 ```
