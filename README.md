@@ -1002,3 +1002,17 @@ Intall dev
 pip3 install -r slovnet/requirements/dev.txt -r slovnet/requirements/gpu.txt
 pip3 install -e slovnet
 ```
+
+Release
+
+```bash
+# Update setup.py version
+
+git commit -am 'Up version'
+git tag v0.6.0
+
+git push
+git push --tags
+
+# Github Action builds dist and publishes to PyPi
+```

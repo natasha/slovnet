@@ -8,7 +8,7 @@ with open('README.md') as file:
 
 setup(
     name='slovnet',
-    version='0.5.0',
+    version='0.6.0',
 
     description='Deep-learning based NLP modeling for Russian language',
     long_description=description,
